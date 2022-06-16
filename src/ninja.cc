@@ -648,7 +648,7 @@ int NinjaMain::ToolRules(const Options* options, int argc, char* argv[]) {
 
   // Print rules
 
-  typedef map<string, const Rule*> Rules;
+  using Rules = map<string, const Rule*>;
   const Rules& rules = state_.bindings_.GetRules();
   for (Rules::const_iterator i = rules.begin(); i != rules.end(); ++i) {
     printf("%s", i->first.c_str());

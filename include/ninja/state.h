@@ -84,7 +84,7 @@ struct Pool {
     }
   };
 
-  typedef std::set<Edge*, WeightedEdgeCmp> DelayedEdges;
+  using DelayedEdges = std::set<Edge*, WeightedEdgeCmp>;
   DelayedEdges delayed_;
 };
 

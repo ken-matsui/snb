@@ -258,7 +258,7 @@ struct EdgeCmp {
   }
 };
 
-typedef std::set<Edge*, EdgeCmp> EdgeSet;
+using EdgeSet = std::set<Edge*, EdgeCmp>;
 
 /// ImplicitDepLoader loads implicit dependencies, as referenced via the
 /// "depfile" attribute in build files.

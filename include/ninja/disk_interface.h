@@ -84,18 +84,6 @@ struct RealDiskInterface : public DiskInterface {
 
   /// Whether stat information can be cached.  Only has an effect on Windows.
   void AllowStatCache(bool allow);
-
- private:
-#ifdef _WIN32
-  /// Whether stat information can be cached.
-  bool use_cache_;
-
-  typedef std::map<std::string, TimeStamp> DirCache;
-  // TODO: Neither a map nor a hashmap seems ideal here.  If the statcache
-  // works out, come up with a better data structure.
-  typedef std::map<std::string, DirCache> Cache;
-  mutable Cache cache_;
-#endif
 };
 
 #endif  // NINJA_DISK_INTERFACE_H_

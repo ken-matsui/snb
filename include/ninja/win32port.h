@@ -22,11 +22,11 @@
 #include <inttypes.h>
 #endif
 
-typedef signed short int16_t;
-typedef unsigned short uint16_t;
+using int16_t = signed short;
+using uint16_t = unsigned short;
 /// A 64-bit integer type
-typedef signed long long int64_t;
-typedef unsigned long long uint64_t;
+using int64_t = signed long long;
+using uint64_t = unsigned long long;
 
 // printf format specifier for uint64_t, from C99.
 #ifndef PRIu64
