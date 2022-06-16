@@ -58,8 +58,8 @@ unsigned int MurmurHash2(const void* key, size_t len) {
 namespace std {
 template<>
 struct hash<StringPiece> {
-  typedef StringPiece argument_type;
-  typedef size_t result_type;
+  using argument_type = StringPiece;
+  using result_type = size_t;
 
   size_t operator()(StringPiece key) const {
     return MurmurHash2(key.str_, key.len_);

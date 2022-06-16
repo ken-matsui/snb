@@ -23,7 +23,7 @@
 /// externally.  It is useful for reducing the number of std::strings
 /// we need to allocate.
 struct StringPiece {
-  typedef const char* const_iterator;
+  using const_iterator = const char*;
 
   StringPiece() : str_(NULL), len_(0) {}
 

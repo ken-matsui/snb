@@ -51,7 +51,7 @@ struct EvalString {
 
 private:
   enum TokenType { RAW, SPECIAL };
-  typedef std::vector<std::pair<std::string, TokenType> > TokenList;
+  using TokenList = std::vector<std::pair<std::string, TokenType>>;
   TokenList parsed_;
 };
 
@@ -72,7 +72,7 @@ struct Rule {
   friend struct ManifestParser;
 
   std::string name_;
-  typedef std::map<std::string, EvalString> Bindings;
+  using Bindings = std::map<std::string, EvalString>;
   Bindings bindings_;
 };
 
