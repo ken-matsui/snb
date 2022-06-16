@@ -81,9 +81,6 @@ struct RealDiskInterface : public DiskInterface {
   virtual Status ReadFile(const std::string& path, std::string* contents,
                           std::string* err);
   virtual int RemoveFile(const std::string& path);
-
-  /// Whether stat information can be cached.  Only has an effect on Windows.
-  void AllowStatCache(bool allow);
 };
 
 #endif  // NINJA_DISK_INTERFACE_H_
