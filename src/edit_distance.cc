@@ -19,8 +19,8 @@
 
 using namespace std;
 
-int EditDistance(const std::string_view& s1,
-                 const std::string_view& s2,
+int EditDistance(std::string_view s1,
+                 std::string_view s2,
                  bool allow_replacements,
                  int max_edit_distance) {
   // The algorithm implemented below is the "classic"
