@@ -16,9 +16,8 @@
 #define NINJA_DEPFILE_PARSER_H_
 
 #include <string>
+#include <string_view>
 #include <vector>
-
-#include "string_piece.h"
 
 struct DepfileParserOptions {
   DepfileParserOptions() {}
@@ -34,8 +33,8 @@ struct DepfileParser {
   /// pointers within it.
   bool Parse(std::string* content, std::string* err);
 
-  std::vector<StringPiece> outs_;
-  std::vector<StringPiece> ins_;
+  std::vector<std::string_view> outs_;
+  std::vector<std::string_view> ins_;
   DepfileParserOptions options_;
 };
 

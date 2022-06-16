@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <string.h>
-#include "string_piece.h"
 #include "util.h"
 
 // MurmurHash2, by Austin Appleby
@@ -54,17 +53,5 @@ unsigned int MurmurHash2(const void* key, size_t len) {
 }
 
 #include <unordered_map>
-
-namespace std {
-template<>
-struct hash<StringPiece> {
-  using argument_type = StringPiece;
-  using result_type = size_t;
-
-  size_t operator()(StringPiece key) const {
-    return MurmurHash2(key.str_, key.len_);
-  }
-};
-}
 
 #endif // NINJA_MAP_H_

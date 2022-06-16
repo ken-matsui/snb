@@ -40,7 +40,7 @@ struct NodeStoringImplicitDepLoader : public ImplicitDepLoader {
 
  protected:
   virtual bool ProcessDepfileDeps(Edge* edge,
-                                  std::vector<StringPiece>* depfile_ins,
+                                  std::vector<std::string_view>* depfile_ins,
                                   std::string* err);
 
  private:
@@ -48,11 +48,12 @@ struct NodeStoringImplicitDepLoader : public ImplicitDepLoader {
 };
 
 bool NodeStoringImplicitDepLoader::ProcessDepfileDeps(
-    Edge* edge, std::vector<StringPiece>* depfile_ins, std::string* err) {
-  for (std::vector<StringPiece>::iterator i = depfile_ins->begin();
+    Edge* edge, std::vector<std::string_view>* depfile_ins, std::string* err) {
+  for (std::vector<std::string_view>::iterator i = depfile_ins->begin();
        i != depfile_ins->end(); ++i) {
     uint64_t slash_bits;
-    CanonicalizePath(const_cast<char*>(i->str_), &i->len_, &slash_bits);
+    size_t size = i->size();
+    CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
     Node* node = state_->GetNode(*i, slash_bits);
     dep_nodes_output_->push_back(node);
   }

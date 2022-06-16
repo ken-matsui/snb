@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <stdio.h>
 
 #include "hash_map.h"
@@ -31,7 +32,7 @@ struct Edge;
 struct BuildLogUser {
   /// Return if a given output is no longer part of the build manifest.
   /// This is only called during recompaction and doesn't have to be fast.
-  [[nodiscard]] virtual bool IsPathDead(StringPiece s) const = 0;
+  [[nodiscard]] virtual bool IsPathDead(std::string_view s) const = 0;
 };
 
 /// Store a log of every command ran for every build.
@@ -63,7 +64,7 @@ struct BuildLog {
     int end_time;
     TimeStamp mtime;
 
-    static uint64_t HashCommand(StringPiece command);
+    static uint64_t HashCommand(std::string_view command);
 
     // Used by tests.
     bool operator==(const LogEntry& o) const {
@@ -88,10 +89,10 @@ struct BuildLog {
                  std::string* err);
 
   /// Restat all outputs in the log
-  bool Restat(StringPiece path, const DiskInterface& disk_interface,
+  bool Restat(std::string_view path, const DiskInterface& disk_interface,
               int output_count, char** outputs, std::string* err);
 
-  using Entries = std::unordered_map<StringPiece, std::unique_ptr<LogEntry>>;
+  using Entries = std::unordered_map<std::string_view, std::unique_ptr<LogEntry>>;
   [[nodiscard]] const Entries& entries() const { return entries_; }
 
  private:

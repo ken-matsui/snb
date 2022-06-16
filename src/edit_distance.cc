@@ -19,8 +19,8 @@
 
 using namespace std;
 
-int EditDistance(const StringPiece& s1,
-                 const StringPiece& s2,
+int EditDistance(const std::string_view& s1,
+                 const std::string_view& s2,
                  bool allow_replacements,
                  int max_edit_distance) {
   // The algorithm implemented below is the "classic"
@@ -35,8 +35,8 @@ int EditDistance(const StringPiece& s1,
   // only the entries to the left, top, and top-left are needed.  The left
   // entry is in row[x-1], the top entry is what's in row[x] from the last
   // iteration, and the top-left entry is stored in previous.
-  int m = s1.len_;
-  int n = s2.len_;
+  int m = s1.size();
+  int n = s2.size();
 
   vector<int> row(n + 1);
   for (int i = 1; i <= n; ++i)
@@ -50,11 +50,11 @@ int EditDistance(const StringPiece& s1,
     for (int x = 1; x <= n; ++x) {
       int old_row = row[x];
       if (allow_replacements) {
-        row[x] = min(previous + (s1.str_[y - 1] == s2.str_[x - 1] ? 0 : 1),
+        row[x] = min(previous + (s1[y - 1] == s2[x - 1] ? 0 : 1),
                      min(row[x - 1], row[x]) + 1);
       }
       else {
-        if (s1.str_[y - 1] == s2.str_[x - 1])
+        if (s1[y - 1] == s2[x - 1])
           row[x] = previous;
         else
           row[x] = min(row[x - 1], row[x]) + 1;

@@ -14,7 +14,6 @@
 
 #include "includes_normalize.h"
 
-#include "string_piece.h"
 #include "string_piece_util.h"
 #include "util.h"
 

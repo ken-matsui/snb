@@ -906,10 +906,11 @@ bool Builder::ExtractDeps(CommandRunner::Result* result,
 
     // XXX check depfile matches expected output.
     deps_nodes->reserve(deps.ins_.size());
-    for (vector<StringPiece>::iterator i = deps.ins_.begin();
+    for (vector<std::string_view>::iterator i = deps.ins_.begin();
          i != deps.ins_.end(); ++i) {
       uint64_t slash_bits;
-      CanonicalizePath(const_cast<char*>(i->str_), &i->len_, &slash_bits);
+      size_t size = i->size();
+      CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
       deps_nodes->push_back(state_->GetNode(*i, slash_bits));
     }
 

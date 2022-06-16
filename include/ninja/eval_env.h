@@ -19,8 +19,6 @@
 #include <string>
 #include <vector>
 
-#include "string_piece.h"
-
 struct Rule;
 
 /// An interface for a scope for variable (e.g. "$foo") lookups.
@@ -42,8 +40,8 @@ struct EvalString {
   void Clear() { parsed_.clear(); }
   bool empty() const { return parsed_.empty(); }
 
-  void AddText(StringPiece text);
-  void AddSpecial(StringPiece text);
+  void AddText(std::string_view text);
+  void AddSpecial(std::string_view text);
 
   /// Construct a human-readable representation of the parsed state,
   /// for use in tests.

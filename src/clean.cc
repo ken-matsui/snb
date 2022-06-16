@@ -139,7 +139,7 @@ int Cleaner::CleanDead(const BuildLog::Entries& entries) {
     //   graph.
     //
     if (!n || (!n->in_edge() && n->out_edges().empty())) {
-      Remove(i->first.AsString());
+      Remove(std::string(i->first));
     }
   }
   PrintFooter();
