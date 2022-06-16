@@ -485,7 +485,7 @@ struct CGroupSubSys {
     vector<std::string_view> pieces =
         SplitStringPiece(std::string_view(line.c_str() + first + 1), ',');
     for (size_t i = 0; i < pieces.size(); i++) {
-      subsystems.push_back(pieces[i]);
+      subsystems.emplace_back(std::string(pieces[i]));
     }
     return true;
   }
