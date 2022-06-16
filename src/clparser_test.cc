@@ -118,11 +118,7 @@ TEST(CLParserTest, DuplicatedHeaderPathConverted) {
   const char kInput[] =
       "Note: including file: sub/./foo.h\r\n"
       "Note: including file: bar.h\r\n"
-#ifdef _WIN32
-      "Note: including file: sub\\foo.h\r\n";
-#else
       "Note: including file: sub/foo.h\r\n";
-#endif
   ASSERT_TRUE(parser.Parse(kInput, "", &output, &err));
   // We should have dropped one copy of foo.h.
   ASSERT_EQ("", output);

@@ -14,10 +14,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#ifdef _WIN32
-#include <io.h>
-#include <windows.h>
-#endif
 
 #include "disk_interface.h"
 #include "graph.h"
@@ -67,15 +63,9 @@ TEST_F(DiskInterfaceTest, StatMissingFile) {
 
 TEST_F(DiskInterfaceTest, StatBadPath) {
   string err;
-#ifdef _WIN32
-  string bad_path("cc:\\foo");
-  EXPECT_EQ(-1, disk_.Stat(bad_path, &err));
-  EXPECT_NE("", err);
-#else
   string too_long_name(512, 'x');
   EXPECT_EQ(-1, disk_.Stat(too_long_name, &err));
   EXPECT_NE("", err);
-#endif
 }
 
 TEST_F(DiskInterfaceTest, StatExistingFile) {
@@ -106,68 +96,6 @@ TEST_F(DiskInterfaceTest, StatExistingDir) {
             disk_.Stat("subdir/subsubdir/.", &err));
 }
 
-#ifdef _WIN32
-TEST_F(DiskInterfaceTest, StatCache) {
-  string err;
-
-  ASSERT_TRUE(Touch("file1"));
-  ASSERT_TRUE(Touch("fiLE2"));
-  ASSERT_TRUE(disk_.MakeDir("subdir"));
-  ASSERT_TRUE(disk_.MakeDir("subdir/subsubdir"));
-  ASSERT_TRUE(Touch("subdir\\subfile1"));
-  ASSERT_TRUE(Touch("subdir\\SUBFILE2"));
-  ASSERT_TRUE(Touch("subdir\\SUBFILE3"));
-
-  disk_.AllowStatCache(false);
-  TimeStamp parent_stat_uncached = disk_.Stat("..", &err);
-  disk_.AllowStatCache(true);
-
-  EXPECT_GT(disk_.Stat("FIle1", &err), 1);
-  EXPECT_EQ("", err);
-  EXPECT_GT(disk_.Stat("file1", &err), 1);
-  EXPECT_EQ("", err);
-
-  EXPECT_GT(disk_.Stat("subdir/subfile2", &err), 1);
-  EXPECT_EQ("", err);
-  EXPECT_GT(disk_.Stat("sUbdir\\suBFile1", &err), 1);
-  EXPECT_EQ("", err);
-
-  EXPECT_GT(disk_.Stat("..", &err), 1);
-  EXPECT_EQ("", err);
-  EXPECT_GT(disk_.Stat(".", &err), 1);
-  EXPECT_EQ("", err);
-  EXPECT_GT(disk_.Stat("subdir", &err), 1);
-  EXPECT_EQ("", err);
-  EXPECT_GT(disk_.Stat("subdir/subsubdir", &err), 1);
-  EXPECT_EQ("", err);
-
-#ifndef _MSC_VER // TODO: Investigate why. Also see https://github.com/ninja-build/ninja/pull/1423
-  EXPECT_EQ(disk_.Stat("subdir", &err),
-            disk_.Stat("subdir/.", &err));
-  EXPECT_EQ("", err);
-  EXPECT_EQ(disk_.Stat("subdir", &err),
-            disk_.Stat("subdir/subsubdir/..", &err));
-#endif
-  EXPECT_EQ("", err);
-  EXPECT_EQ(disk_.Stat("..", &err), parent_stat_uncached);
-  EXPECT_EQ("", err);
-  EXPECT_EQ(disk_.Stat("subdir/subsubdir", &err),
-            disk_.Stat("subdir/subsubdir/.", &err));
-  EXPECT_EQ("", err);
-
-  // Test error cases.
-  string bad_path("cc:\\foo");
-  EXPECT_EQ(-1, disk_.Stat(bad_path, &err));
-  EXPECT_NE("", err); err.clear();
-  EXPECT_EQ(-1, disk_.Stat(bad_path, &err));
-  EXPECT_NE("", err); err.clear();
-  EXPECT_EQ(0, disk_.Stat("nosuchfile", &err));
-  EXPECT_EQ("", err);
-  EXPECT_EQ(0, disk_.Stat("nosuchdir/nosuchfile", &err));
-  EXPECT_EQ("", err);
-}
-#endif
-
 TEST_F(DiskInterfaceTest, ReadFile) {
   string err;
   std::string content;
@@ -196,13 +124,6 @@ TEST_F(DiskInterfaceTest, MakeDirs) {
   FILE* f = fopen((path + "a_file").c_str(), "w");
   EXPECT_TRUE(f);
   EXPECT_EQ(0, fclose(f));
-#ifdef _WIN32
-  string path2 = "another\\with\\back\\\\slashes\\";
-  EXPECT_TRUE(disk_.MakeDirs(path2));
-  FILE* f2 = fopen((path2 + "a_file").c_str(), "w");
-  EXPECT_TRUE(f2);
-  EXPECT_EQ(0, fclose(f2));
-#endif
 }
 
 TEST_F(DiskInterfaceTest, RemoveFile) {
@@ -211,12 +132,6 @@ TEST_F(DiskInterfaceTest, RemoveFile) {
   EXPECT_EQ(0, disk_.RemoveFile(kFileName));
   EXPECT_EQ(1, disk_.RemoveFile(kFileName));
   EXPECT_EQ(1, disk_.RemoveFile("does not exist"));
-#ifdef _WIN32
-  ASSERT_TRUE(Touch(kFileName));
-  EXPECT_EQ(0, system((std::string("attrib +R ") + kFileName).c_str()));
-  EXPECT_EQ(0, disk_.RemoveFile(kFileName));
-  EXPECT_EQ(1, disk_.RemoveFile(kFileName));
-#endif
 }
 
 TEST_F(DiskInterfaceTest, RemoveDirectory) {
@@ -229,7 +144,7 @@ TEST_F(DiskInterfaceTest, RemoveDirectory) {
 
 struct StatTest : public StateTestWithBuiltinRules,
                   public DiskInterface {
-  StatTest() : scan_(&state_, NULL, NULL, this, NULL) {}
+  StatTest() : scan_(&state_, nullptr, nullptr, this, nullptr) {}
 
   // DiskInterface implementation.
   virtual TimeStamp Stat(const string& path, string* err) const;
@@ -272,7 +187,7 @@ TEST_F(StatTest, Simple) {
   EXPECT_TRUE(out->Stat(this, &err));
   EXPECT_EQ("", err);
   ASSERT_EQ(1u, stats_.size());
-  scan_.RecomputeDirty(out, NULL, NULL);
+  scan_.RecomputeDirty(out, nullptr, nullptr);
   ASSERT_EQ(2u, stats_.size());
   ASSERT_EQ("out", stats_[0]);
   ASSERT_EQ("in",  stats_[1]);
@@ -288,7 +203,7 @@ TEST_F(StatTest, TwoStep) {
   EXPECT_TRUE(out->Stat(this, &err));
   EXPECT_EQ("", err);
   ASSERT_EQ(1u, stats_.size());
-  scan_.RecomputeDirty(out, NULL, NULL);
+  scan_.RecomputeDirty(out, nullptr, NULL);
   ASSERT_EQ(3u, stats_.size());
   ASSERT_EQ("out", stats_[0]);
   ASSERT_TRUE(GetNode("out")->dirty());

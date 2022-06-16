@@ -12,22 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef _WIN32
-#include <direct.h>  // Has to be before util.h is included.
-#endif
-
 #include "test.h"
 
 #include <algorithm>
 
 #include <errno.h>
 #include <stdlib.h>
-#ifdef _WIN32
-#include <windows.h>
-#include <io.h>
-#else
 #include <unistd.h>
-#endif
 
 #include "build_log.h"
 #include "graph.h"
@@ -47,37 +38,11 @@ using namespace std;
 
 namespace {
 
-#ifdef _WIN32
-/// Windows has no mkdtemp.  Implement it in terms of _mktemp_s.
-char* mkdtemp(char* name_template) {
-  int err = _mktemp_s(name_template, strlen(name_template) + 1);
-  if (err < 0) {
-    perror("_mktemp_s");
-    return NULL;
-  }
-
-  err = _mkdir(name_template);
-  if (err < 0) {
-    perror("mkdir");
-    return NULL;
-  }
-
-  return name_template;
-}
-#endif  // _WIN32
-
 string GetSystemTempDir() {
-#ifdef _WIN32
-  char buf[1024];
-  if (!GetTempPath(sizeof(buf), buf))
-    return "";
-  return buf;
-#else
   const char* tempdir = getenv("TMPDIR");
   if (tempdir)
     return tempdir;
   return "/tmp";
-#endif
 }
 
 }  // anonymous namespace
@@ -99,7 +64,7 @@ Node* StateTestWithBuiltinRules::GetNode(const string& path) {
 
 void AssertParse(State* state, const char* input,
                  ManifestParserOptions opts) {
-  ManifestParser parser(state, NULL, opts);
+  ManifestParser parser(state, nullptr, opts);
   string err;
   EXPECT_TRUE(parser.ParseTest(input, &err));
   ASSERT_EQ("", err);
@@ -225,11 +190,7 @@ void ScopedTempDir::Cleanup() {
   if (chdir(start_dir_.c_str()) < 0)
     Fatal("chdir: %s", strerror(errno));
 
-#ifdef _WIN32
-  string command = "rmdir /s /q " + temp_dir_name_;
-#else
   string command = "rm -rf " + temp_dir_name_;
-#endif
   if (system(command.c_str()) < 0)
     Fatal("system: %s", strerror(errno));
 

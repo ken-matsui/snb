@@ -91,11 +91,7 @@ struct BuildLog {
   bool Restat(StringPiece path, const DiskInterface& disk_interface,
               int output_count, char** outputs, std::string* err);
 
-  #if NINJA_CPP11
-    using Entries = ExternalStringHashMap<std::unique_ptr<LogEntry>>::Type;
-  #else
-    typedef ExternalStringHashMap<LogEntry*>::Type Entries;
-  #endif
+  using Entries = ExternalStringHashMap<std::unique_ptr<LogEntry>>::Type;
   const Entries& entries() const { return entries_; }
 
  private:

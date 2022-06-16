@@ -41,9 +41,9 @@ unsigned int MurmurHash2(const void* key, size_t len) {
   }
   switch (len) {
   case 3: h ^= data[2] << 16;
-          NINJA_FALLTHROUGH;
+          [[fallthrough]];
   case 2: h ^= data[1] << 8;
-          NINJA_FALLTHROUGH;
+          [[fallthrough]];
   case 1: h ^= data[0];
     h *= m;
   };

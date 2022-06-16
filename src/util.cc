@@ -69,15 +69,7 @@ void Fatal(const char* msg, ...) {
   vfprintf(stderr, msg, ap);
   va_end(ap);
   fprintf(stderr, "\n");
-#ifdef _WIN32
-  // On Windows, some tools may inject extra threads.
-  // exit() may block on locks held by those threads, so forcibly exit.
-  fflush(stderr);
-  fflush(stdout);
-  ExitProcess(1);
-#else
   exit(1);
-#endif
 }
 
 void Warning(const char* msg, va_list ap) {
@@ -129,11 +121,7 @@ void CanonicalizePath(string* path, uint64_t* slash_bits) {
 }
 
 static bool IsPathSeparator(char c) {
-#ifdef _WIN32
-  return c == '/' || c == '\\';
-#else
   return c == '/';
-#endif
 }
 
 void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
@@ -153,20 +141,8 @@ void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
   const char* end = start + *len;
 
   if (IsPathSeparator(*src)) {
-#ifdef _WIN32
-
-    // network path starts with //
-    if (*len > 1 && IsPathSeparator(*(src + 1))) {
-      src += 2;
-      dst += 2;
-    } else {
-      ++src;
-      ++dst;
-    }
-#else
     ++src;
     ++dst;
-#endif
   }
 
   while (src < end) {
@@ -211,25 +187,7 @@ void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
   }
 
   *len = dst - start - 1;
-#ifdef _WIN32
-  uint64_t bits = 0;
-  uint64_t bits_mask = 1;
-
-  for (char* c = start; c < start + *len; ++c) {
-    switch (*c) {
-      case '\\':
-        bits |= bits_mask;
-        *c = '/';
-        NINJA_FALLTHROUGH;
-      case '/':
-        bits_mask <<= 1;
-    }
-  }
-
-  *slash_bits = bits;
-#else
   *slash_bits = 0;
-#endif
 }
 
 static inline bool IsKnownShellSafeCharacter(char ch) {
@@ -336,33 +294,6 @@ void GetWin32EscapedString(const string& input, string* result) {
 }
 
 int ReadFile(const string& path, string* contents, string* err) {
-#ifdef _WIN32
-  // This makes a ninja run on a set of 1500 manifest files about 4% faster
-  // than using the generic fopen code below.
-  err->clear();
-  HANDLE f = ::CreateFileA(path.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL,
-                           OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-  if (f == INVALID_HANDLE_VALUE) {
-    err->assign(GetLastErrorString());
-    return -ENOENT;
-  }
-
-  for (;;) {
-    DWORD len;
-    char buf[64 << 10];
-    if (!::ReadFile(f, buf, sizeof(buf), &len, NULL)) {
-      err->assign(GetLastErrorString());
-      contents->clear();
-      ::CloseHandle(f);
-      return -EIO;
-    }
-    if (len == 0)
-      break;
-    contents->append(buf, len);
-  }
-  ::CloseHandle(f);
-  return 0;
-#else
   FILE* f = fopen(path.c_str(), "rb");
   if (!f) {
     err->assign(strerror(errno));
@@ -392,7 +323,6 @@ int ReadFile(const string& path, string* contents, string* err) {
   }
   fclose(f);
   return 0;
-#endif
 }
 
 void SetCloseOnExec(int fd) {
@@ -419,7 +349,7 @@ const char* SpellcheckStringV(const string& text,
   const int kMaxValidEditDistance = 3;
 
   int min_distance = kMaxValidEditDistance + 1;
-  const char* result = NULL;
+  const char* result = nullptr;
   for (vector<const char*>::const_iterator i = words.begin();
        i != words.end(); ++i) {
     int distance = EditDistance(*i, text, kAllowReplacements,
@@ -444,35 +374,6 @@ const char* SpellcheckString(const char* text, ...) {
   va_end(ap);
   return SpellcheckStringV(text, words);
 }
-
-#ifdef _WIN32
-string GetLastErrorString() {
-  DWORD err = GetLastError();
-
-  char* msg_buf;
-  FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        err,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (char*)&msg_buf,
-        0,
-        NULL);
-  string msg = msg_buf;
-  LocalFree(msg_buf);
-  return msg;
-}
-
-void Win32Fatal(const char* function, const char* hint) {
-  if (hint) {
-    Fatal("%s: %s (%s)", function, GetLastErrorString().c_str(), hint);
-  } else {
-    Fatal("%s: %s", function, GetLastErrorString().c_str());
-  }
-}
-#endif
 
 bool islatinalpha(int c) {
   // isalpha() is locale-dependent.
@@ -652,52 +553,6 @@ int ParseCPUFromCGroup() {
 #endif
 
 int GetProcessorCount() {
-#ifdef _WIN32
-  DWORD cpuCount = 0;
-#ifndef _WIN64
-  // Need to use GetLogicalProcessorInformationEx to get real core count on
-  // machines with >64 cores. See https://stackoverflow.com/a/31209344/21475
-  DWORD len = 0;
-  if (!GetLogicalProcessorInformationEx(RelationProcessorCore, nullptr, &len)
-        && GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-    std::vector<char> buf(len);
-    int cores = 0;
-    if (GetLogicalProcessorInformationEx(RelationProcessorCore,
-          reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(
-            buf.data()), &len)) {
-      for (DWORD i = 0; i < len; ) {
-        auto info = reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>(
-            buf.data() + i);
-        if (info->Relationship == RelationProcessorCore &&
-            info->Processor.GroupCount == 1) {
-          for (KAFFINITY core_mask = info->Processor.GroupMask[0].Mask;
-               core_mask; core_mask >>= 1) {
-            cores += (core_mask & 1);
-          }
-        }
-        i += info->Size;
-      }
-      if (cores != 0) {
-        cpuCount = cores;
-      }
-    }
-  }
-#endif
-  if (cpuCount == 0) {
-    cpuCount = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
-  }
-  JOBOBJECT_CPU_RATE_CONTROL_INFORMATION info;
-  // reference:
-  // https://docs.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_cpu_rate_control_information
-  if (QueryInformationJobObject(NULL, JobObjectCpuRateControlInformation, &info,
-                                sizeof(info), NULL)) {
-    if (info.ControlFlags & (JOB_OBJECT_CPU_RATE_CONTROL_ENABLE |
-                             JOB_OBJECT_CPU_RATE_CONTROL_HARD_CAP)) {
-      return cpuCount * info.CpuRate / 10000;
-    }
-  }
-  return cpuCount;
-#else
   int cgroupCount = -1;
   int schedCount = -1;
 #if defined(linux) || defined(__GLIBC__)
@@ -722,7 +577,6 @@ int GetProcessorCount() {
   if (cgroupCount >= 0 && schedCount >= 0) return std::min(cgroupCount, schedCount);
   if (cgroupCount < 0 && schedCount < 0) return sysconf(_SC_NPROCESSORS_ONLN);
   return std::max(cgroupCount, schedCount);
-#endif
 }
 
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -847,14 +701,7 @@ string ElideMiddle(const string& str, size_t width) {
 }
 
 bool Truncate(const string& path, size_t size, string* err) {
-#ifdef _WIN32
-  int fh = _sopen(path.c_str(), _O_RDWR | _O_CREAT, _SH_DENYNO,
-                  _S_IREAD | _S_IWRITE);
-  int success = _chsize(fh, size);
-  _close(fh);
-#else
   int success = truncate(path.c_str(), size);
-#endif
   // Both truncate() and _chsize() return 0 on success and set errno and return
   // -1 on failure.
   if (success < 0) {

@@ -21,11 +21,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-#ifdef _WIN32
-#include "getopt.h"
-#include <direct.h>
-#include <windows.h>
-#elif defined(_AIX)
+#ifdef _AIX
 #include "getopt.h"
 #include <unistd.h>
 #else
@@ -53,14 +49,6 @@
 #include "version.h"
 
 using namespace std;
-
-#ifdef _WIN32
-// Defined in msvc_helper_main-win32.cc.
-int MSVCHelperMain(int argc, char** argv);
-
-// Defined in minidump-win32.cc.
-void CreateWin32MiniDump(_EXCEPTION_POINTERS* pep);
-#endif
 
 namespace {
 
@@ -676,17 +664,6 @@ int NinjaMain::ToolRules(const Options* options, int argc, char* argv[]) {
   return 0;
 }
 
-#ifdef _WIN32
-int NinjaMain::ToolWinCodePage(const Options* options, int argc, char* argv[]) {
-  if (argc != 0) {
-    printf("usage: ninja -t wincodepage\n");
-    return 1;
-  }
-  printf("Build file encoding: %s\n", GetACP() == CP_UTF8? "UTF-8" : "ANSI");
-  return 0;
-}
-#endif
-
 enum PrintCommandMode { PCM_Single, PCM_All };
 void PrintCommands(Edge* edge, EdgeSet* seen, PrintCommandMode mode) {
   if (!edge)
@@ -1082,10 +1059,6 @@ const Tool* ChooseTool(const string& tool_name) {
   static const Tool kTools[] = {
     { "browse", "browse dependency graph in a web browser",
       Tool::RUN_AFTER_LOAD, &NinjaMain::ToolBrowse },
-#ifdef _WIN32
-    { "msvc", "build helper for MSVC cl.exe (DEPRECATED)",
-      Tool::RUN_AFTER_FLAGS, &NinjaMain::ToolMSVC },
-#endif
     { "clean", "clean built files",
       Tool::RUN_AFTER_LOAD, &NinjaMain::ToolClean },
     { "commands", "list all commands required to rebuild given targets",
@@ -1114,10 +1087,6 @@ const Tool* ChooseTool(const string& tool_name) {
       Tool::RUN_AFTER_LOGS, &NinjaMain::ToolCleanDead },
     { "urtle", NULL,
       Tool::RUN_AFTER_FLAGS, &NinjaMain::ToolUrtle },
-#ifdef _WIN32
-    { "wincodepage", "print the Windows code page used by ninja",
-      Tool::RUN_AFTER_FLAGS, &NinjaMain::ToolWinCodePage },
-#endif
     { NULL, NULL, Tool::RUN_AFTER_FLAGS, NULL }
   };
 
@@ -1157,9 +1126,6 @@ bool DebugEnable(const string& name) {
 "  explain      explain what caused a command to execute\n"
 "  keepdepfile  don't delete depfiles after they're read by ninja\n"
 "  keeprsp      don't delete @response files on success\n"
-#ifdef _WIN32
-"  nostatcache  don't batch stat() calls per directory and cache them\n"
-#endif
 "multiple modes can be enabled via -d FOO -d BAR\n");
     return false;
   } else if (name == "stats") {
