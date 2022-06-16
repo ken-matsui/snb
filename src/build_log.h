@@ -15,6 +15,7 @@
 #ifndef NINJA_BUILD_LOG_H_
 #define NINJA_BUILD_LOG_H_
 
+#include <memory>
 #include <string>
 #include <stdio.h>
 
@@ -90,7 +91,11 @@ struct BuildLog {
   bool Restat(StringPiece path, const DiskInterface& disk_interface,
               int output_count, char** outputs, std::string* err);
 
-  typedef ExternalStringHashMap<LogEntry*>::Type Entries;
+  #if NINJA_CPP11
+    using Entries = ExternalStringHashMap<std::unique_ptr<LogEntry>>::Type;
+  #else
+    typedef ExternalStringHashMap<LogEntry*>::Type Entries;
+  #endif
   const Entries& entries() const { return entries_; }
 
  private:

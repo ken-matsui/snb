@@ -23,6 +23,7 @@
 
 #include <stdarg.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -47,6 +48,24 @@ NORETURN void Fatal(const char* msg, ...);
 #define NINJA_FALLTHROUGH __attribute__ ((fallthrough))
 #else // C++11 on gcc 6, and all other cases
 #define NINJA_FALLTHROUGH
+#endif
+
+/// Whether C++11 features are enabled or not.
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+#  define NINJA_CPP11 true
+#else
+#  define NINJA_CPP11 false
+#endif
+
+#if defined(__cpp_lib_to_address)
+using std::to_address
+#else
+template <typename T>
+T* to_address(T* ptr) { return ptr; }
+#  if NINJA_CPP11
+template <typename T>
+T* to_address(const std::unique_ptr<T>& ptr) { return ptr.get(); }
+#  endif
 #endif
 
 /// Log a warning message.
