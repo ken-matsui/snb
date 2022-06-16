@@ -64,7 +64,7 @@ template <typename T>
 T* to_address(T* ptr) { return ptr; }
 #  if NINJA_CPP11
 template <typename T>
-decltype(auto) to_address(const std::unique_ptr<T>& ptr) { return ptr.get(); }
+auto to_address(const std::unique_ptr<T>& ptr) { return ptr.get(); }
 #  endif
 #endif
 
