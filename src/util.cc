@@ -418,16 +418,16 @@ std::pair<int64_t, bool> readCount(const std::string& path) {
 struct MountPoint {
   int mountId;
   int parentId;
-  StringPiece deviceId;
-  StringPiece root;
-  StringPiece mountPoint;
-  vector<StringPiece> options;
-  vector<StringPiece> optionalFields;
-  StringPiece fsType;
-  StringPiece mountSource;
-  vector<StringPiece> superOptions;
+  std::string_view deviceId;
+  std::string_view root;
+  std::string_view mountPoint;
+  vector<std::string_view> options;
+  vector<std::string_view> optionalFields;
+  std::string_view fsType;
+  std::string_view mountSource;
+  vector<std::string_view> superOptions;
   bool parse(const string& line) {
-    vector<StringPiece> pieces = SplitStringPiece(line, ' ');
+    vector<std::string_view> pieces = SplitStringPiece(line, ' ');
     if (pieces.size() < 10)
       return false;
     size_t optionalStart = 0;
@@ -448,7 +448,7 @@ struct MountPoint {
     mountPoint = pieces[4];
     options = SplitStringPiece(pieces[5], ',');
     optionalFields =
-        vector<StringPiece>(&pieces[6], &pieces[optionalStart - 1]);
+        vector<std::string_view>(&pieces[6], &pieces[optionalStart - 1]);
     fsType = pieces[optionalStart];
     mountSource = pieces[optionalStart + 1];
     superOptions = SplitStringPiece(pieces[optionalStart + 2], ',');
@@ -482,8 +482,8 @@ struct CGroupSubSys {
     line[second] = '\0';
     id = atoi(line.c_str());
     name = line.substr(second + 1);
-    vector<StringPiece> pieces =
-        SplitStringPiece(StringPiece(line.c_str() + first + 1), ',');
+    vector<std::string_view> pieces =
+        SplitStringPiece(std::string_view(line.c_str() + first + 1), ',');
     for (size_t i = 0; i < pieces.size(); i++) {
       subsystems.push_back(pieces[i].AsString());
     }
