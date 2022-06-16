@@ -441,8 +441,8 @@ struct MountPoint {
       return false;
     if (optionalStart + 3 != pieces.size())
       return false;
-    mountId = atoi(pieces[0].AsString().c_str());
-    parentId = atoi(pieces[1].AsString().c_str());
+    mountId = atoi(pieces[0].data());
+    parentId = atoi(pieces[1].data());
     deviceId = pieces[2];
     root = pieces[3];
     mountPoint = pieces[4];
@@ -456,14 +456,14 @@ struct MountPoint {
   }
   string translate(string& path) const {
     // path must be sub dir of root
-    if (path.compare(0, root.len_, root.str_, root.len_) != 0) {
+    if (path.compare(0, root.size(), root.data(), root.size()) != 0) {
       return string();
     }
-    path.erase(0, root.len_);
+    path.erase(0, root.size());
     if (path == ".." || (path.length() > 2 && path.compare(0, 3, "../") == 0)) {
       return string();
     }
-    return mountPoint.AsString() + "/" + path;
+    return std::string(mountPoint) + "/" + path;
   }
 };
 
@@ -485,7 +485,7 @@ struct CGroupSubSys {
     vector<std::string_view> pieces =
         SplitStringPiece(std::string_view(line.c_str() + first + 1), ',');
     for (size_t i = 0; i < pieces.size(); i++) {
-      subsystems.push_back(pieces[i].AsString());
+      subsystems.push_back(pieces[i]);
     }
     return true;
   }
@@ -505,7 +505,7 @@ map<string, string> ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
     if (mp.fsType != "cgroup")
       continue;
     for (size_t i = 0; i < mp.superOptions.size(); i++) {
-      string opt = mp.superOptions[i].AsString();
+      string opt(mp.superOptions[i]);
       map<string, CGroupSubSys>::iterator subsys = subsystems.find(opt);
       if (subsys == subsystems.end())
         continue;
