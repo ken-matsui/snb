@@ -31,7 +31,7 @@ struct Edge;
 struct BuildLogUser {
   /// Return if a given output is no longer part of the build manifest.
   /// This is only called during recompaction and doesn't have to be fast.
-  virtual bool IsPathDead(StringPiece s) const = 0;
+  [[nodiscard]] virtual bool IsPathDead(StringPiece s) const = 0;
 };
 
 /// Store a log of every command ran for every build.
@@ -66,7 +66,7 @@ struct BuildLog {
     static uint64_t HashCommand(StringPiece command);
 
     // Used by tests.
-    bool operator==(const LogEntry& o) {
+    bool operator==(const LogEntry& o) const {
       return output == o.output && command_hash == o.command_hash &&
           start_time == o.start_time && end_time == o.end_time &&
           mtime == o.mtime;
@@ -91,12 +91,8 @@ struct BuildLog {
   bool Restat(StringPiece path, const DiskInterface& disk_interface,
               int output_count, char** outputs, std::string* err);
 
-  #if NINJA_CPP11
-    using Entries = ExternalStringHashMap<std::unique_ptr<LogEntry>>::Type;
-  #else
-    typedef ExternalStringHashMap<LogEntry*>::Type Entries;
-  #endif
-  const Entries& entries() const { return entries_; }
+  using Entries = std::unordered_map<StringPiece, std::unique_ptr<LogEntry>>;
+  [[nodiscard]] const Entries& entries() const { return entries_; }
 
  private:
   /// Should be called before using log_file_. When false is returned, errno

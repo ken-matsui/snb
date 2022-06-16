@@ -166,7 +166,7 @@ bool DependencyScan::RecomputeNodeDirty(Node* node, std::vector<Node*>* stack,
       edge->validations_.begin(), edge->validations_.end());
 
   // Visit all inputs; we're dirty if any of the inputs are dirty.
-  Node* most_recent_input = NULL;
+  Node* most_recent_input = nullptr;
   for (vector<Node*>::iterator i = edge->inputs_.begin();
        i != edge->inputs_.end(); ++i) {
     // Visit this input.
@@ -225,7 +225,7 @@ bool DependencyScan::RecomputeNodeDirty(Node* node, std::vector<Node*>* stack,
 
 bool DependencyScan::VerifyDAG(Node* node, vector<Node*>* stack, string* err) {
   Edge* edge = node->in_edge();
-  assert(edge != NULL);
+  assert(edge != nullptr);
 
   // If we have no temporary mark on the edge then we do not yet have a cycle.
   if (edge->mark_ != Edge::VisitInStack)
@@ -439,11 +439,7 @@ std::string EdgeEnv::MakePathList(const Node* const* const span,
       result.push_back(sep);
     const string& path = (*i)->PathDecanonicalized();
     if (escape_in_out_ == kShellEscape) {
-#ifdef _WIN32
-      GetWin32EscapedString(path, &result);
-#else
       GetShellEscapedString(path, &result);
-#endif
     } else {
       result.append(path);
     }
@@ -459,17 +455,9 @@ void Edge::CollectInputs(bool shell_escape,
     if (shell_escape) {
       std::string unescaped;
       unescaped.swap(path);
-#ifdef _WIN32
-      GetWin32EscapedString(unescaped, &path);
-#else
       GetShellEscapedString(unescaped, &path);
-#endif
     }
-#if __cplusplus >= 201103L
     out->push_back(std::move(path));
-#else
-    out->push_back(path);
-#endif
   }
 }
 
@@ -554,15 +542,6 @@ bool Edge::maybe_phonycycle_diagnostic() const {
 // static
 string Node::PathDecanonicalized(const string& path, uint64_t slash_bits) {
   string result = path;
-#ifdef _WIN32
-  uint64_t mask = 1;
-  for (char* c = &result[0]; (c = strchr(c, '/')) != NULL;) {
-    if (slash_bits & mask)
-      *c = '\\';
-    c++;
-    mask <<= 1;
-  }
-#endif
   return result;
 }
 

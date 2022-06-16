@@ -28,11 +28,7 @@ using namespace std;
 
 namespace {
 
-#ifdef _WIN32
-const char* kSimpleCommand = "cmd /c dir \\";
-#else
 const char* kSimpleCommand = "ls /";
-#endif
 
 struct SubprocessTest : public testing::Test {
   SubprocessSet subprocs_;
@@ -66,10 +62,6 @@ TEST_F(SubprocessTest, NoSuchCommand) {
 
   EXPECT_EQ(ExitFailure, subproc->Finish());
   EXPECT_NE("", subproc->GetOutput());
-#ifdef _WIN32
-  ASSERT_EQ("CreateProcess failed: The system cannot find the file "
-            "specified.\n", subproc->GetOutput());
-#endif
 }
 
 #ifndef _WIN32
@@ -180,13 +172,8 @@ TEST_F(SubprocessTest, SetWithMulti) {
   Subprocess* processes[3];
   const char* kCommands[3] = {
     kSimpleCommand,
-#ifdef _WIN32
-    "cmd /c echo hi",
-    "cmd /c time /t",
-#else
     "id -u",
     "pwd",
-#endif
   };
 
   for (int i = 0; i < 3; ++i) {

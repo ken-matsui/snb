@@ -17,11 +17,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-#endif
-
 #include "debug_flags.h"
 
 using namespace std;
@@ -107,16 +102,7 @@ void StatusPrinter::BuildEdgeFinished(Edge* edge, int64_t end_time_millis,
     else
       final_output = output;
 
-#ifdef _WIN32
-    // Fix extra CR being added on Windows, writing out CR CR LF (#773)
-    _setmode(_fileno(stdout), _O_BINARY);  // Begin Windows extra CR fix
-#endif
-
     printer_.PrintOnNewLine(final_output);
-
-#ifdef _WIN32
-    _setmode(_fileno(stdout), _O_TEXT);  // End Windows extra CR fix
-#endif
   }
 }
 

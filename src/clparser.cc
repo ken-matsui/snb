@@ -21,12 +21,7 @@
 #include "metrics.h"
 #include "string_piece_util.h"
 
-#ifdef _WIN32
-#include "includes_normalize.h"
-#include "string_piece.h"
-#else
 #include "util.h"
-#endif
 
 using namespace std;
 
@@ -85,9 +80,6 @@ bool CLParser::Parse(const string& output, const string& deps_prefix,
   assert(&output != filtered_output);
   size_t start = 0;
   bool seen_show_includes = false;
-#ifdef _WIN32
-  IncludesNormalize normalizer(".");
-#endif
 
   while (start < output.size()) {
     size_t end = output.find_first_of("\r\n", start);
@@ -99,15 +91,10 @@ bool CLParser::Parse(const string& output, const string& deps_prefix,
     if (!include.empty()) {
       seen_show_includes = true;
       string normalized;
-#ifdef _WIN32
-      if (!normalizer.Normalize(include, &normalized, err))
-        return false;
-#else
       // TODO: should this make the path relative to cwd?
       normalized = include;
       uint64_t slash_bits;
       CanonicalizePath(&normalized, &slash_bits);
-#endif
       if (!IsSystemInclude(normalized))
         includes_.insert(normalized);
     } else if (!seen_show_includes && FilterInputFilename(line)) {

@@ -123,7 +123,7 @@ struct State {
   std::vector<Node*> DefaultNodes(std::string* error) const;
 
   /// Mapping of path -> Node.
-  typedef ExternalStringHashMap<Node*>::Type Paths;
+  using Paths = std::unordered_map<StringPiece, Node*>;
   Paths paths_;
 
   /// All the pools used in the graph.

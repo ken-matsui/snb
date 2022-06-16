@@ -41,9 +41,9 @@ unsigned int MurmurHash2(const void* key, size_t len) {
   }
   switch (len) {
   case 3: h ^= data[2] << 16;
-          NINJA_FALLTHROUGH;
+          [[fallthrough]];
   case 2: h ^= data[1] << 8;
-          NINJA_FALLTHROUGH;
+          [[fallthrough]];
   case 1: h ^= data[0];
     h *= m;
   };
@@ -66,14 +66,5 @@ struct hash<StringPiece> {
   }
 };
 }
-
-/// A template for hash_maps keyed by a StringPiece whose string is
-/// owned externally (typically by the values).  Use like:
-/// ExternalStringHash<Foo*>::Type foos; to make foos into a hash
-/// mapping StringPiece => Foo*.
-template<typename V>
-struct ExternalStringHashMap {
-  typedef std::unordered_map<StringPiece, V> Type;
-};
 
 #endif // NINJA_MAP_H_

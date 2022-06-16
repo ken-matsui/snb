@@ -239,11 +239,7 @@ TEST_F(GraphTest, CollectInputs) {
   EXPECT_EQ(5u, inputs.size());
   EXPECT_EQ("in1", inputs[0]);
   EXPECT_EQ("in2", inputs[1]);
-#ifdef _WIN32
-  EXPECT_EQ("\"in with space\"", inputs[2]);
-#else
   EXPECT_EQ("'in with space'", inputs[2]);
-#endif
   EXPECT_EQ("implicit", inputs[3]);
   EXPECT_EQ("order_only", inputs[4]);
 }
@@ -253,13 +249,8 @@ TEST_F(GraphTest, VarInOutPathEscaping) {
 "build a$ b: cat no'space with$ space$$ no\"space2\n"));
 
   Edge* edge = GetNode("a b")->in_edge();
-#ifdef _WIN32
-  EXPECT_EQ("cat no'space \"with space$\" \"no\\\"space2\" > \"a b\"",
-      edge->EvaluateCommand());
-#else
   EXPECT_EQ("cat 'no'\\''space' 'with space$' 'no\"space2' > 'a b'",
       edge->EvaluateCommand());
-#endif
 }
 
 // Regression test for https://github.com/ninja-build/ninja/issues/380
@@ -493,27 +484,6 @@ TEST_F(GraphTest, CycleWithLengthOneFromDepfileOneHopAway) {
   EXPECT_EQ(1, edge->inputs_.size());
   EXPECT_EQ("c", edge->inputs_[0]->path());
 }
-
-#ifdef _WIN32
-TEST_F(GraphTest, Decanonicalize) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(&state_,
-"build out\\out1: cat src\\in1\n"
-"build out\\out2/out3\\out4: cat mid1\n"
-"build out3 out4\\foo: cat mid1\n"));
-
-  string err;
-  vector<Node*> root_nodes = state_.RootNodes(&err);
-  EXPECT_EQ(4u, root_nodes.size());
-  EXPECT_EQ(root_nodes[0]->path(), "out/out1");
-  EXPECT_EQ(root_nodes[1]->path(), "out/out2/out3/out4");
-  EXPECT_EQ(root_nodes[2]->path(), "out3");
-  EXPECT_EQ(root_nodes[3]->path(), "out4/foo");
-  EXPECT_EQ(root_nodes[0]->PathDecanonicalized(), "out\\out1");
-  EXPECT_EQ(root_nodes[1]->PathDecanonicalized(), "out\\out2/out3\\out4");
-  EXPECT_EQ(root_nodes[2]->PathDecanonicalized(), "out3");
-  EXPECT_EQ(root_nodes[3]->PathDecanonicalized(), "out4\\foo");
-}
-#endif
 
 TEST_F(GraphTest, DyndepLoadTrivial) {
   AssertParse(&state_,

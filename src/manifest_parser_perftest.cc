@@ -22,10 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include "getopt.h"
-#include <direct.h>
-#elif defined(_AIX)
+#ifdef _AIX
 #include "getopt.h"
 #include <unistd.h>
 #else

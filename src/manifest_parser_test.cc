@@ -225,11 +225,7 @@ TEST_F(ParserTest, Dollars) {
 "build $x: foo y\n"
 ));
   EXPECT_EQ("$dollar", state.bindings_.LookupVariable("x"));
-#ifdef _WIN32
-  EXPECT_EQ("$dollarbar$baz$blah", state.edges_[0]->EvaluateCommand());
-#else
   EXPECT_EQ("'$dollar'bar$baz$blah", state.edges_[0]->EvaluateCommand());
-#endif
 }
 
 TEST_F(ParserTest, EscapeSpaces) {
@@ -259,26 +255,6 @@ TEST_F(ParserTest, CanonicalizeFile) {
   EXPECT_FALSE(state.LookupNode("in//2"));
 }
 
-#ifdef _WIN32
-TEST_F(ParserTest, CanonicalizeFileBackslashes) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(
-"rule cat\n"
-"  command = cat $in > $out\n"
-"build out: cat in\\1 in\\\\2\n"
-"build in\\1: cat\n"
-"build in\\2: cat\n"));
-
-  Node* node = state.LookupNode("in/1");;
-  EXPECT_TRUE(node);
-  EXPECT_EQ(1, node->slash_bits());
-  node = state.LookupNode("in/2");
-  EXPECT_TRUE(node);
-  EXPECT_EQ(1, node->slash_bits());
-  EXPECT_FALSE(state.LookupNode("in//1"));
-  EXPECT_FALSE(state.LookupNode("in//2"));
-}
-#endif
-
 TEST_F(ParserTest, PathVariables) {
   ASSERT_NO_FATAL_FAILURE(AssertParse(
 "rule cat\n"
@@ -301,34 +277,6 @@ TEST_F(ParserTest, CanonicalizePaths) {
   EXPECT_FALSE(state.LookupNode("./bar/baz/../foo.cc"));
   EXPECT_TRUE(state.LookupNode("bar/foo.cc"));
 }
-
-#ifdef _WIN32
-TEST_F(ParserTest, CanonicalizePathsBackslashes) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(
-"rule cat\n"
-"  command = cat $in > $out\n"
-"build ./out.o: cat ./bar/baz/../foo.cc\n"
-"build .\\out2.o: cat .\\bar/baz\\..\\foo.cc\n"
-"build .\\out3.o: cat .\\bar\\baz\\..\\foo3.cc\n"
-));
-
-  EXPECT_FALSE(state.LookupNode("./out.o"));
-  EXPECT_FALSE(state.LookupNode(".\\out2.o"));
-  EXPECT_FALSE(state.LookupNode(".\\out3.o"));
-  EXPECT_TRUE(state.LookupNode("out.o"));
-  EXPECT_TRUE(state.LookupNode("out2.o"));
-  EXPECT_TRUE(state.LookupNode("out3.o"));
-  EXPECT_FALSE(state.LookupNode("./bar/baz/../foo.cc"));
-  EXPECT_FALSE(state.LookupNode(".\\bar/baz\\..\\foo.cc"));
-  EXPECT_FALSE(state.LookupNode(".\\bar/baz\\..\\foo3.cc"));
-  Node* node = state.LookupNode("bar/foo.cc");
-  EXPECT_TRUE(node);
-  EXPECT_EQ(0, node->slash_bits());
-  node = state.LookupNode("bar/foo3.cc");
-  EXPECT_TRUE(node);
-  EXPECT_EQ(1, node->slash_bits());
-}
-#endif
 
 TEST_F(ParserTest, DuplicateEdgeWithMultipleOutputs) {
   ASSERT_NO_FATAL_FAILURE(AssertParse(
@@ -422,7 +370,7 @@ TEST_F(ParserTest, ReservedWords) {
 TEST_F(ParserTest, Errors) {
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest(string("subn", 4), &err));
     EXPECT_EQ("input:1: expected '=', got eof\n"
@@ -433,7 +381,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("foobar", &err));
     EXPECT_EQ("input:1: expected '=', got eof\n"
@@ -444,7 +392,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("x 3", &err));
     EXPECT_EQ("input:1: expected '=', got identifier\n"
@@ -455,7 +403,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = 3", &err));
     EXPECT_EQ("input:1: unexpected EOF\n"
@@ -466,7 +414,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = 3\ny 2", &err));
     EXPECT_EQ("input:2: expected '=', got identifier\n"
@@ -477,7 +425,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = $", &err));
     EXPECT_EQ("input:1: bad $-escape (literal $ must be written as $$)\n"
@@ -488,7 +436,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = $\n $[\n", &err));
     EXPECT_EQ("input:2: bad $-escape (literal $ must be written as $$)\n"
@@ -499,7 +447,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = a$\n b$\n $\n", &err));
     EXPECT_EQ("input:4: unexpected EOF\n"
@@ -508,7 +456,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("build\n", &err));
     EXPECT_EQ("input:1: expected path\n"
@@ -519,7 +467,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("build x: y z\n", &err));
     EXPECT_EQ("input:1: unknown build rule 'y'\n"
@@ -530,7 +478,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("build x:: y z\n", &err));
     EXPECT_EQ("input:1: expected build command name\n"
@@ -541,7 +489,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n  command = cat ok\n"
                                   "build x: cat $\n :\n",
@@ -554,7 +502,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n",
                                   &err));
@@ -563,7 +511,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n"
                                   "  command = echo\n"
@@ -577,7 +525,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n"
                                   "  command = echo\n"
@@ -589,7 +537,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n"
                                   "  command = ${fafsd\n"
@@ -604,7 +552,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n"
                                   "  command = cat\n"
@@ -619,7 +567,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cat\n"
                                   "  command = cat\n"
@@ -633,7 +581,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule %foo\n",
                                   &err));
@@ -645,7 +593,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cc\n"
                                   "  command = foo\n"
@@ -659,7 +607,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cc\n  command = foo\n"
                                   "build $.: cc bar.cc\n",
@@ -672,7 +620,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cc\n  command = foo\n  && bar",
                                   &err));
@@ -684,7 +632,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("rule cc\n  command = foo\n"
                                   "build $: cc bar.cc\n",
@@ -697,7 +645,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("default\n",
                                   &err));
@@ -709,7 +657,7 @@ TEST_F(ParserTest, Errors) {
 
   {
     State local_state;
-    ManifestParser parser(&local_state, NULL);
+    ManifestParser parser(&local_state, nullptr);
     string err;
     EXPECT_FALSE(parser.ParseTest("default nonexistent\n",
                                   &err));
