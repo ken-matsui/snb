@@ -157,5 +157,3 @@ int RealDiskInterface::RemoveFile(const string& path) {
   }
   return 0;
 }
-
-void RealDiskInterface::AllowStatCache(bool allow) {}

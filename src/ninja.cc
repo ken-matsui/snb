@@ -1302,8 +1302,6 @@ int NinjaMain::RunBuild(int argc, char** argv, Status* status) {
     return 1;
   }
 
-  disk_interface_.AllowStatCache(g_experimental_statcache);
-
   Builder builder(&state_, config_, &build_log_, &deps_log_, &disk_interface_,
                   status, start_time_millis_);
   for (size_t i = 0; i < targets.size(); ++i) {
@@ -1317,9 +1315,6 @@ int NinjaMain::RunBuild(int argc, char** argv, Status* status) {
       }
     }
   }
-
-  // Make sure restat rules do not see stale timestamps.
-  disk_interface_.AllowStatCache(false);
 
   if (builder.AlreadyUpToDate()) {
     status->Info("no work to do.");
