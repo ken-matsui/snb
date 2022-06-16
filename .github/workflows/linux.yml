@@ -124,9 +124,9 @@ jobs:
       run: pytest-3 --color=yes ../..
       working-directory: build-clang/Release
 
-    - name: clang-tidy
-      run: /usr/lib/llvm-10/share/clang/run-clang-tidy.py -header-filter=src
-      working-directory: build-clang
+#     - name: clang-tidy
+#       run: /usr/lib/llvm-10/share/clang/run-clang-tidy.py -header-filter=src
+#       working-directory: build-clang
 
   build-with-python:
     runs-on: [ubuntu-latest]
