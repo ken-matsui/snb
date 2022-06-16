@@ -67,13 +67,4 @@ struct hash<StringPiece> {
 };
 }
 
-/// A template for hash_maps keyed by a StringPiece whose string is
-/// owned externally (typically by the values).  Use like:
-/// ExternalStringHash<Foo*>::Type foos; to make foos into a hash
-/// mapping StringPiece => Foo*.
-template<typename V>
-struct ExternalStringHashMap {
-  typedef std::unordered_map<StringPiece, V> Type;
-};
-
 #endif // NINJA_MAP_H_
