@@ -58,7 +58,7 @@ NORETURN void Fatal(const char* msg, ...);
 #endif
 
 #if defined(__cpp_lib_to_address)
-using std::to_address
+using std::to_address;
 #else
 template <typename T>
 T* to_address(T* ptr) { return ptr; }
