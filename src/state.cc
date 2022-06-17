@@ -123,12 +123,12 @@ State::SpellcheckNode(const std::string& path) {
 
   int min_distance = kMaxValidEditDistance + 1;
   Node* result = nullptr;
-  for (Paths::iterator i = paths_.begin(); i != paths_.end(); ++i) {
+  for (const auto& i : paths_) {
     int distance =
-        EditDistance(i->first, path, kAllowReplacements, kMaxValidEditDistance);
-    if (distance < min_distance && i->second) {
+        EditDistance(i.first, path, kAllowReplacements, kMaxValidEditDistance);
+    if (distance < min_distance && i.second) {
       min_distance = distance;
-      result = i->second;
+      result = i.second;
     }
   }
   return result;
@@ -195,13 +195,12 @@ State::DefaultNodes(std::string* err) const {
 
 void
 State::Reset() {
-  for (Paths::iterator i = paths_.begin(); i != paths_.end(); ++i)
-    i->second->ResetState();
-  for (std::vector<Edge*>::iterator e = edges_.begin(); e != edges_.end();
-       ++e) {
-    (*e)->outputs_ready_ = false;
-    (*e)->deps_loaded_ = false;
-    (*e)->mark_ = Edge::VisitNone;
+  for (const auto& path : paths_)
+    path.second->ResetState();
+  for (Edge* edge : edges_) {
+    edge->outputs_ready_ = false;
+    edge->deps_loaded_ = false;
+    edge->mark_ = Edge::VisitNone;
   }
 }
 

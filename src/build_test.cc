@@ -337,9 +337,8 @@ TEST_F(PlanTest, PoolsWithDepthTwo) {
 
   ASSERT_FALSE(plan_.FindWork());
 
-  for (std::deque<Edge*>::iterator it = edges.begin(); it != edges.end();
-       ++it) {
-    plan_.EdgeFinished(*it, Plan::kEdgeSucceeded, &err);
+  for (Edge* edge : edges) {
+    plan_.EdgeFinished(edge, Plan::kEdgeSucceeded, &err);
     ASSERT_EQ("", err);
   }
 
@@ -650,15 +649,13 @@ FakeCommandRunner::StartCommand(Edge* edge) {
     fs_->Tick();
     fs_->Create(dep, "");
     fs_->Tick();
-    for (std::vector<Node*>::iterator out = edge->outputs_.begin();
-         out != edge->outputs_.end(); ++out) {
-      fs_->Create((*out)->path(), "");
+    for (Node* output : edge->outputs_) {
+      fs_->Create(output->path(), "");
     }
   } else if (edge->rule().name() == "touch-out-implicit-dep") {
     std::string dep = edge->GetBinding("test_dependency");
-    for (std::vector<Node*>::iterator out = edge->outputs_.begin();
-         out != edge->outputs_.end(); ++out) {
-      fs_->Create((*out)->path(), "");
+    for (Node* output : edge->outputs_) {
+      fs_->Create(output->path(), "");
     }
     fs_->Tick();
     fs_->Create(dep, "");
@@ -681,13 +678,12 @@ FakeCommandRunner::StartCommand(Edge* edge) {
     std::string dep = edge->GetBinding("test_dependency");
     std::string depfile = edge->GetUnescapedDepfile();
     std::string contents;
-    for (std::vector<Node*>::iterator out = edge->outputs_.begin();
-         out != edge->outputs_.end(); ++out) {
+    for (Node* output : edge->outputs_) {
       fs_->Tick();
       fs_->Tick();
       fs_->Tick();
-      fs_->Create((*out)->path(), "");
-      contents += (*out)->path() + ": " + dep + "\n";
+      fs_->Create(output->path(), "");
+      contents += output->path() + ": " + dep + "\n";
     }
     if (!dep.empty() && !depfile.empty())
       fs_->Create(depfile, contents);
@@ -766,10 +762,9 @@ FakeCommandRunner::WaitForCommand(Result* result) {
       edge->GetBinding("verify_active_edge");
   if (!verify_active_edge.empty()) {
     bool verify_active_edge_found = false;
-    for (std::vector<Edge*>::iterator i = active_edges_.begin();
-         i != active_edges_.end(); ++i) {
-      if (!(*i)->outputs_.empty()
-          && (*i)->outputs_[0]->path() == verify_active_edge) {
+    for (Edge* active_edge : active_edges_) {
+      if (!active_edge->outputs_.empty()
+          && active_edge->outputs_[0]->path() == verify_active_edge) {
         verify_active_edge_found = true;
       }
     }

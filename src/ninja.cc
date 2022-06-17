@@ -435,29 +435,23 @@ NinjaMain::ToolQuery(const Options* options, int argc, char* argv[]) {
       }
       if (!edge->validations_.empty()) {
         printf("  validations:\n");
-        for (std::vector<Node*>::iterator validation =
-                 edge->validations_.begin();
-             validation != edge->validations_.end(); ++validation) {
-          printf("    %s\n", (*validation)->path().c_str());
+        for (Node* validation : edge->validations_) {
+          printf("    %s\n", validation->path().c_str());
         }
       }
     }
     printf("  outputs:\n");
-    for (std::vector<Edge*>::const_iterator edge = node->out_edges().begin();
-         edge != node->out_edges().end(); ++edge) {
-      for (std::vector<Node*>::iterator out = (*edge)->outputs_.begin();
-           out != (*edge)->outputs_.end(); ++out) {
-        printf("    %s\n", (*out)->path().c_str());
+    for (Edge* edge : node->out_edges()) {
+      for (Node* output : edge->outputs_) {
+        printf("    %s\n", output->path().c_str());
       }
     }
     const std::vector<Edge*> validation_edges = node->validation_out_edges();
     if (!validation_edges.empty()) {
       printf("  validation for:\n");
-      for (std::vector<Edge*>::const_iterator edge = validation_edges.begin();
-           edge != validation_edges.end(); ++edge) {
-        for (std::vector<Node*>::iterator out = (*edge)->outputs_.begin();
-             out != (*edge)->outputs_.end(); ++out) {
-          printf("    %s\n", (*out)->path().c_str());
+      for (Edge* validation_edge : validation_edges) {
+        for (Node* output : validation_edge->outputs_) {
+          printf("    %s\n", output->path().c_str());
         }
       }
     }
@@ -511,12 +505,10 @@ ToolTargetsList(const std::vector<Node*>& nodes, int depth, int indent) {
 
 int
 ToolTargetsSourceList(State* state) {
-  for (std::vector<Edge*>::iterator e = state->edges_.begin();
-       e != state->edges_.end(); ++e) {
-    for (std::vector<Node*>::iterator inps = (*e)->inputs_.begin();
-         inps != (*e)->inputs_.end(); ++inps) {
-      if (!(*inps)->in_edge())
-        printf("%s\n", (*inps)->path().c_str());
+  for (Edge* edge : state->edges_) {
+    for (Node* input : edge->inputs_) {
+      if (!input->in_edge())
+        printf("%s\n", input->path().c_str());
     }
   }
   return 0;
@@ -527,20 +519,17 @@ ToolTargetsList(State* state, const std::string& rule_name) {
   std::set<std::string> rules;
 
   // Gather the outputs.
-  for (std::vector<Edge*>::iterator e = state->edges_.begin();
-       e != state->edges_.end(); ++e) {
-    if ((*e)->rule_->name() == rule_name) {
-      for (std::vector<Node*>::iterator out_node = (*e)->outputs_.begin();
-           out_node != (*e)->outputs_.end(); ++out_node) {
-        rules.insert((*out_node)->path());
+  for (Edge* edge : state->edges_) {
+    if (edge->rule_->name() == rule_name) {
+      for (Node* output : edge->outputs_) {
+        rules.insert(output->path());
       }
     }
   }
 
   // Print them.
-  for (std::set<std::string>::const_iterator i = rules.begin();
-       i != rules.end(); ++i) {
-    printf("%s\n", (*i).c_str());
+  for (const std::string& rule : rules) {
+    printf("%s\n", rule.c_str());
   }
 
   return 0;
@@ -548,12 +537,11 @@ ToolTargetsList(State* state, const std::string& rule_name) {
 
 int
 ToolTargetsList(State* state) {
-  for (std::vector<Edge*>::iterator e = state->edges_.begin();
-       e != state->edges_.end(); ++e) {
-    for (std::vector<Node*>::iterator out_node = (*e)->outputs_.begin();
-         out_node != (*e)->outputs_.end(); ++out_node) {
+  for (Edge* edge : state->edges_) {
+    for (std::vector<Node*>::iterator out_node = edge->outputs_.begin();
+         out_node != edge->outputs_.end(); ++out_node) {
       printf(
-          "%s: %s\n", (*out_node)->path().c_str(), (*e)->rule_->name().c_str()
+          "%s: %s\n", (*out_node)->path().c_str(), edge->rule_->name().c_str()
       );
     }
   }
@@ -578,20 +566,19 @@ NinjaMain::ToolDeps(const Options* options, int argc, char** argv) {
   }
 
   RealDiskInterface disk_interface;
-  for (std::vector<Node*>::iterator it = nodes.begin(), end = nodes.end();
-       it != end; ++it) {
-    DepsLog::Deps* deps = deps_log_.GetDeps(*it);
+  for (Node* node : nodes) {
+    DepsLog::Deps* deps = deps_log_.GetDeps(node);
     if (!deps) {
-      printf("%s: deps not found\n", (*it)->path().c_str());
+      printf("%s: deps not found\n", node->path().c_str());
       continue;
     }
 
     std::string err;
-    TimeStamp mtime = disk_interface.Stat((*it)->path(), &err);
+    TimeStamp mtime = disk_interface.Stat(node->path(), &err);
     if (mtime == -1)
       Error("%s", err.c_str()); // Log and ignore Stat() errors;
     printf(
-        "%s: #deps %d, deps mtime %" PRId64 " (%s)\n", (*it)->path().c_str(),
+        "%s: #deps %d, deps mtime %" PRId64 " (%s)\n", node->path().c_str(),
         deps->node_count, deps->mtime,
         (!mtime || mtime > deps->mtime ? "STALE" : "VALID")
     );
@@ -729,9 +716,8 @@ PrintCommands(Edge* edge, EdgeSet* seen, PrintCommandMode mode) {
     return;
 
   if (mode == PCM_All) {
-    for (std::vector<Node*>::iterator in = edge->inputs_.begin();
-         in != edge->inputs_.end(); ++in)
-      PrintCommands((*in)->in_edge(), seen, mode);
+    for (Node* input : edge->inputs_)
+      PrintCommands(input->in_edge(), seen, mode);
   }
 
   if (!edge->is_phony())
@@ -791,9 +777,8 @@ CollectInputs(
   if (!seen->insert(edge).second)
     return;
 
-  for (std::vector<Node*>::iterator in = edge->inputs_.begin();
-       in != edge->inputs_.end(); ++in)
-    CollectInputs((*in)->in_edge(), seen, result);
+  for (Node* input : edge->inputs_)
+    CollectInputs(input->in_edge(), seen, result);
 
   if (!edge->is_phony()) {
     edge->CollectInputs(true, result);
@@ -998,23 +983,22 @@ NinjaMain::ToolCompilationDatabase(
   }
 
   putchar('[');
-  for (std::vector<Edge*>::iterator e = state_.edges_.begin();
-       e != state_.edges_.end(); ++e) {
-    if ((*e)->inputs_.empty())
+  for (Edge* edge : state_.edges_) {
+    if (edge->inputs_.empty())
       continue;
     if (argc == 0) {
       if (!first) {
         putchar(',');
       }
-      printCompdb(&cwd[0], *e, eval_mode);
+      printCompdb(&cwd[0], edge, eval_mode);
       first = false;
     } else {
       for (int i = 0; i != argc; ++i) {
-        if ((*e)->rule_->name() == argv[i]) {
+        if (edge->rule_->name() == argv[i]) {
           if (!first) {
             putchar(',');
           }
-          printCompdb(&cwd[0], *e, eval_mode);
+          printCompdb(&cwd[0], edge, eval_mode);
           first = false;
         }
       }

@@ -146,9 +146,8 @@ DependencyScan::RecomputeNodeDirty(
   }
 
   // Load output mtimes so we can compare them to the most recent input below.
-  for (std::vector<Node*>::iterator o = edge->outputs_.begin();
-       o != edge->outputs_.end(); ++o) {
-    if (!(*o)->StatIfNecessary(disk_interface_, err))
+  for (Node* output : edge->outputs_) {
+    if (!output->StatIfNecessary(disk_interface_, err))
       return false;
   }
 
@@ -209,10 +208,9 @@ DependencyScan::RecomputeNodeDirty(
       return false;
 
   // Finally, visit each output and update their dirty state if necessary.
-  for (std::vector<Node*>::iterator o = edge->outputs_.begin();
-       o != edge->outputs_.end(); ++o) {
+  for (Node* output : edge->outputs_) {
     if (dirty)
-      (*o)->MarkDirty();
+      output->MarkDirty();
   }
 
   // If an edge is dirty, its outputs are normally not ready.  (It's

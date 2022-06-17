@@ -205,8 +205,8 @@ DyndepParser::ParseEdge(std::string* err) {
   }
 
   dyndeps->implicit_inputs_.reserve(ins.size());
-  for (std::vector<EvalString>::iterator i = ins.begin(); i != ins.end(); ++i) {
-    std::string path = i->Evaluate(&env_);
+  for (const EvalString& in : ins) {
+    std::string path = in.Evaluate(&env_);
     if (path.empty())
       return lexer_.Error("empty path", err);
     uint64_t slash_bits;
@@ -216,9 +216,8 @@ DyndepParser::ParseEdge(std::string* err) {
   }
 
   dyndeps->implicit_outputs_.reserve(outs.size());
-  for (std::vector<EvalString>::iterator i = outs.begin(); i != outs.end();
-       ++i) {
-    std::string path = i->Evaluate(&env_);
+  for (const EvalString& out : outs) {
+    std::string path = out.Evaluate(&env_);
     if (path.empty())
       return lexer_.Error("empty path", err);
     std::string path_err;
