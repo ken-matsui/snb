@@ -215,11 +215,7 @@ struct Builder {
   State* state_;
   const BuildConfig& config_;
   Plan plan_;
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
-  std::unique_ptr<CommandRunner> command_runner_;  // auto_ptr was deprecated in C++11.
-#else
-  std::auto_ptr<CommandRunner> command_runner_;
-#endif
+  std::unique_ptr<CommandRunner> command_runner_;
   Status* status_;
 
  private:
