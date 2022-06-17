@@ -140,7 +140,7 @@ TEST_F(ParserTest, InNewline) {
       "[cat ][$in_newline][ > ][$out]", rule->GetBinding("command")->Serialize()
   );
 
-  Edge* edge = state.edges_[0];
+  Edge* edge = state.edges_[0].get();
   EXPECT_EQ("cat in\nin2 > out", edge->EvaluateCommand());
 }
 
@@ -160,13 +160,13 @@ TEST_F(ParserTest, Variables) {
   );
 
   ASSERT_EQ(2u, state.edges_.size());
-  Edge* edge = state.edges_[0];
+  Edge* edge = state.edges_[0].get();
   EXPECT_EQ(
       "ld one-letter-test -pthread -under -o a b c", edge->EvaluateCommand()
   );
   EXPECT_EQ("1/2", state.bindings_.LookupVariable("nested2"));
 
-  edge = state.edges_[1];
+  edge = state.edges_[1].get();
   EXPECT_EQ(
       "ld one-letter-test 1/2/3 -under -o supernested x",
       edge->EvaluateCommand()

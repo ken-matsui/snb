@@ -505,7 +505,7 @@ ToolTargetsList(const std::vector<Node*>& nodes, int depth, int indent) {
 
 int
 ToolTargetsSourceList(State* state) {
-  for (Edge* edge : state->edges_) {
+  for (std::unique_ptr<Edge>& edge : state->edges_) {
     for (Node* input : edge->inputs_) {
       if (!input->in_edge())
         printf("%s\n", input->path().c_str());
@@ -519,7 +519,7 @@ ToolTargetsList(State* state, const std::string& rule_name) {
   std::set<std::string> rules;
 
   // Gather the outputs.
-  for (Edge* edge : state->edges_) {
+  for (std::unique_ptr<Edge>& edge : state->edges_) {
     if (edge->rule_->name() == rule_name) {
       for (Node* output : edge->outputs_) {
         rules.insert(output->path());
@@ -537,7 +537,7 @@ ToolTargetsList(State* state, const std::string& rule_name) {
 
 int
 ToolTargetsList(State* state) {
-  for (Edge* edge : state->edges_) {
+  for (std::unique_ptr<Edge>& edge : state->edges_) {
     for (std::vector<Node*>::iterator out_node = edge->outputs_.begin();
          out_node != edge->outputs_.end(); ++out_node) {
       printf(
@@ -983,14 +983,14 @@ NinjaMain::ToolCompilationDatabase(
   }
 
   putchar('[');
-  for (Edge* edge : state_.edges_) {
+  for (std::unique_ptr<Edge>& edge : state_.edges_) {
     if (edge->inputs_.empty())
       continue;
     if (argc == 0) {
       if (!first) {
         putchar(',');
       }
-      printCompdb(&cwd[0], edge, eval_mode);
+      printCompdb(&cwd[0], edge.get(), eval_mode);
       first = false;
     } else {
       for (int i = 0; i != argc; ++i) {
@@ -998,7 +998,7 @@ NinjaMain::ToolCompilationDatabase(
           if (!first) {
             putchar(',');
           }
-          printCompdb(&cwd[0], edge, eval_mode);
+          printCompdb(&cwd[0], edge.get(), eval_mode);
           first = false;
         }
       }

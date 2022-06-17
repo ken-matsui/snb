@@ -403,7 +403,7 @@ TEST_F(DyndepParserTest, NoImplicit) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   EXPECT_EQ(0u, i->second.implicit_outputs_.size());
@@ -417,7 +417,7 @@ TEST_F(DyndepParserTest, EmptyImplicit) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   EXPECT_EQ(0u, i->second.implicit_outputs_.size());
@@ -431,7 +431,7 @@ TEST_F(DyndepParserTest, ImplicitIn) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   EXPECT_EQ(0u, i->second.implicit_outputs_.size());
@@ -446,7 +446,7 @@ TEST_F(DyndepParserTest, ImplicitIns) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   EXPECT_EQ(0u, i->second.implicit_outputs_.size());
@@ -462,7 +462,7 @@ TEST_F(DyndepParserTest, ImplicitOut) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   ASSERT_EQ(1u, i->second.implicit_outputs_.size());
@@ -477,7 +477,7 @@ TEST_F(DyndepParserTest, ImplicitOuts) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   ASSERT_EQ(2u, i->second.implicit_outputs_.size());
@@ -493,7 +493,7 @@ TEST_F(DyndepParserTest, ImplicitInsAndOuts) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   ASSERT_EQ(2u, i->second.implicit_outputs_.size());
@@ -512,7 +512,7 @@ TEST_F(DyndepParserTest, Restat) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(true, i->second.restat_);
   EXPECT_EQ(0u, i->second.implicit_outputs_.size());
@@ -526,7 +526,7 @@ TEST_F(DyndepParserTest, OtherOutput) {
   );
 
   EXPECT_EQ(1u, dyndep_file_.size());
-  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+  DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
   ASSERT_NE(i, dyndep_file_.end());
   EXPECT_EQ(false, i->second.restat_);
   EXPECT_EQ(0u, i->second.implicit_outputs_.size());
@@ -549,14 +549,14 @@ TEST_F(DyndepParserTest, MultipleEdges) {
 
   EXPECT_EQ(2u, dyndep_file_.size());
   {
-    DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0]);
+    DyndepFile::iterator i = dyndep_file_.find(state_.edges_[0].get());
     ASSERT_NE(i, dyndep_file_.end());
     EXPECT_EQ(false, i->second.restat_);
     EXPECT_EQ(0u, i->second.implicit_outputs_.size());
     EXPECT_EQ(0u, i->second.implicit_inputs_.size());
   }
   {
-    DyndepFile::iterator i = dyndep_file_.find(state_.edges_[1]);
+    DyndepFile::iterator i = dyndep_file_.find(state_.edges_[1].get());
     ASSERT_NE(i, dyndep_file_.end());
     EXPECT_EQ(true, i->second.restat_);
     EXPECT_EQ(0u, i->second.implicit_outputs_.size());

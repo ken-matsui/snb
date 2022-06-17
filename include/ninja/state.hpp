@@ -168,7 +168,7 @@ struct State {
   std::map<std::string, Pool*> pools_;
 
   /// All the edges of the graph.
-  std::vector<Edge*> edges_;
+  std::vector<std::unique_ptr<Edge>> edges_;
 
   BindingEnv bindings_;
   std::vector<Node*> defaults_;

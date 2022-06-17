@@ -87,13 +87,13 @@ State::LookupPool(const std::string& pool_name) {
 
 Edge*
 State::AddEdge(const Rule* rule) {
-  Edge* edge = new Edge();
+  std::unique_ptr<Edge> edge = std::make_unique<Edge>();
   edge->rule_ = rule;
   edge->pool_ = &State::kDefaultPool;
   edge->env_ = &bindings_;
   edge->id_ = edges_.size();
-  edges_.push_back(edge);
-  return edge;
+  edges_.push_back(std::move(edge));
+  return edges_.back().get();
 }
 
 Node*
@@ -172,12 +172,10 @@ std::vector<Node*>
 State::RootNodes(std::string* err) const {
   std::vector<Node*> root_nodes;
   // Search for nodes with no output.
-  for (std::vector<Edge*>::const_iterator e = edges_.begin(); e != edges_.end();
-       ++e) {
-    for (std::vector<Node*>::const_iterator out = (*e)->outputs_.begin();
-         out != (*e)->outputs_.end(); ++out) {
-      if ((*out)->out_edges().empty())
-        root_nodes.push_back(*out);
+  for (const std::unique_ptr<Edge>& edge : edges_) {
+    for (Node* output : edge->outputs_) {
+      if (output->out_edges().empty())
+        root_nodes.push_back(output);
     }
   }
 
@@ -196,7 +194,7 @@ void
 State::Reset() {
   for (const auto& path : paths_)
     path.second->ResetState();
-  for (Edge* edge : edges_) {
+  for (std::unique_ptr<Edge>& edge : edges_) {
     edge->outputs_ready_ = false;
     edge->deps_loaded_ = false;
     edge->mark_ = Edge::VisitNone;
