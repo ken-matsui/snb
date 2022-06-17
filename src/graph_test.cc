@@ -19,7 +19,7 @@
 using namespace std;
 
 struct GraphTest : public StateTestWithBuiltinRules {
-  GraphTest() : scan_(&state_, NULL, NULL, &fs_, NULL) {}
+  GraphTest() : scan_(&state_, nullptr, nullptr, &fs_, nullptr) {}
 
   VirtualFileSystem fs_;
   DependencyScan scan_;
@@ -32,7 +32,7 @@ TEST_F(GraphTest, MissingImplicit) {
   fs_.Create("out", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   // A missing implicit dep *should* make the output dirty.
@@ -50,7 +50,7 @@ TEST_F(GraphTest, ModifiedImplicit) {
   fs_.Create("implicit", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   // A modified implicit dep should make the output dirty.
@@ -72,7 +72,7 @@ TEST_F(GraphTest, FunkyMakefilePath) {
   fs_.Create("implicit.h", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), nullptr, &err));
   ASSERT_EQ("", err);
 
   // implicit.h has changed, though our depfile refers to it with a
@@ -97,7 +97,7 @@ TEST_F(GraphTest, ExplicitImplicit) {
   fs_.Create("data", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), nullptr, &err));
   ASSERT_EQ("", err);
 
   // We have both an implicit and an explicit dep on implicit.h.
@@ -125,7 +125,7 @@ TEST_F(GraphTest, ImplicitOutputMissing) {
   fs_.Create("out", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_TRUE(GetNode("out")->dirty());
@@ -141,7 +141,7 @@ TEST_F(GraphTest, ImplicitOutputOutOfDate) {
   fs_.Create("out", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_TRUE(GetNode("out")->dirty());
@@ -163,7 +163,7 @@ TEST_F(GraphTest, ImplicitOutputOnlyMissing) {
   fs_.Create("in", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.imp"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.imp"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_TRUE(GetNode("out.imp")->dirty());
@@ -176,7 +176,7 @@ TEST_F(GraphTest, ImplicitOutputOnlyOutOfDate) {
   fs_.Create("in", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.imp"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.imp"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_TRUE(GetNode("out.imp")->dirty());
@@ -195,7 +195,7 @@ TEST_F(GraphTest, PathWithCurrentDirectory) {
   fs_.Create("out.o", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_FALSE(GetNode("out.o")->dirty());
@@ -275,7 +275,7 @@ TEST_F(GraphTest, DepfileWithCanonicalizablePath) {
   fs_.Create("out.o", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_FALSE(GetNode("out.o")->dirty());
@@ -297,13 +297,13 @@ TEST_F(GraphTest, DepfileRemoved) {
   fs_.Create("out.o", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), nullptr, &err));
   ASSERT_EQ("", err);
   EXPECT_FALSE(GetNode("out.o")->dirty());
 
   state_.Reset();
   fs_.RemoveFile("out.o.d");
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out.o"), nullptr, &err));
   ASSERT_EQ("", err);
   EXPECT_TRUE(GetNode("out.o")->dirty());
 }
@@ -357,7 +357,7 @@ TEST_F(GraphTest, NestedPhonyPrintsDone) {
       "build n2: phony n1\n"
   );
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("n2"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("n2"), nullptr, &err));
   ASSERT_EQ("", err);
 
   Plan plan_;
@@ -374,7 +374,7 @@ TEST_F(GraphTest, PhonySelfReferenceError) {
   AssertParse(&state_, "build a: phony a\n", parser_opts);
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("a"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("a"), nullptr, &err));
   ASSERT_EQ("dependency cycle: a -> a [-w phonycycle=err]", err);
 }
 
@@ -388,21 +388,21 @@ TEST_F(GraphTest, DependencyCycle) {
   );
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("dependency cycle: out -> mid -> in -> pre -> out", err);
 }
 
 TEST_F(GraphTest, CycleInEdgesButNotInNodes1) {
   string err;
   AssertParse(&state_, "build a b: cat a\n");
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("b"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("b"), nullptr, &err));
   ASSERT_EQ("dependency cycle: a -> a", err);
 }
 
 TEST_F(GraphTest, CycleInEdgesButNotInNodes2) {
   string err;
   ASSERT_NO_FATAL_FAILURE(AssertParse(&state_, "build b a: cat a\n"));
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("b"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("b"), nullptr, &err));
   ASSERT_EQ("dependency cycle: a -> a", err);
 }
 
@@ -413,7 +413,7 @@ TEST_F(GraphTest, CycleInEdgesButNotInNodes3) {
       "build a b: cat c\n"
       "build c: cat a\n"
   ));
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("b"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("b"), nullptr, &err));
   ASSERT_EQ("dependency cycle: a -> c -> a", err);
 }
 
@@ -427,7 +427,7 @@ TEST_F(GraphTest, CycleInEdgesButNotInNodes4) {
       "build a e: cat d\n"
       "build f: cat e\n"
   ));
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("f"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("f"), nullptr, &err));
   ASSERT_EQ("dependency cycle: a -> d -> c -> b -> a", err);
 }
 
@@ -444,7 +444,7 @@ TEST_F(GraphTest, CycleWithLengthZeroFromDepfile) {
   fs_.Create("dep.d", "a: b\n");
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("a"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("a"), nullptr, &err));
   ASSERT_EQ("dependency cycle: b -> b", err);
 
   // Despite the depfile causing edge to be a cycle (it has outputs a and b,
@@ -470,7 +470,7 @@ TEST_F(GraphTest, CycleWithLengthOneFromDepfile) {
   fs_.Create("dep.d", "a: c\n");
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("a"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("a"), nullptr, &err));
   ASSERT_EQ("dependency cycle: b -> c -> b", err);
 
   // Despite the depfile causing edge to be a cycle (|edge| has outputs a and b,
@@ -498,7 +498,7 @@ TEST_F(GraphTest, CycleWithLengthOneFromDepfileOneHopAway) {
   fs_.Create("dep.d", "a: c\n");
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("d"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("d"), nullptr, &err));
   ASSERT_EQ("dependency cycle: b -> c -> b", err);
 
   // Despite the depfile causing edge to be a cycle (|edge| has outputs a and b,
@@ -749,7 +749,7 @@ TEST_F(GraphTest, DyndepFileMissing) {
   );
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("loading 'dd': No such file or directory", err);
 }
 
@@ -764,7 +764,7 @@ TEST_F(GraphTest, DyndepFileError) {
   fs_.Create("dd", "ninja_dyndep_version = 1\n");
 
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("'out' not mentioned in its dyndep file 'dd'", err);
 }
 
@@ -786,7 +786,7 @@ TEST_F(GraphTest, DyndepImplicitInputNewer) {
   fs_.Create("in", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_FALSE(GetNode("in")->dirty());
@@ -816,7 +816,7 @@ TEST_F(GraphTest, DyndepFileReady) {
   fs_.Create("in", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_FALSE(GetNode("in")->dirty());
@@ -842,7 +842,7 @@ TEST_F(GraphTest, DyndepFileNotClean) {
   fs_.Create("out", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_TRUE(GetNode("dd")->dirty());
@@ -869,7 +869,7 @@ TEST_F(GraphTest, DyndepFileNotReady) {
   fs_.Create("out", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_FALSE(GetNode("dd")->dirty());
@@ -898,7 +898,7 @@ TEST_F(GraphTest, DyndepFileSecondNotReady) {
   fs_.Create("out", "");
 
   string err;
-  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   ASSERT_EQ("", err);
 
   EXPECT_TRUE(GetNode("dd1")->dirty());
@@ -929,7 +929,7 @@ TEST_F(GraphTest, DyndepFileCircular) {
 
   Edge* edge = GetNode("out")->in_edge();
   string err;
-  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), NULL, &err));
+  EXPECT_FALSE(scan_.RecomputeDirty(GetNode("out"), nullptr, &err));
   EXPECT_EQ("dependency cycle: circ -> in -> circ", err);
 
   // Verify that "out.d" was loaded exactly once despite
@@ -977,7 +977,7 @@ TEST_F(GraphTest, PhonyDepsMtimes) {
   Node* out1 = GetNode("out1");
   Node* in1 = GetNode("in1");
 
-  EXPECT_TRUE(scan_.RecomputeDirty(out1, NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(out1, nullptr, &err));
   EXPECT_TRUE(!out1->dirty());
 
   // Get the mtime of out1
@@ -994,7 +994,7 @@ TEST_F(GraphTest, PhonyDepsMtimes) {
   ASSERT_TRUE(in1->Stat(&fs_, &err));
   EXPECT_GT(in1->mtime(), in1Mtime1);
 
-  EXPECT_TRUE(scan_.RecomputeDirty(out1, NULL, &err));
+  EXPECT_TRUE(scan_.RecomputeDirty(out1, nullptr, &err));
   EXPECT_GT(in1->mtime(), in1Mtime1);
   EXPECT_EQ(out1->mtime(), out1Mtime1);
   EXPECT_TRUE(out1->dirty());

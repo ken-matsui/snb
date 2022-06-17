@@ -29,7 +29,7 @@ struct Parser {
 
   /// Load and parse a file.
   bool
-  Load(const std::string& filename, std::string* err, Lexer* parent = NULL);
+  Load(const std::string& filename, std::string* err, Lexer* parent = nullptr);
 
 protected:
   /// If the next token is not \a expected, produce an error string

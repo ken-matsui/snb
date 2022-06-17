@@ -54,7 +54,8 @@ DepsLog::OpenForWrite(const string& path, string* err) {
 bool
 DepsLog::RecordDeps(Node* node, TimeStamp mtime, const vector<Node*>& nodes) {
   return RecordDeps(
-      node, mtime, nodes.size(), nodes.empty() ? NULL : (Node**)&nodes.front()
+      node, mtime, nodes.size(),
+      nodes.empty() ? nullptr : (Node**)&nodes.front()
   );
 }
 
@@ -140,7 +141,7 @@ DepsLog::Close() {
   OpenForWriteIfNeeded(); // create the file even if nothing has been recorded
   if (file_)
     fclose(file_);
-  file_ = NULL;
+  file_ = nullptr;
 }
 
 LoadStatus
@@ -291,7 +292,7 @@ DepsLog::GetDeps(Node* node) {
   // Abort if the node has no id (never referenced in the deps) or if
   // there's no deps recorded for the node.
   if (node->id() < 0 || node->id() >= (int)deps_.size())
-    return NULL;
+    return nullptr;
   return deps_[node->id()];
 }
 
@@ -306,7 +307,7 @@ DepsLog::GetFirstReverseDepsNode(Node* node) {
         return nodes_[id];
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 bool
@@ -381,7 +382,7 @@ DepsLog::UpdateDeps(int out_id, Deps* deps) {
   if (out_id >= (int)deps_.size())
     deps_.resize(out_id + 1);
 
-  bool delete_old = deps_[out_id] != NULL;
+  bool delete_old = deps_[out_id] != nullptr;
   if (delete_old)
     delete deps_[out_id];
   deps_[out_id] = deps;
@@ -434,7 +435,7 @@ DepsLog::OpenForWriteIfNeeded() {
   }
   // Set the buffer size to this and flush the file buffer after every record
   // to make sure records aren't written partially.
-  if (setvbuf(file_, NULL, _IOFBF, kMaxRecordSize + 1) != 0) {
+  if (setvbuf(file_, nullptr, _IOFBF, kMaxRecordSize + 1) != 0) {
     return false;
   }
   SetCloseOnExec(fileno(file_));

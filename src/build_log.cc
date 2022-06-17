@@ -329,7 +329,7 @@ BuildLog::Load(const string& path, string* err) {
     if (!end)
       continue;
     *end = 0;
-    mtime = strtoll(start, NULL, 10);
+    mtime = strtoll(start, nullptr, 10);
     start = end + 1;
 
     end = (char*)memchr(start, kFieldSeparator, line_end - start);
