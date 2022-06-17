@@ -529,7 +529,8 @@ ParseMountInfo(std::map<std::string, CGroupSubSys>& subsystems) {
       continue;
     for (size_t i = 0; i < mp.superOptions.size(); i++) {
       std::string opt(mp.superOptions[i]);
-      std::map<std::string, CGroupSubSys>::iterator subsys = subsystems.find(opt);
+      std::map<std::string, CGroupSubSys>::iterator subsys =
+          subsystems.find(opt);
       if (subsys == subsystems.end())
         continue;
       std::string newPath = mp.translate(subsys->second.name);
