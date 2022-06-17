@@ -19,8 +19,8 @@
 #include "timestamp.hpp"
 #include "util.hpp" // uint64_t
 
-#include <memory>
 #include <cstdio>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>

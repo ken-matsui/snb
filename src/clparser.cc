@@ -22,13 +22,11 @@
 #include <cassert>
 #include <cstring>
 
-using namespace std;
-
 namespace {
 
 /// Return true if \a input ends with \a needle.
 bool
-EndsWith(const string& input, const string& needle) {
+EndsWith(const std::string& input, const std::string& needle) {
   return (
       input.size() >= needle.size()
       && input.substr(input.size() - needle.size()) == needle
@@ -38,12 +36,15 @@ EndsWith(const string& input, const string& needle) {
 } // anonymous namespace
 
 // static
-string
-CLParser::FilterShowIncludes(const string& line, const string& deps_prefix) {
-  const string kDepsPrefixEnglish = "Note: including file: ";
+std::string
+CLParser::FilterShowIncludes(
+    const std::string& line, const std::string& deps_prefix
+) {
+  const std::string kDepsPrefixEnglish = "Note: including file: ";
   const char* in = line.c_str();
   const char* end = in + line.size();
-  const string& prefix = deps_prefix.empty() ? kDepsPrefixEnglish : deps_prefix;
+  const std::string& prefix =
+      deps_prefix.empty() ? kDepsPrefixEnglish : deps_prefix;
   if (end - in > (int)prefix.size()
       && memcmp(in, prefix.c_str(), (int)prefix.size()) == 0) {
     in += prefix.size();
@@ -56,18 +57,18 @@ CLParser::FilterShowIncludes(const string& line, const string& deps_prefix) {
 
 // static
 bool
-CLParser::IsSystemInclude(string path) {
+CLParser::IsSystemInclude(std::string path) {
   transform(path.begin(), path.end(), path.begin(), ToLowerASCII);
   // TODO: this is a heuristic, perhaps there's a better way?
   return (
-      path.find("program files") != string::npos
-      || path.find("microsoft visual studio") != string::npos
+      path.find("program files") != std::string::npos
+      || path.find("microsoft visual studio") != std::string::npos
   );
 }
 
 // static
 bool
-CLParser::FilterInputFilename(string line) {
+CLParser::FilterInputFilename(std::string line) {
   transform(line.begin(), line.end(), line.begin(), ToLowerASCII);
   // TODO: other extensions, like .asm?
   return EndsWith(line, ".c") || EndsWith(line, ".cc") || EndsWith(line, ".cxx")
@@ -77,8 +78,8 @@ CLParser::FilterInputFilename(string line) {
 // static
 bool
 CLParser::Parse(
-    const string& output, const string& deps_prefix, string* filtered_output,
-    string* err
+    const std::string& output, const std::string& deps_prefix,
+    std::string* filtered_output, std::string* err
 ) {
   METRIC_RECORD("CLParser::Parse");
 
@@ -89,14 +90,14 @@ CLParser::Parse(
 
   while (start < output.size()) {
     size_t end = output.find_first_of("\r\n", start);
-    if (end == string::npos)
+    if (end == std::string::npos)
       end = output.size();
-    string line = output.substr(start, end - start);
+    std::string line = output.substr(start, end - start);
 
-    string include = FilterShowIncludes(line, deps_prefix);
+    std::string include = FilterShowIncludes(line, deps_prefix);
     if (!include.empty()) {
       seen_show_includes = true;
-      string normalized;
+      std::string normalized;
       // TODO: should this make the path relative to cwd?
       normalized = include;
       uint64_t slash_bits;

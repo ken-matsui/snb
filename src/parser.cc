@@ -17,18 +17,16 @@
 #include "disk_interface.hpp"
 #include "metrics.hpp"
 
-using namespace std;
-
 bool
-Parser::Load(const string& filename, string* err, Lexer* parent) {
+Parser::Load(const std::string& filename, std::string* err, Lexer* parent) {
   METRIC_RECORD(".ninja parse");
-  string contents;
-  string read_err;
+  std::string contents;
+  std::string read_err;
   if (file_reader_->ReadFile(filename, &contents, &read_err)
       != FileReader::Okay) {
     *err = "loading '" + filename + "': " + read_err;
     if (parent)
-      parent->Error(string(*err), err);
+      parent->Error(std::string(*err), err);
     return false;
   }
 
@@ -36,11 +34,11 @@ Parser::Load(const string& filename, string* err, Lexer* parent) {
 }
 
 bool
-Parser::ExpectToken(Lexer::Token expected, string* err) {
+Parser::ExpectToken(Lexer::Token expected, std::string* err) {
   Lexer::Token token = lexer_.ReadToken();
   if (token != expected) {
-    string message = string("expected ") + Lexer::TokenName(expected);
-    message += string(", got ") + Lexer::TokenName(token);
+    std::string message = std::string("expected ") + Lexer::TokenName(expected);
+    message += std::string(", got ") + Lexer::TokenName(token);
     message += Lexer::TokenErrorHint(expected);
     return lexer_.Error(message, err);
   }

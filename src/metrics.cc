@@ -28,8 +28,6 @@
 
 #include <algorithm>
 
-using namespace std;
-
 Metrics* g_metrics = nullptr;
 
 namespace {
@@ -96,7 +94,7 @@ ScopedMetric::~ScopedMetric() {
 }
 
 Metric*
-Metrics::NewMetric(const string& name) {
+Metrics::NewMetric(const std::string& name) {
   Metric* metric = new Metric;
   metric->name = name;
   metric->count = 0;
@@ -108,16 +106,16 @@ Metrics::NewMetric(const string& name) {
 void
 Metrics::Report() {
   int width = 0;
-  for (vector<Metric*>::iterator i = metrics_.begin(); i != metrics_.end();
+  for (std::vector<Metric*>::iterator i = metrics_.begin(); i != metrics_.end();
        ++i) {
-    width = max((int)(*i)->name.size(), width);
+    width = std::max((int)(*i)->name.size(), width);
   }
 
   printf(
       "%-*s\t%-6s\t%-9s\t%s\n", width, "metric", "count", "avg (us)",
       "total (ms)"
   );
-  for (vector<Metric*>::iterator i = metrics_.begin(); i != metrics_.end();
+  for (std::vector<Metric*>::iterator i = metrics_.begin(); i != metrics_.end();
        ++i) {
     Metric* metric = *i;
     double total = metric->sum / (double)1000;

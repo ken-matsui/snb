@@ -19,8 +19,6 @@
 #include <cstdarg>
 #include <cstdlib>
 
-using namespace std;
-
 StatusPrinter::StatusPrinter(const BuildConfig& config)
     : config_(config), started_edges_(0), finished_edges_(0), total_edges_(0),
       running_edges_(0), time_millis_(0), progress_status_format_(nullptr),
@@ -55,7 +53,7 @@ StatusPrinter::BuildEdgeStarted(const Edge* edge, int64_t start_time_millis) {
 
 void
 StatusPrinter::BuildEdgeFinished(
-    Edge* edge, int64_t end_time_millis, bool success, const string& output
+    Edge* edge, int64_t end_time_millis, bool success, const std::string& output
 ) {
   time_millis_ = end_time_millis;
   ++finished_edges_;
@@ -73,8 +71,8 @@ StatusPrinter::BuildEdgeFinished(
 
   // Print the command that is spewing before printing its output.
   if (!success) {
-    string outputs;
-    for (vector<Node*>::const_iterator o = edge->outputs_.begin();
+    std::string outputs;
+    for (std::vector<Node*>::const_iterator o = edge->outputs_.begin();
          o != edge->outputs_.end(); ++o)
       outputs += (*o)->path() + " ";
 
@@ -103,7 +101,7 @@ StatusPrinter::BuildEdgeFinished(
     // (Launching subprocesses in pseudo ttys doesn't work because there are
     // only a few hundred available on some systems, and ninja can launch
     // thousands of parallel compile commands.)
-    string final_output;
+    std::string final_output;
     if (!printer_.supports_color())
       final_output = StripAnsiEscapeCodes(output);
     else
@@ -141,11 +139,11 @@ StatusPrinter::BuildFinished() {
   printer_.PrintOnNewLine("");
 }
 
-string
+std::string
 StatusPrinter::FormatProgressStatus(
     const char* progress_status_format, int64_t time_millis
 ) const {
-  string out;
+  std::string out;
   char buf[32];
   for (const char* s = progress_status_format; *s != '\0'; ++s) {
     if (*s == '%') {
@@ -233,7 +231,7 @@ StatusPrinter::PrintStatus(const Edge* edge, int64_t time_millis) {
 
   bool force_full_command = config_.verbosity == BuildConfig::VERBOSE;
 
-  string to_print = edge->GetBinding("description");
+  std::string to_print = edge->GetBinding("description");
   if (to_print.empty() || force_full_command)
     to_print = edge->GetBinding("command");
 

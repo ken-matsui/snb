@@ -18,15 +18,13 @@
 #include <cstdio>
 #include <cstring>
 
-using namespace std;
-
 const char kPath[] =
     "../../third_party/WebKit/Source/WebCore/"
     "platform/leveldb/LevelDBWriteBatch.cpp";
 
 int
 main() {
-  vector<int> times;
+  std::vector<int> times;
 
   char buf[200];
   size_t len = strlen(kPath);

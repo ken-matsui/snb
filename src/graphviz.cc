@@ -20,14 +20,12 @@
 #include <algorithm>
 #include <cstdio>
 
-using namespace std;
-
 void
 GraphViz::AddTarget(Node* node) {
   if (visited_nodes_.find(node) != visited_nodes_.end())
     return;
 
-  string pathstr = node->path();
+  std::string pathstr = node->path();
   replace(pathstr.begin(), pathstr.end(), '\\', '/');
   printf("\"%p\" [label=\"%s\"]\n", node, pathstr.c_str());
   visited_nodes_.insert(node);
@@ -64,11 +62,11 @@ GraphViz::AddTarget(Node* node) {
         "\"%p\" [label=\"%s\", shape=ellipse]\n", edge,
         edge->rule_->name().c_str()
     );
-    for (vector<Node*>::iterator out = edge->outputs_.begin();
+    for (std::vector<Node*>::iterator out = edge->outputs_.begin();
          out != edge->outputs_.end(); ++out) {
       printf("\"%p\" -> \"%p\"\n", edge, *out);
     }
-    for (vector<Node*>::iterator in = edge->inputs_.begin();
+    for (std::vector<Node*>::iterator in = edge->inputs_.begin();
          in != edge->inputs_.end(); ++in) {
       const char* order_only = "";
       if (edge->is_order_only(in - edge->inputs_.begin()))
@@ -77,7 +75,7 @@ GraphViz::AddTarget(Node* node) {
     }
   }
 
-  for (vector<Node*>::iterator in = edge->inputs_.begin();
+  for (std::vector<Node*>::iterator in = edge->inputs_.begin();
        in != edge->inputs_.end(); ++in) {
     AddTarget(*in);
   }

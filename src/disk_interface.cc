@@ -25,18 +25,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-using namespace std;
-
 namespace {
 
-string
-DirName(const string& path) {
+std::string
+DirName(const std::string& path) {
   static const char kPathSeparators[] = "/";
   static const char* const kEnd = kPathSeparators + sizeof(kPathSeparators) - 1;
 
-  string::size_type slash_pos = path.find_last_of(kPathSeparators);
-  if (slash_pos == string::npos)
-    return string(); // Nothing to do.
+  std::string::size_type slash_pos = path.find_last_of(kPathSeparators);
+  if (slash_pos == std::string::npos)
+    return std::string(); // Nothing to do.
   while (slash_pos > 0
          && std::find(kPathSeparators, kEnd, path[slash_pos - 1]) != kEnd)
     --slash_pos;
@@ -44,7 +42,7 @@ DirName(const string& path) {
 }
 
 int
-MakeDir(const string& path) {
+MakeDir(const std::string& path) {
   return mkdir(path.c_str(), 0777);
 }
 
@@ -53,11 +51,11 @@ MakeDir(const string& path) {
 // DiskInterface ---------------------------------------------------------------
 
 bool
-DiskInterface::MakeDirs(const string& path) {
-  string dir = DirName(path);
+DiskInterface::MakeDirs(const std::string& path) {
+  std::string dir = DirName(path);
   if (dir.empty())
     return true; // Reached root; assume it's there.
-  string err;
+  std::string err;
   TimeStamp mtime = Stat(dir, &err);
   if (mtime < 0) {
     Error("%s", err.c_str());
@@ -76,7 +74,7 @@ DiskInterface::MakeDirs(const string& path) {
 // RealDiskInterface -----------------------------------------------------------
 
 TimeStamp
-RealDiskInterface::Stat(const string& path, string* err) const {
+RealDiskInterface::Stat(const std::string& path, std::string* err) const {
   METRIC_RECORD("node stat");
   struct stat st;
   if (stat(path.c_str(), &st) < 0) {
@@ -104,7 +102,9 @@ RealDiskInterface::Stat(const string& path, string* err) const {
 }
 
 bool
-RealDiskInterface::WriteFile(const string& path, const string& contents) {
+RealDiskInterface::WriteFile(
+    const std::string& path, const std::string& contents
+) {
   FILE* fp = fopen(path.c_str(), "w");
   if (fp == nullptr) {
     Error(
@@ -135,7 +135,7 @@ RealDiskInterface::WriteFile(const string& path, const string& contents) {
 }
 
 bool
-RealDiskInterface::MakeDir(const string& path) {
+RealDiskInterface::MakeDir(const std::string& path) {
   if (::MakeDir(path) < 0) {
     if (errno == EEXIST) {
       return true;
@@ -147,7 +147,9 @@ RealDiskInterface::MakeDir(const string& path) {
 }
 
 FileReader::Status
-RealDiskInterface::ReadFile(const string& path, string* contents, string* err) {
+RealDiskInterface::ReadFile(
+    const std::string& path, std::string* contents, std::string* err
+) {
   switch (::ReadFile(path, contents, err)) {
     case 0:
       return Okay;
@@ -159,7 +161,7 @@ RealDiskInterface::ReadFile(const string& path, string* contents, string* err) {
 }
 
 int
-RealDiskInterface::RemoveFile(const string& path) {
+RealDiskInterface::RemoveFile(const std::string& path) {
   if (remove(path.c_str()) < 0) {
     switch (errno) {
       case ENOENT:

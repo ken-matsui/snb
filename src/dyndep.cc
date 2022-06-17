@@ -24,8 +24,6 @@
 #include <cassert>
 #include <cstdio>
 
-using namespace std;
-
 bool
 DyndepLoader::LoadDyndeps(Node* node, std::string* err) const {
   DyndepFile ddf;
