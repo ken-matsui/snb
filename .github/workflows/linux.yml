@@ -12,9 +12,9 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Build debug ninja
-#      env:
-#        CFLAGS: -fstack-protector-all -fsanitize=address
-#        CXXFLAGS: -fstack-protector-all -fsanitize=address
+      env:
+        CFLAGS: -fstack-protector-all -fsanitize=address
+        CXXFLAGS: -fstack-protector-all -fsanitize=address
       run: |
         cmake -DCMAKE_BUILD_TYPE=Debug -B debug-build
         cmake --build debug-build --parallel --config Debug
