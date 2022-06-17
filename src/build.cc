@@ -274,8 +274,7 @@ Plan::CleanNode(DependencyScan* scan, Node* node, std::string* err) {
     // If all non-order-only inputs for this edge are now clean,
     // we might have changed the dirty state of the outputs.
     std::vector<Node*>::iterator begin = oe->inputs_.begin(),
-                                 end = oe->inputs_.end()
-                                       - oe->order_only_deps_;
+                                 end = oe->inputs_.end() - oe->order_only_deps_;
     if (find_if(begin, end, std::mem_fn(&Node::dirty)) == end) {
       // Recompute most_recent_input.
       Node* most_recent_input = nullptr;
