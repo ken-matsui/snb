@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "parser.h"
+#include "parser.hpp"
 
-#include "disk_interface.h"
-#include "metrics.h"
+#include "disk_interface.hpp"
+#include "metrics.hpp"
 
 using namespace std;
 

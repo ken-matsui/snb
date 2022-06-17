@@ -15,7 +15,7 @@
 #ifndef NINJA_MANIFEST_PARSER_H_
 #define NINJA_MANIFEST_PARSER_H_
 
-#include "parser.h"
+#include "parser.hpp"
 
 struct BindingEnv;
 struct EvalString;

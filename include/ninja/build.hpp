@@ -15,10 +15,10 @@
 #ifndef NINJA_BUILD_H_
 #define NINJA_BUILD_H_
 
-#include "depfile_parser.h"
-#include "exit_status.h"
-#include "graph.h" // XXX needed for DependencyScan; should rearrange.
-#include "util.h" // int64_t
+#include "depfile_parser.hpp"
+#include "exit_status.hpp"
+#include "graph.hpp" // XXX needed for DependencyScan; should rearrange.
+#include "util.hpp" // int64_t
 
 #include <cstdio>
 #include <map>

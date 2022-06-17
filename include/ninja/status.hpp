@@ -15,8 +15,8 @@
 #ifndef NINJA_STATUS_H_
 #define NINJA_STATUS_H_
 
-#include "build.h"
-#include "line_printer.h"
+#include "build.hpp"
+#include "line_printer.hpp"
 
 #include <map>
 #include <string>

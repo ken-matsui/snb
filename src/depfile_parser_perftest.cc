@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "depfile_parser.h"
-#include "metrics.h"
-#include "util.h"
+#include "depfile_parser.hpp"
+#include "metrics.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

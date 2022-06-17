@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dyndep.h"
+#include "dyndep.hpp"
 
-#include "debug_flags.h"
-#include "disk_interface.h"
-#include "dyndep_parser.h"
-#include "graph.h"
-#include "state.h"
-#include "util.h"
+#include "debug_flags.hpp"
+#include "disk_interface.hpp"
+#include "dyndep_parser.hpp"
+#include "graph.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 #include <assert.h>
 #include <stdio.h>

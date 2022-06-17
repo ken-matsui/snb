@@ -33,7 +33,7 @@
 #  endif
 #endif
 
-#include "exit_status.h"
+#include "exit_status.hpp"
 
 /// Subprocess wraps a single async subprocess.  It is entirely
 /// passive: it expects the caller to notify it when its fds are ready

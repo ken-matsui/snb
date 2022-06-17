@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "deps_log.h"
+#include "deps_log.hpp"
 
-#include "graph.h"
-#include "metrics.h"
-#include "state.h"
-#include "util.h"
+#include "graph.hpp"
+#include "metrics.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 #include <assert.h>
 #include <errno.h>

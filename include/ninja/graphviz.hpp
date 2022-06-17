@@ -15,8 +15,8 @@
 #ifndef NINJA_GRAPHVIZ_H_
 #define NINJA_GRAPHVIZ_H_
 
-#include "dyndep.h"
-#include "graph.h"
+#include "dyndep.hpp"
+#include "graph.hpp"
 
 #include <set>
 

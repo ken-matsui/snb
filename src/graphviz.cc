@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "graphviz.h"
+#include "graphviz.hpp"
 
-#include "dyndep.h"
-#include "graph.h"
+#include "dyndep.hpp"
+#include "graph.hpp"
 
 #include <algorithm>
 #include <stdio.h>

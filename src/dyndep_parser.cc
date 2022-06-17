@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dyndep_parser.h"
+#include "dyndep_parser.hpp"
 
-#include "dyndep.h"
-#include "graph.h"
-#include "state.h"
-#include "util.h"
-#include "version.h"
+#include "dyndep.hpp"
+#include "graph.hpp"
+#include "state.hpp"
+#include "util.hpp"
+#include "version.hpp"
 
 #include <vector>
 

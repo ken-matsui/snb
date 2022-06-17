@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "json.h"
+#include "json.hpp"
 
 #include <cstdio>
 #include <string>

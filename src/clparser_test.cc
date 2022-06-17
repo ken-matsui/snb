@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "clparser.h"
-#include "test.h"
-#include "util.h"
+#include "clparser.hpp"
+#include "test.hpp"
+#include "util.hpp"
 
 using namespace std;
 

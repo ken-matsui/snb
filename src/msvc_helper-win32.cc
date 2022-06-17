@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "msvc_helper.h"
-#include "util.h"
+#include "msvc_helper.hpp"
+#include "util.hpp"
 
 #include <windows.h>
 

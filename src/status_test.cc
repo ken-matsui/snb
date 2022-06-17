@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "status.h"
-#include "test.h"
+#include "status.hpp"
+#include "test.hpp"
 
 TEST(StatusTest, StatusFormatElapsed) {
   BuildConfig config;

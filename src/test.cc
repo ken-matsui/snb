@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "test.h"
+#include "test.hpp"
 
-#include "build_log.h"
-#include "graph.h"
-#include "manifest_parser.h"
-#include "util.h"
+#include "build_log.hpp"
+#include "graph.hpp"
+#include "manifest_parser.hpp"
+#include "util.hpp"
 
 #include <algorithm>
 #include <cstring>

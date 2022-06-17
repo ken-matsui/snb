@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "version.h"
+#include "version.hpp"
 
-#include "util.h"
+#include "util.hpp"
 
 #include <stdlib.h>
 

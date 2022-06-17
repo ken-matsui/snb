@@ -30,12 +30,12 @@
 #  include <unistd.h>
 #endif
 
-#include "disk_interface.h"
-#include "graph.h"
-#include "manifest_parser.h"
-#include "metrics.h"
-#include "state.h"
-#include "util.h"
+#include "disk_interface.hpp"
+#include "graph.hpp"
+#include "manifest_parser.hpp"
+#include "metrics.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 using namespace std;
 

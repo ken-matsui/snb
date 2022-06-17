@@ -15,8 +15,8 @@
 #ifndef NINJA_DEPS_LOG_H_
 #define NINJA_DEPS_LOG_H_
 
-#include "load_status.h"
-#include "timestamp.h"
+#include "load_status.hpp"
+#include "timestamp.hpp"
 
 #include <stdio.h>
 #include <string>

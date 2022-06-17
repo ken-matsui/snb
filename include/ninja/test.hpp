@@ -15,10 +15,10 @@
 #ifndef NINJA_TEST_H_
 #define NINJA_TEST_H_
 
-#include "disk_interface.h"
-#include "manifest_parser.h"
-#include "state.h"
-#include "util.h"
+#include "disk_interface.hpp"
+#include "manifest_parser.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 // A tiny testing framework inspired by googletest, but much simpler and
 // faster to compile. It supports most things commonly used from googltest. The

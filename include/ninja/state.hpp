@@ -15,9 +15,9 @@
 #ifndef NINJA_STATE_H_
 #define NINJA_STATE_H_
 
-#include "eval_env.h"
-#include "graph.h"
-#include "util.h"
+#include "eval_env.hpp"
+#include "graph.hpp"
+#include "util.hpp"
 
 #include <map>
 #include <set>

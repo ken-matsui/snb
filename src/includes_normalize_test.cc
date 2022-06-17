@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "includes_normalize.h"
-#include "string_piece_util.h"
-#include "test.h"
-#include "util.h"
+#include "includes_normalize.hpp"
+#include "string_piece_util.hpp"
+#include "test.hpp"
+#include "util.hpp"
 
 #include <algorithm>
 #include <direct.h>

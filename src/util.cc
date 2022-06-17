@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "util.h"
+#include "util.hpp"
 
 #ifdef __CYGWIN__
 #  include <io.h>
@@ -48,7 +48,7 @@
 #elif defined(_AIX) && !defined(__PASE__)
 #  include <libperfstat.h>
 #elif defined(linux) || defined(__GLIBC__)
-#  include "string_piece_util.h"
+#  include "string_piece_util.hpp"
 
 #  include <fstream>
 #  include <map>
@@ -59,7 +59,7 @@
 #  include <sys/cpuset.h>
 #endif
 
-#include "edit_distance.h"
+#include "edit_distance.hpp"
 
 using namespace std;
 

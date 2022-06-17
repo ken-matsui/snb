@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "manifest_parser.h"
+#include "manifest_parser.hpp"
 
-#include "graph.h"
-#include "state.h"
-#include "util.h"
-#include "version.h"
+#include "graph.hpp"
+#include "state.hpp"
+#include "util.hpp"
+#include "version.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

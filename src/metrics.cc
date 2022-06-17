@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "metrics.h"
+#include "metrics.hpp"
 
 #include <errno.h>
 #include <stdio.h>
@@ -24,7 +24,7 @@
 #  include <windows.h>
 #endif
 
-#include "util.h"
+#include "util.hpp"
 
 #include <algorithm>
 

@@ -15,7 +15,7 @@
 #ifndef NINJA_PARSER_H_
 #define NINJA_PARSER_H_
 
-#include "lexer.h"
+#include "lexer.hpp"
 
 #include <string>
 

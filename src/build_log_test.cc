@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build_log.h"
-#include "test.h"
-#include "util.h"
+#include "build_log.hpp"
+#include "test.hpp"
+#include "util.hpp"
 
 #include <cassert>
 #include <cstring>

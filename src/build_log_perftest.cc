@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build_log.h"
-#include "graph.h"
-#include "manifest_parser.h"
-#include "metrics.h"
-#include "state.h"
-#include "util.h"
+#include "build_log.hpp"
+#include "graph.hpp"
+#include "manifest_parser.hpp"
+#include "metrics.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

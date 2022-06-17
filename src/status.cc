@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "status.h"
+#include "status.hpp"
 
-#include "debug_flags.h"
+#include "debug_flags.hpp"
 
 #include <stdarg.h>
 #include <stdlib.h>

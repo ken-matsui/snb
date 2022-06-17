@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "line_printer.h"
+#include "line_printer.hpp"
 
-#include "util.h"
+#include "util.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

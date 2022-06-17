@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build.h"
-#include "build_log.h"
-#include "deps_log.h"
-#include "graph.h"
-#include "status.h"
-#include "test.h"
+#include "build.hpp"
+#include "build_log.hpp"
+#include "deps_log.hpp"
+#include "graph.hpp"
+#include "status.hpp"
+#include "test.hpp"
 
 #include <assert.h>
 

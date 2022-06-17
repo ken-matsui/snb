@@ -15,9 +15,9 @@
 #ifndef NINJA_CLEAN_H_
 #define NINJA_CLEAN_H_
 
-#include "build.h"
-#include "build_log.h"
-#include "dyndep.h"
+#include "build.hpp"
+#include "build_log.hpp"
+#include "dyndep.hpp"
 
 #include <set>
 #include <string>
