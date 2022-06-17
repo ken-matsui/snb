@@ -12,33 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "clparser.h"
+#include "getopt.h"
 #include "msvc_helper.h"
+#include "util.h"
 
 #include <fcntl.h>
 #include <io.h>
 #include <stdio.h>
 #include <windows.h>
 
-#include "clparser.h"
-#include "util.h"
-
-#include "getopt.h"
-
 using namespace std;
 
 namespace {
 
-void Usage() {
+void
+Usage() {
   printf(
-"usage: ninja -t msvc [options] -- cl.exe /showIncludes /otherArgs\n"
-"options:\n"
-"  -e ENVFILE load environment block from ENVFILE as environment\n"
-"  -o FILE    write output dependency information to FILE.d\n"
-"  -p STRING  localized prefix of msvc's /showIncludes output\n"
-         );
+      "usage: ninja -t msvc [options] -- cl.exe /showIncludes /otherArgs\n"
+      "options:\n"
+      "  -e ENVFILE load environment block from ENVFILE as environment\n"
+      "  -o FILE    write output dependency information to FILE.d\n"
+      "  -p STRING  localized prefix of msvc's /showIncludes output\n"
+  );
 }
 
-void PushPathIntoEnvironment(const string& env_block) {
+void
+PushPathIntoEnvironment(const string& env_block) {
   const char* as_str = env_block.c_str();
   while (as_str[0]) {
     if (_strnicmp(as_str, "path=", 5) == 0) {
@@ -50,13 +50,13 @@ void PushPathIntoEnvironment(const string& env_block) {
   }
 }
 
-void WriteDepFileOrDie(const char* object_path, const CLParser& parse) {
+void
+WriteDepFileOrDie(const char* object_path, const CLParser& parse) {
   string depfile_path = string(object_path) + ".d";
   FILE* depfile = fopen(depfile_path.c_str(), "w");
   if (!depfile) {
     unlink(object_path);
-    Fatal("opening %s: %s", depfile_path.c_str(),
-          GetLastErrorString().c_str());
+    Fatal("opening %s: %s", depfile_path.c_str(), GetLastErrorString().c_str());
   }
   if (fprintf(depfile, "%s: ", object_path) < 0) {
     unlink(object_path);
@@ -65,8 +65,8 @@ void WriteDepFileOrDie(const char* object_path, const CLParser& parse) {
     Fatal("writing %s", depfile_path.c_str());
   }
   const set<string>& headers = parse.includes_;
-  for (set<string>::const_iterator i = headers.begin();
-       i != headers.end(); ++i) {
+  for (set<string>::const_iterator i = headers.begin(); i != headers.end();
+       ++i) {
     if (fprintf(depfile, "%s\n", EscapeForDepfile(*i).c_str()) < 0) {
       unlink(object_path);
       fclose(depfile);
@@ -77,19 +77,19 @@ void WriteDepFileOrDie(const char* object_path, const CLParser& parse) {
   fclose(depfile);
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
-int MSVCHelperMain(int argc, char** argv) {
+int
+MSVCHelperMain(int argc, char** argv) {
   const char* output_filename = nullptr;
   const char* envfile = nullptr;
 
   const option kLongOptions[] = {
-    { "help", no_argument, nullptr, 'h' },
-    { nullptr, 0, nullptr, 0 }
-  };
+      {"help", no_argument, nullptr, 'h'}, {nullptr, 0, nullptr, 0}};
   int opt;
   string deps_prefix;
-  while ((opt = getopt_long(argc, argv, "e:o:p:h", kLongOptions, nullptr)) != -1) {
+  while ((opt = getopt_long(argc, argv, "e:o:p:h", kLongOptions, nullptr)) != -1
+  ) {
     switch (opt) {
       case 'e':
         envfile = optarg;

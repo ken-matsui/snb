@@ -15,12 +15,12 @@
 #include "util.h"
 
 #ifdef __CYGWIN__
-#include <windows.h>
-#include <io.h>
-#elif defined( _WIN32)
-#include <windows.h>
-#include <io.h>
-#include <share.h>
+#  include <io.h>
+#  include <windows.h>
+#elif defined(_WIN32)
+#  include <io.h>
+#  include <share.h>
+#  include <windows.h>
 #endif
 
 #include <assert.h>
@@ -34,35 +34,37 @@
 #include <sys/types.h>
 
 #ifndef _WIN32
-#include <unistd.h>
-#include <sys/time.h>
+#  include <sys/time.h>
+#  include <unistd.h>
 #endif
 
 #include <vector>
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
-#include <sys/sysctl.h>
+#  include <sys/sysctl.h>
 #elif defined(__SVR4) && defined(__sun)
-#include <unistd.h>
-#include <sys/loadavg.h>
+#  include <sys/loadavg.h>
+#  include <unistd.h>
 #elif defined(_AIX) && !defined(__PASE__)
-#include <libperfstat.h>
+#  include <libperfstat.h>
 #elif defined(linux) || defined(__GLIBC__)
-#include <sys/sysinfo.h>
-#include <fstream>
-#include <map>
-#include "string_piece_util.h"
+#  include "string_piece_util.h"
+
+#  include <fstream>
+#  include <map>
+#  include <sys/sysinfo.h>
 #endif
 
 #if defined(__FreeBSD__)
-#include <sys/cpuset.h>
+#  include <sys/cpuset.h>
 #endif
 
 #include "edit_distance.h"
 
 using namespace std;
 
-void Fatal(const char* msg, ...) {
+void
+Fatal(const char* msg, ...) {
   va_list ap;
   fprintf(stderr, "ninja: fatal: ");
   va_start(ap, msg);
@@ -72,46 +74,53 @@ void Fatal(const char* msg, ...) {
   exit(1);
 }
 
-void Warning(const char* msg, va_list ap) {
+void
+Warning(const char* msg, va_list ap) {
   fprintf(stderr, "ninja: warning: ");
   vfprintf(stderr, msg, ap);
   fprintf(stderr, "\n");
 }
 
-void Warning(const char* msg, ...) {
+void
+Warning(const char* msg, ...) {
   va_list ap;
   va_start(ap, msg);
   Warning(msg, ap);
   va_end(ap);
 }
 
-void Error(const char* msg, va_list ap) {
+void
+Error(const char* msg, va_list ap) {
   fprintf(stderr, "ninja: error: ");
   vfprintf(stderr, msg, ap);
   fprintf(stderr, "\n");
 }
 
-void Error(const char* msg, ...) {
+void
+Error(const char* msg, ...) {
   va_list ap;
   va_start(ap, msg);
   Error(msg, ap);
   va_end(ap);
 }
 
-void Info(const char* msg, va_list ap) {
+void
+Info(const char* msg, va_list ap) {
   fprintf(stdout, "ninja: ");
   vfprintf(stdout, msg, ap);
   fprintf(stdout, "\n");
 }
 
-void Info(const char* msg, ...) {
+void
+Info(const char* msg, ...) {
   va_list ap;
   va_start(ap, msg);
   Info(msg, ap);
   va_end(ap);
 }
 
-void CanonicalizePath(string* path, uint64_t* slash_bits) {
+void
+CanonicalizePath(string* path, uint64_t* slash_bits) {
   size_t len = path->size();
   char* str = 0;
   if (len > 0)
@@ -120,11 +129,13 @@ void CanonicalizePath(string* path, uint64_t* slash_bits) {
   path->resize(len);
 }
 
-static bool IsPathSeparator(char c) {
+static bool
+IsPathSeparator(char c) {
   return c == '/';
 }
 
-void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
+void
+CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
   // WARNING: this function is performance-critical; please benchmark
   // any changes you make to it.
   if (*len == 0) {
@@ -178,7 +189,7 @@ void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
 
     while (src != end && !IsPathSeparator(*src))
       *dst++ = *src++;
-    *dst++ = *src++;  // Copy '/' or final \0 character as well.
+    *dst++ = *src++; // Copy '/' or final \0 character as well.
   }
 
   if (dst == start) {
@@ -190,10 +201,14 @@ void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
   *slash_bits = 0;
 }
 
-static inline bool IsKnownShellSafeCharacter(char ch) {
-  if ('A' <= ch && ch <= 'Z') return true;
-  if ('a' <= ch && ch <= 'z') return true;
-  if ('0' <= ch && ch <= '9') return true;
+static inline bool
+IsKnownShellSafeCharacter(char ch) {
+  if ('A' <= ch && ch <= 'Z')
+    return true;
+  if ('a' <= ch && ch <= 'z')
+    return true;
+  if ('0' <= ch && ch <= '9')
+    return true;
 
   switch (ch) {
     case '_':
@@ -207,7 +222,8 @@ static inline bool IsKnownShellSafeCharacter(char ch) {
   }
 }
 
-static inline bool IsKnownWin32SafeCharacter(char ch) {
+static inline bool
+IsKnownWin32SafeCharacter(char ch) {
   switch (ch) {
     case ' ':
     case '"':
@@ -217,21 +233,26 @@ static inline bool IsKnownWin32SafeCharacter(char ch) {
   }
 }
 
-static inline bool StringNeedsShellEscaping(const string& input) {
+static inline bool
+StringNeedsShellEscaping(const string& input) {
   for (size_t i = 0; i < input.size(); ++i) {
-    if (!IsKnownShellSafeCharacter(input[i])) return true;
+    if (!IsKnownShellSafeCharacter(input[i]))
+      return true;
   }
   return false;
 }
 
-static inline bool StringNeedsWin32Escaping(const string& input) {
+static inline bool
+StringNeedsWin32Escaping(const string& input) {
   for (size_t i = 0; i < input.size(); ++i) {
-    if (!IsKnownWin32SafeCharacter(input[i])) return true;
+    if (!IsKnownWin32SafeCharacter(input[i]))
+      return true;
   }
   return false;
 }
 
-void GetShellEscapedString(const string& input, string* result) {
+void
+GetShellEscapedString(const string& input, string* result) {
   assert(result);
 
   if (!StringNeedsShellEscaping(input)) {
@@ -257,8 +278,8 @@ void GetShellEscapedString(const string& input, string* result) {
   result->push_back(kQuote);
 }
 
-
-void GetWin32EscapedString(const string& input, string* result) {
+void
+GetWin32EscapedString(const string& input, string* result) {
   assert(result);
   if (!StringNeedsWin32Escaping(input)) {
     result->append(input);
@@ -293,7 +314,8 @@ void GetWin32EscapedString(const string& input, string* result) {
   result->push_back(kQuote);
 }
 
-int ReadFile(const string& path, string* contents, string* err) {
+int
+ReadFile(const string& path, string* contents, string* err) {
   FILE* f = fopen(path.c_str(), "rb");
   if (!f) {
     err->assign(strerror(errno));
@@ -316,7 +338,7 @@ int ReadFile(const string& path, string* contents, string* err) {
     contents->append(buf, len);
   }
   if (ferror(f)) {
-    err->assign(strerror(errno));  // XXX errno?
+    err->assign(strerror(errno)); // XXX errno?
     contents->clear();
     fclose(f);
     return -errno;
@@ -325,7 +347,8 @@ int ReadFile(const string& path, string* contents, string* err) {
   return 0;
 }
 
-void SetCloseOnExec(int fd) {
+void
+SetCloseOnExec(int fd) {
 #ifndef _WIN32
   int flags = fcntl(fd, F_GETFD);
   if (flags < 0) {
@@ -335,25 +358,24 @@ void SetCloseOnExec(int fd) {
       perror("fcntl(F_SETFD)");
   }
 #else
-  HANDLE hd = (HANDLE) _get_osfhandle(fd);
-  if (! SetHandleInformation(hd, HANDLE_FLAG_INHERIT, 0)) {
+  HANDLE hd = (HANDLE)_get_osfhandle(fd);
+  if (!SetHandleInformation(hd, HANDLE_FLAG_INHERIT, 0)) {
     fprintf(stderr, "SetHandleInformation(): %s", GetLastErrorString().c_str());
   }
-#endif  // ! _WIN32
+#endif // ! _WIN32
 }
 
-
-const char* SpellcheckStringV(const string& text,
-                              const vector<const char*>& words) {
+const char*
+SpellcheckStringV(const string& text, const vector<const char*>& words) {
   const bool kAllowReplacements = true;
   const int kMaxValidEditDistance = 3;
 
   int min_distance = kMaxValidEditDistance + 1;
   const char* result = nullptr;
-  for (vector<const char*>::const_iterator i = words.begin();
-       i != words.end(); ++i) {
-    int distance = EditDistance(*i, text, kAllowReplacements,
-                                kMaxValidEditDistance);
+  for (vector<const char*>::const_iterator i = words.begin(); i != words.end();
+       ++i) {
+    int distance =
+        EditDistance(*i, text, kAllowReplacements, kMaxValidEditDistance);
     if (distance < min_distance) {
       min_distance = distance;
       result = *i;
@@ -362,7 +384,8 @@ const char* SpellcheckStringV(const string& text,
   return result;
 }
 
-const char* SpellcheckString(const char* text, ...) {
+const char*
+SpellcheckString(const char* text, ...) {
   // Note: This takes a const char* instead of a string& because using
   // va_start() with a reference parameter is undefined behavior.
   va_list ap;
@@ -375,12 +398,14 @@ const char* SpellcheckString(const char* text, ...) {
   return SpellcheckStringV(text, words);
 }
 
-bool islatinalpha(int c) {
+bool
+islatinalpha(int c) {
   // isalpha() is locale-dependent.
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-string StripAnsiEscapeCodes(const string& in) {
+string
+StripAnsiEscapeCodes(const string& in) {
   string stripped;
   stripped.reserve(in.size());
 
@@ -392,8 +417,10 @@ string StripAnsiEscapeCodes(const string& in) {
     }
 
     // Only strip CSIs for now.
-    if (i + 1 >= in.size()) break;
-    if (in[i + 1] != '[') continue;  // Not a CSI.
+    if (i + 1 >= in.size())
+      break;
+    if (in[i + 1] != '[')
+      continue; // Not a CSI.
     i += 2;
 
     // Skip everything up to and including the next [a-zA-Z].
@@ -404,7 +431,8 @@ string StripAnsiEscapeCodes(const string& in) {
 }
 
 #if defined(linux) || defined(__GLIBC__)
-std::pair<int64_t, bool> readCount(const std::string& path) {
+std::pair<int64_t, bool>
+readCount(const std::string& path) {
   std::ifstream file(path.c_str());
   if (!file.is_open())
     return std::make_pair(0, false);
@@ -426,7 +454,8 @@ struct MountPoint {
   std::string_view fsType;
   std::string_view mountSource;
   vector<std::string_view> superOptions;
-  bool parse(const string& line) {
+  bool
+  parse(const string& line) {
     vector<std::string_view> pieces = SplitStringPiece(line, ' ');
     if (pieces.size() < 10)
       return false;
@@ -454,7 +483,8 @@ struct MountPoint {
     superOptions = SplitStringPiece(pieces[optionalStart + 2], ',');
     return true;
   }
-  string translate(string& path) const {
+  string
+  translate(string& path) const {
     // path must be sub dir of root
     if (path.compare(0, root.size(), root.data(), root.size()) != 0) {
       return string();
@@ -471,7 +501,8 @@ struct CGroupSubSys {
   int id;
   string name;
   vector<string> subsystems;
-  bool parse(string& line) {
+  bool
+  parse(string& line) {
     size_t first = line.find(':');
     if (first == string::npos)
       return false;
@@ -491,7 +522,8 @@ struct CGroupSubSys {
   }
 };
 
-map<string, string> ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
+map<string, string>
+ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
   map<string, string> cgroups;
   ifstream mountinfo("/proc/self/mountinfo");
   if (!mountinfo.is_open())
@@ -517,7 +549,8 @@ map<string, string> ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
   return cgroups;
 }
 
-map<string, CGroupSubSys> ParseSelfCGroup() {
+map<string, CGroupSubSys>
+ParseSelfCGroup() {
   map<string, CGroupSubSys> cgroups;
   ifstream cgroup("/proc/self/cgroup");
   if (!cgroup.is_open())
@@ -535,7 +568,8 @@ map<string, CGroupSubSys> ParseSelfCGroup() {
   return cgroups;
 }
 
-int ParseCPUFromCGroup() {
+int
+ParseCPUFromCGroup() {
   map<string, CGroupSubSys> subsystems = ParseSelfCGroup();
   map<string, string> cgroups = ParseMountInfo(subsystems);
   map<string, string>::iterator cpu = cgroups.find("cpu");
@@ -552,7 +586,8 @@ int ParseCPUFromCGroup() {
 }
 #endif
 
-int GetProcessorCount() {
+int
+GetProcessorCount() {
   int cgroupCount = -1;
   int schedCount = -1;
 #if defined(linux) || defined(__GLIBC__)
@@ -564,8 +599,10 @@ int GetProcessorCount() {
 #if defined(__FreeBSD__)
   cpuset_t mask;
   CPU_ZERO(&mask);
-  if (cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, sizeof(mask),
-    &mask) == 0) {
+  if (cpuset_getaffinity(
+          CPU_LEVEL_WHICH, CPU_WHICH_TID, -1, sizeof(mask), &mask
+      )
+      == 0) {
     return CPU_COUNT(&mask);
   }
 #elif defined(CPU_COUNT)
@@ -574,14 +611,16 @@ int GetProcessorCount() {
     schedCount = CPU_COUNT(&set);
   }
 #endif
-  if (cgroupCount >= 0 && schedCount >= 0) return std::min(cgroupCount, schedCount);
-  if (cgroupCount < 0 && schedCount < 0) return sysconf(_SC_NPROCESSORS_ONLN);
+  if (cgroupCount >= 0 && schedCount >= 0)
+    return std::min(cgroupCount, schedCount);
+  if (cgroupCount < 0 && schedCount < 0)
+    return sysconf(_SC_NPROCESSORS_ONLN);
   return std::max(cgroupCount, schedCount);
 }
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-static double CalculateProcessorLoad(uint64_t idle_ticks, uint64_t total_ticks)
-{
+static double
+CalculateProcessorLoad(uint64_t idle_ticks, uint64_t total_ticks) {
   static uint64_t previous_idle_ticks = 0;
   static uint64_t previous_total_ticks = 0;
   static double previous_load = -0.0;
@@ -602,7 +641,7 @@ static double CalculateProcessorLoad(uint64_t idle_ticks, uint64_t total_ticks)
     double load_since_last_call = 1.0 - idle_to_total_ratio;
 
     // Filter/smooth result when possible.
-    if(previous_load > 0) {
+    if (previous_load > 0) {
       load = 0.9 * previous_load + 0.1 * load_since_last_call;
     } else {
       load = load_since_last_call;
@@ -616,14 +655,15 @@ static double CalculateProcessorLoad(uint64_t idle_ticks, uint64_t total_ticks)
   return load;
 }
 
-static uint64_t FileTimeToTickCount(const FILETIME & ft)
-{
+static uint64_t
+FileTimeToTickCount(const FILETIME& ft) {
   uint64_t high = (((uint64_t)(ft.dwHighDateTime)) << 32);
-  uint64_t low  = ft.dwLowDateTime;
+  uint64_t low = ft.dwLowDateTime;
   return (high | low);
 }
 
-double GetLoadAverage() {
+double
+GetLoadAverage() {
   FILETIME idle_time, kernel_time, user_time;
   BOOL get_system_time_succeeded =
       GetSystemTimes(&idle_time, &kernel_time, &user_time);
@@ -646,11 +686,13 @@ double GetLoadAverage() {
   return posix_compatible_load;
 }
 #elif defined(__PASE__)
-double GetLoadAverage() {
+double
+GetLoadAverage() {
   return -0.0f;
 }
 #elif defined(_AIX)
-double GetLoadAverage() {
+double
+GetLoadAverage() {
   perfstat_cpu_total_t cpu_stats;
   if (perfstat_cpu_total(NULL, &cpu_stats, sizeof(cpu_stats), 1) < 0) {
     return -0.0f;
@@ -660,19 +702,22 @@ double GetLoadAverage() {
   return double(cpu_stats.loadavg[0]) / double(1 << SBITS);
 }
 #elif defined(__UCLIBC__) || (defined(__BIONIC__) && __ANDROID_API__ < 29)
-double GetLoadAverage() {
+double
+GetLoadAverage() {
   struct sysinfo si;
   if (sysinfo(&si) != 0)
     return -0.0f;
   return 1.0 / (1 << SI_LOAD_SHIFT) * si.loads[0];
 }
 #elif defined(__HAIKU__)
-double GetLoadAverage() {
-    return -0.0f;
+double
+GetLoadAverage() {
+  return -0.0f;
 }
 #else
-double GetLoadAverage() {
-  double loadavg[3] = { 0.0f, 0.0f, 0.0f };
+double
+GetLoadAverage() {
+  double loadavg[3] = {0.0f, 0.0f, 0.0f};
   if (getloadavg(loadavg, 3) < 0) {
     // Maybe we should return an error here or the availability of
     // getloadavg(3) should be checked when ninja is configured.
@@ -682,25 +727,30 @@ double GetLoadAverage() {
 }
 #endif // _WIN32
 
-string ElideMiddle(const string& str, size_t width) {
+string
+ElideMiddle(const string& str, size_t width) {
   switch (width) {
-      case 0: return "";
-      case 1: return ".";
-      case 2: return "..";
-      case 3: return "...";
+    case 0:
+      return "";
+    case 1:
+      return ".";
+    case 2:
+      return "..";
+    case 3:
+      return "...";
   }
-  const int kMargin = 3;  // Space for "...".
+  const int kMargin = 3; // Space for "...".
   string result = str;
   if (result.size() > width) {
     size_t elide_size = (width - kMargin) / 2;
-    result = result.substr(0, elide_size)
-      + "..."
-      + result.substr(result.size() - elide_size, elide_size);
+    result = result.substr(0, elide_size) + "..."
+             + result.substr(result.size() - elide_size, elide_size);
   }
   return result;
 }
 
-bool Truncate(const string& path, size_t size, string* err) {
+bool
+Truncate(const string& path, size_t size, string* err) {
   int success = truncate(path.c_str(), size);
   // Both truncate() and _chsize() return 0 on success and set errno and return
   // -1 on failure.

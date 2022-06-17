@@ -15,15 +15,15 @@
 #ifndef NINJA_GRAPH_H_
 #define NINJA_GRAPH_H_
 
-#include <algorithm>
-#include <set>
-#include <string>
-#include <vector>
-
 #include "dyndep.h"
 #include "eval_env.h"
 #include "timestamp.h"
 #include "util.h"
+
+#include <algorithm>
+#include <set>
+#include <string>
+#include <vector>
 
 struct BuildLog;
 struct DepfileParserOptions;
@@ -38,81 +38,133 @@ struct State;
 /// it's dirty, mtime, etc.
 struct Node {
   Node(const std::string& path, uint64_t slash_bits)
-      : path_(path),
-        slash_bits_(slash_bits),
-        mtime_(-1),
-        exists_(ExistenceStatusUnknown),
-        dirty_(false),
-        dyndep_pending_(false),
-        in_edge_(NULL),
-        id_(-1) {}
+      : path_(path), slash_bits_(slash_bits), mtime_(-1),
+        exists_(ExistenceStatusUnknown), dirty_(false), dyndep_pending_(false),
+        in_edge_(NULL), id_(-1) {}
 
   /// Return false on error.
-  bool Stat(DiskInterface* disk_interface, std::string* err);
+  bool
+  Stat(DiskInterface* disk_interface, std::string* err);
 
   /// If the file doesn't exist, set the mtime_ from its dependencies
-  void UpdatePhonyMtime(TimeStamp mtime);
+  void
+  UpdatePhonyMtime(TimeStamp mtime);
 
   /// Return false on error.
-  bool StatIfNecessary(DiskInterface* disk_interface, std::string* err) {
+  bool
+  StatIfNecessary(DiskInterface* disk_interface, std::string* err) {
     if (status_known())
       return true;
     return Stat(disk_interface, err);
   }
 
   /// Mark as not-yet-stat()ed and not dirty.
-  void ResetState() {
+  void
+  ResetState() {
     mtime_ = -1;
     exists_ = ExistenceStatusUnknown;
     dirty_ = false;
   }
 
   /// Mark the Node as already-stat()ed and missing.
-  void MarkMissing() {
+  void
+  MarkMissing() {
     if (mtime_ == -1) {
       mtime_ = 0;
     }
     exists_ = ExistenceStatusMissing;
   }
 
-  bool exists() const {
+  bool
+  exists() const {
     return exists_ == ExistenceStatusExists;
   }
 
-  bool status_known() const {
+  bool
+  status_known() const {
     return exists_ != ExistenceStatusUnknown;
   }
 
-  const std::string& path() const { return path_; }
+  const std::string&
+  path() const {
+    return path_;
+  }
   /// Get |path()| but use slash_bits to convert back to original slash styles.
-  std::string PathDecanonicalized() const {
+  std::string
+  PathDecanonicalized() const {
     return PathDecanonicalized(path_, slash_bits_);
   }
-  static std::string PathDecanonicalized(const std::string& path,
-                                         uint64_t slash_bits);
-  uint64_t slash_bits() const { return slash_bits_; }
+  static std::string
+  PathDecanonicalized(const std::string& path, uint64_t slash_bits);
+  uint64_t
+  slash_bits() const {
+    return slash_bits_;
+  }
 
-  TimeStamp mtime() const { return mtime_; }
+  TimeStamp
+  mtime() const {
+    return mtime_;
+  }
 
-  bool dirty() const { return dirty_; }
-  void set_dirty(bool dirty) { dirty_ = dirty; }
-  void MarkDirty() { dirty_ = true; }
+  bool
+  dirty() const {
+    return dirty_;
+  }
+  void
+  set_dirty(bool dirty) {
+    dirty_ = dirty;
+  }
+  void
+  MarkDirty() {
+    dirty_ = true;
+  }
 
-  bool dyndep_pending() const { return dyndep_pending_; }
-  void set_dyndep_pending(bool pending) { dyndep_pending_ = pending; }
+  bool
+  dyndep_pending() const {
+    return dyndep_pending_;
+  }
+  void
+  set_dyndep_pending(bool pending) {
+    dyndep_pending_ = pending;
+  }
 
-  Edge* in_edge() const { return in_edge_; }
-  void set_in_edge(Edge* edge) { in_edge_ = edge; }
+  Edge*
+  in_edge() const {
+    return in_edge_;
+  }
+  void
+  set_in_edge(Edge* edge) {
+    in_edge_ = edge;
+  }
 
-  int id() const { return id_; }
-  void set_id(int id) { id_ = id; }
+  int
+  id() const {
+    return id_;
+  }
+  void
+  set_id(int id) {
+    id_ = id;
+  }
 
-  const std::vector<Edge*>& out_edges() const { return out_edges_; }
-  const std::vector<Edge*>& validation_out_edges() const { return validation_out_edges_; }
-  void AddOutEdge(Edge* edge) { out_edges_.push_back(edge); }
-  void AddValidationOutEdge(Edge* edge) { validation_out_edges_.push_back(edge); }
+  const std::vector<Edge*>&
+  out_edges() const {
+    return out_edges_;
+  }
+  const std::vector<Edge*>&
+  validation_out_edges() const {
+    return validation_out_edges_;
+  }
+  void
+  AddOutEdge(Edge* edge) {
+    out_edges_.push_back(edge);
+  }
+  void
+  AddValidationOutEdge(Edge* edge) {
+    validation_out_edges_.push_back(edge);
+  }
 
-  void Dump(const char* prefix="") const;
+  void
+  Dump(const char* prefix = "") const;
 
 private:
   std::string path_;
@@ -124,13 +176,15 @@ private:
   /// Possible values of mtime_:
   ///   -1: file hasn't been examined
   ///   0:  we looked, and file doesn't exist
-  ///   >0: actual file's mtime, or the latest mtime of its dependencies if it doesn't exist
+  ///   >0: actual file's mtime, or the latest mtime of its dependencies if it
+  ///   doesn't exist
   TimeStamp mtime_;
 
   enum ExistenceStatus {
     /// The file hasn't been examined.
     ExistenceStatusUnknown,
-    /// The file doesn't exist. mtime_ will be the latest mtime of its dependencies.
+    /// The file doesn't exist. mtime_ will be the latest mtime of its
+    /// dependencies.
     ExistenceStatusMissing,
     /// The path is an actual file. mtime_ will be the file's mtime.
     ExistenceStatusExists
@@ -162,11 +216,7 @@ private:
 
 /// An edge in the dependency graph; links between Nodes using Rules.
 struct Edge {
-  enum VisitMark {
-    VisitNone,
-    VisitInStack,
-    VisitDone
-  };
+  enum VisitMark { VisitNone, VisitInStack, VisitDone };
 
   Edge()
       : rule_(NULL), pool_(NULL), dyndep_(NULL), env_(NULL), mark_(VisitNone),
@@ -176,28 +226,37 @@ struct Edge {
         implicit_outs_(0) {}
 
   /// Return true if all inputs' in-edges are ready.
-  bool AllInputsReady() const;
+  bool
+  AllInputsReady() const;
 
   /// Expand all variables in a command and return it as a string.
   /// If incl_rsp_file is enabled, the string will also contain the
   /// full contents of a response file (if applicable)
-  std::string EvaluateCommand(bool incl_rsp_file = false) const;
+  std::string
+  EvaluateCommand(bool incl_rsp_file = false) const;
 
   /// Returns the shell-escaped value of |key|.
-  std::string GetBinding(const std::string& key) const;
-  bool GetBindingBool(const std::string& key) const;
+  std::string
+  GetBinding(const std::string& key) const;
+  bool
+  GetBindingBool(const std::string& key) const;
 
   /// Like GetBinding("depfile"), but without shell escaping.
-  std::string GetUnescapedDepfile() const;
+  std::string
+  GetUnescapedDepfile() const;
   /// Like GetBinding("dyndep"), but without shell escaping.
-  std::string GetUnescapedDyndep() const;
+  std::string
+  GetUnescapedDyndep() const;
   /// Like GetBinding("rspfile"), but without shell escaping.
-  std::string GetUnescapedRspfile() const;
+  std::string
+  GetUnescapedRspfile() const;
 
-  void Dump(const char* prefix="") const;
+  void
+  Dump(const char* prefix = "") const;
 
   // Append all edge explicit inputs to |*out|. Possibly with shell escaping.
-  void CollectInputs(bool shell_escape, std::vector<std::string>* out) const;
+  void
+  CollectInputs(bool shell_escape, std::vector<std::string>* out) const;
 
   const Rule* rule_;
   Pool* pool_;
@@ -214,10 +273,22 @@ struct Edge {
   bool generated_by_dep_loader_;
   TimeStamp command_start_time_;
 
-  const Rule& rule() const { return *rule_; }
-  Pool* pool() const { return pool_; }
-  int weight() const { return 1; }
-  bool outputs_ready() const { return outputs_ready_; }
+  const Rule&
+  rule() const {
+    return *rule_;
+  }
+  Pool*
+  pool() const {
+    return pool_;
+  }
+  int
+  weight() const {
+    return 1;
+  }
+  bool
+  outputs_ready() const {
+    return outputs_ready_;
+  }
 
   // There are three types of inputs.
   // 1) explicit deps, which show up as $in on the command line;
@@ -229,11 +300,13 @@ struct Edge {
   // #2 and #3 when we need to access the various subsets.
   int implicit_deps_;
   int order_only_deps_;
-  bool is_implicit(size_t index) {
-    return index >= inputs_.size() - order_only_deps_ - implicit_deps_ &&
-        !is_order_only(index);
+  bool
+  is_implicit(size_t index) {
+    return index >= inputs_.size() - order_only_deps_ - implicit_deps_
+           && !is_order_only(index);
   }
-  bool is_order_only(size_t index) {
+  bool
+  is_order_only(size_t index) {
     return index >= inputs_.size() - order_only_deps_;
   }
 
@@ -243,17 +316,22 @@ struct Edge {
   // These are stored in outputs_ in that order, and we keep a count of
   // #2 to use when we need to access the various subsets.
   int implicit_outs_;
-  bool is_implicit_out(size_t index) const {
+  bool
+  is_implicit_out(size_t index) const {
     return index >= outputs_.size() - implicit_outs_;
   }
 
-  bool is_phony() const;
-  bool use_console() const;
-  bool maybe_phonycycle_diagnostic() const;
+  bool
+  is_phony() const;
+  bool
+  use_console() const;
+  bool
+  maybe_phonycycle_diagnostic() const;
 };
 
 struct EdgeCmp {
-  bool operator()(const Edge* a, const Edge* b) const {
+  bool
+  operator()(const Edge* a, const Edge* b) const {
     return a->id_ < b->id_;
   }
 };
@@ -263,44 +341,52 @@ using EdgeSet = std::set<Edge*, EdgeCmp>;
 /// ImplicitDepLoader loads implicit dependencies, as referenced via the
 /// "depfile" attribute in build files.
 struct ImplicitDepLoader {
-  ImplicitDepLoader(State* state, DepsLog* deps_log,
-                    DiskInterface* disk_interface,
-                    DepfileParserOptions const* depfile_parser_options)
+  ImplicitDepLoader(
+      State* state, DepsLog* deps_log, DiskInterface* disk_interface,
+      DepfileParserOptions const* depfile_parser_options
+  )
       : state_(state), disk_interface_(disk_interface), deps_log_(deps_log),
         depfile_parser_options_(depfile_parser_options) {}
 
   /// Load implicit dependencies for \a edge.
   /// @return false on error (without filling \a err if info is just missing
   //                          or out of date).
-  bool LoadDeps(Edge* edge, std::string* err);
+  bool
+  LoadDeps(Edge* edge, std::string* err);
 
-  DepsLog* deps_log() const {
+  DepsLog*
+  deps_log() const {
     return deps_log_;
   }
 
- protected:
+protected:
   /// Process loaded implicit dependencies for \a edge and update the graph
   /// @return false on error (without filling \a err if info is just missing)
-  virtual bool ProcessDepfileDeps(Edge* edge,
-                                  std::vector<std::string_view>* depfile_ins,
-                                  std::string* err);
+  virtual bool
+  ProcessDepfileDeps(
+      Edge* edge, std::vector<std::string_view>* depfile_ins, std::string* err
+  );
 
   /// Load implicit dependencies for \a edge from a depfile attribute.
   /// @return false on error (without filling \a err if info is just missing).
-  bool LoadDepFile(Edge* edge, const std::string& path, std::string* err);
+  bool
+  LoadDepFile(Edge* edge, const std::string& path, std::string* err);
 
   /// Load implicit dependencies for \a edge from the DepsLog.
   /// @return false on error (without filling \a err if info is just missing).
-  bool LoadDepsFromLog(Edge* edge, std::string* err);
+  bool
+  LoadDepsFromLog(Edge* edge, std::string* err);
 
   /// Preallocate \a count spaces in the input array on \a edge, returning
   /// an iterator pointing at the first new space.
-  std::vector<Node*>::iterator PreallocateSpace(Edge* edge, int count);
+  std::vector<Node*>::iterator
+  PreallocateSpace(Edge* edge, int count);
 
   /// If we don't have a edge that generates this input already,
   /// create one; this makes us not abort if the input is missing,
   /// but instead will rebuild in that circumstance.
-  void CreatePhonyInEdge(Node* node);
+  void
+  CreatePhonyInEdge(Node* node);
 
   State* state_;
   DiskInterface* disk_interface_;
@@ -308,15 +394,15 @@ struct ImplicitDepLoader {
   DepfileParserOptions const* depfile_parser_options_;
 };
 
-
 /// DependencyScan manages the process of scanning the files in a graph
 /// and updating the dirty/outputs_ready state of all the nodes and edges.
 struct DependencyScan {
-  DependencyScan(State* state, BuildLog* build_log, DepsLog* deps_log,
-                 DiskInterface* disk_interface,
-                 DepfileParserOptions const* depfile_parser_options)
-      : build_log_(build_log),
-        disk_interface_(disk_interface),
+  DependencyScan(
+      State* state, BuildLog* build_log, DepsLog* deps_log,
+      DiskInterface* disk_interface,
+      DepfileParserOptions const* depfile_parser_options
+  )
+      : build_log_(build_log), disk_interface_(disk_interface),
         dep_loader_(state, deps_log, disk_interface, depfile_parser_options),
         dyndep_loader_(state, disk_interface) {}
 
@@ -327,21 +413,29 @@ struct DependencyScan {
   /// state accordingly.
   /// Appends any validation nodes found to the nodes parameter.
   /// Returns false on failure.
-  bool RecomputeDirty(Node* node, std::vector<Node*>* validation_nodes, std::string* err);
+  bool
+  RecomputeDirty(
+      Node* node, std::vector<Node*>* validation_nodes, std::string* err
+  );
 
   /// Recompute whether any output of the edge is dirty, if so sets |*dirty|.
   /// Returns false on failure.
-  bool RecomputeOutputsDirty(Edge* edge, Node* most_recent_input,
-                             bool* dirty, std::string* err);
+  bool
+  RecomputeOutputsDirty(
+      Edge* edge, Node* most_recent_input, bool* dirty, std::string* err
+  );
 
-  BuildLog* build_log() const {
+  BuildLog*
+  build_log() const {
     return build_log_;
   }
-  void set_build_log(BuildLog* log) {
+  void
+  set_build_log(BuildLog* log) {
     build_log_ = log;
   }
 
-  DepsLog* deps_log() const {
+  DepsLog*
+  deps_log() const {
     return dep_loader_.deps_log();
   }
 
@@ -349,18 +443,27 @@ struct DependencyScan {
   /// build graph with the new information.  One overload accepts
   /// a caller-owned 'DyndepFile' object in which to store the
   /// information loaded from the dyndep file.
-  bool LoadDyndeps(Node* node, std::string* err) const;
-  bool LoadDyndeps(Node* node, DyndepFile* ddf, std::string* err) const;
+  bool
+  LoadDyndeps(Node* node, std::string* err) const;
+  bool
+  LoadDyndeps(Node* node, DyndepFile* ddf, std::string* err) const;
 
- private:
-  bool RecomputeNodeDirty(Node* node, std::vector<Node*>* stack,
-                          std::vector<Node*>* validation_nodes, std::string* err);
-  bool VerifyDAG(Node* node, std::vector<Node*>* stack, std::string* err);
+private:
+  bool
+  RecomputeNodeDirty(
+      Node* node, std::vector<Node*>* stack,
+      std::vector<Node*>* validation_nodes, std::string* err
+  );
+  bool
+  VerifyDAG(Node* node, std::vector<Node*>* stack, std::string* err);
 
   /// Recompute whether a given single output should be marked dirty.
   /// Returns true if so.
-  bool RecomputeOutputDirty(const Edge* edge, const Node* most_recent_input,
-                            const std::string& command, Node* output);
+  bool
+  RecomputeOutputDirty(
+      const Edge* edge, const Node* most_recent_input,
+      const std::string& command, Node* output
+  );
 
   BuildLog* build_log_;
   DiskInterface* disk_interface_;
@@ -368,4 +471,4 @@ struct DependencyScan {
   DyndepLoader dyndep_loader_;
 };
 
-#endif  // NINJA_GRAPH_H_
+#endif // NINJA_GRAPH_H_

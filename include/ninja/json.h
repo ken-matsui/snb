@@ -18,9 +18,11 @@
 #include <string>
 
 // Encode a string in JSON format without encolsing quotes
-std::string EncodeJSONString(const std::string& in);
+std::string
+EncodeJSONString(const std::string& in);
 
 // Print a string in JSON format to stdout without enclosing quotes
-void PrintJSONString(const std::string& in);
+void
+PrintJSONString(const std::string& in);
 
 #endif

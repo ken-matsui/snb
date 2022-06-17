@@ -15,58 +15,82 @@
 #ifndef NINJA_STATUS_H_
 #define NINJA_STATUS_H_
 
-#include <map>
-#include <string>
-
 #include "build.h"
 #include "line_printer.h"
+
+#include <map>
+#include <string>
 
 /// Abstract interface to object that tracks the status of a build:
 /// completion fraction, printing updates.
 struct Status {
-  virtual void PlanHasTotalEdges(int total) = 0;
-  virtual void BuildEdgeStarted(const Edge* edge, int64_t start_time_millis) = 0;
-  virtual void BuildEdgeFinished(Edge* edge, int64_t end_time_millis,
-                                 bool success, const std::string& output) = 0;
-  virtual void BuildLoadDyndeps() = 0;
-  virtual void BuildStarted() = 0;
-  virtual void BuildFinished() = 0;
+  virtual void
+  PlanHasTotalEdges(int total) = 0;
+  virtual void
+  BuildEdgeStarted(const Edge* edge, int64_t start_time_millis) = 0;
+  virtual void
+  BuildEdgeFinished(
+      Edge* edge, int64_t end_time_millis, bool success,
+      const std::string& output
+  ) = 0;
+  virtual void
+  BuildLoadDyndeps() = 0;
+  virtual void
+  BuildStarted() = 0;
+  virtual void
+  BuildFinished() = 0;
 
-  virtual void Info(const char* msg, ...) = 0;
-  virtual void Warning(const char* msg, ...) = 0;
-  virtual void Error(const char* msg, ...) = 0;
+  virtual void
+  Info(const char* msg, ...) = 0;
+  virtual void
+  Warning(const char* msg, ...) = 0;
+  virtual void
+  Error(const char* msg, ...) = 0;
 
-  virtual ~Status() { }
+  virtual ~Status() {}
 };
 
 /// Implementation of the Status interface that prints the status as
 /// human-readable strings to stdout
 struct StatusPrinter : Status {
   explicit StatusPrinter(const BuildConfig& config);
-  virtual void PlanHasTotalEdges(int total);
-  virtual void BuildEdgeStarted(const Edge* edge, int64_t start_time_millis);
-  virtual void BuildEdgeFinished(Edge* edge, int64_t end_time_millis,
-                                 bool success, const std::string& output);
-  virtual void BuildLoadDyndeps();
-  virtual void BuildStarted();
-  virtual void BuildFinished();
+  virtual void
+  PlanHasTotalEdges(int total);
+  virtual void
+  BuildEdgeStarted(const Edge* edge, int64_t start_time_millis);
+  virtual void
+  BuildEdgeFinished(
+      Edge* edge, int64_t end_time_millis, bool success,
+      const std::string& output
+  );
+  virtual void
+  BuildLoadDyndeps();
+  virtual void
+  BuildStarted();
+  virtual void
+  BuildFinished();
 
-  virtual void Info(const char* msg, ...);
-  virtual void Warning(const char* msg, ...);
-  virtual void Error(const char* msg, ...);
+  virtual void
+  Info(const char* msg, ...);
+  virtual void
+  Warning(const char* msg, ...);
+  virtual void
+  Error(const char* msg, ...);
 
-  virtual ~StatusPrinter() { }
+  virtual ~StatusPrinter() {}
 
   /// Format the progress status string by replacing the placeholders.
   /// See the user manual for more information about the available
   /// placeholders.
   /// @param progress_status_format The format of the progress status.
   /// @param status The status of the edge.
-  std::string FormatProgressStatus(const char* progress_status_format,
-                                   int64_t time_millis) const;
+  std::string
+  FormatProgressStatus(const char* progress_status_format, int64_t time_millis)
+      const;
 
- private:
-  void PrintStatus(const Edge* edge, int64_t time_millis);
+private:
+  void
+  PrintStatus(const Edge* edge, int64_t time_millis);
 
   const BuildConfig& config_;
 
@@ -79,8 +103,9 @@ struct StatusPrinter : Status {
   /// The custom progress status format to use.
   const char* progress_status_format_;
 
-  template<size_t S>
-  void SnprintfRate(double rate, char(&buf)[S], const char* format) const {
+  template <size_t S>
+  void
+  SnprintfRate(double rate, char (&buf)[S], const char* format) const {
     if (rate == -1)
       snprintf(buf, S, "?");
     else
@@ -90,9 +115,13 @@ struct StatusPrinter : Status {
   struct SlidingRateInfo {
     SlidingRateInfo(int n) : rate_(-1), N(n), last_update_(-1) {}
 
-    double rate() { return rate_; }
+    double
+    rate() {
+      return rate_;
+    }
 
-    void UpdateRate(int update_hint, int64_t time_millis) {
+    void
+    UpdateRate(int update_hint, int64_t time_millis) {
       if (update_hint == last_update_)
         return;
       last_update_ = update_hint;

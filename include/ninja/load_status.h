@@ -21,4 +21,4 @@ enum LoadStatus {
   LOAD_NOT_FOUND,
 };
 
-#endif  // NINJA_LOAD_STATUS_H_
+#endif // NINJA_LOAD_STATUS_H_

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "string_piece_util.h"
-
 #include "test.h"
 
 using namespace std;

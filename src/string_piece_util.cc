@@ -19,7 +19,8 @@
 #include <vector>
 using namespace std;
 
-vector<std::string_view> SplitStringPiece(std::string_view input, char sep) {
+vector<std::string_view>
+SplitStringPiece(std::string_view input, char sep) {
   vector<std::string_view> elems;
   elems.reserve(count(input.begin(), input.end(), sep) + 1);
 
@@ -38,7 +39,8 @@ vector<std::string_view> SplitStringPiece(std::string_view input, char sep) {
   return elems;
 }
 
-string JoinStringPiece(const vector<std::string_view>& list, char sep) {
+string
+JoinStringPiece(const vector<std::string_view>& list, char sep) {
   if (list.empty()) {
     return "";
   }
@@ -63,7 +65,8 @@ string JoinStringPiece(const vector<std::string_view>& list, char sep) {
   return ret;
 }
 
-bool EqualsCaseInsensitiveASCII(std::string_view a, std::string_view b) {
+bool
+EqualsCaseInsensitiveASCII(std::string_view a, std::string_view b) {
   if (a.size() != b.size()) {
     return false;
   }

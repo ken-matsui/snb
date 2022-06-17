@@ -12,29 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <assert.h>
-#include <stdio.h>
-
 #include "disk_interface.h"
 #include "graph.h"
 #include "test.h"
+
+#include <assert.h>
+#include <stdio.h>
 
 using namespace std;
 
 namespace {
 
 struct DiskInterfaceTest : public testing::Test {
-  virtual void SetUp() {
+  virtual void
+  SetUp() {
     // These tests do real disk accesses, so create a temp dir.
     temp_dir_.CreateAndEnter("Ninja-DiskInterfaceTest");
   }
 
-  virtual void TearDown() {
+  virtual void
+  TearDown() {
     temp_dir_.Cleanup();
   }
 
-  bool Touch(const char* path) {
-    FILE *f = fopen(path, "w");
+  bool
+  Touch(const char* path) {
+    FILE* f = fopen(path, "w");
     if (!f)
       return false;
     return fclose(f) == 0;
@@ -88,19 +91,20 @@ TEST_F(DiskInterfaceTest, StatExistingDir) {
   EXPECT_GT(disk_.Stat("subdir/subsubdir", &err), 1);
   EXPECT_EQ("", err);
 
-  EXPECT_EQ(disk_.Stat("subdir", &err),
-            disk_.Stat("subdir/.", &err));
-  EXPECT_EQ(disk_.Stat("subdir", &err),
-            disk_.Stat("subdir/subsubdir/..", &err));
-  EXPECT_EQ(disk_.Stat("subdir/subsubdir", &err),
-            disk_.Stat("subdir/subsubdir/.", &err));
+  EXPECT_EQ(disk_.Stat("subdir", &err), disk_.Stat("subdir/.", &err));
+  EXPECT_EQ(
+      disk_.Stat("subdir", &err), disk_.Stat("subdir/subsubdir/..", &err)
+  );
+  EXPECT_EQ(
+      disk_.Stat("subdir/subsubdir", &err),
+      disk_.Stat("subdir/subsubdir/.", &err)
+  );
 }
 
 TEST_F(DiskInterfaceTest, ReadFile) {
   string err;
   std::string content;
-  ASSERT_EQ(DiskInterface::NotFound,
-            disk_.ReadFile("foobar", &content, &err));
+  ASSERT_EQ(DiskInterface::NotFound, disk_.ReadFile("foobar", &content, &err));
   EXPECT_EQ("", content);
   EXPECT_NE("", err); // actual value is platform-specific
   err.clear();
@@ -112,8 +116,7 @@ TEST_F(DiskInterfaceTest, ReadFile) {
   fprintf(f, "%s", kTestContent);
   ASSERT_EQ(0, fclose(f));
 
-  ASSERT_EQ(DiskInterface::Okay,
-            disk_.ReadFile(kTestFile, &content, &err));
+  ASSERT_EQ(DiskInterface::Okay, disk_.ReadFile(kTestFile, &content, &err));
   EXPECT_EQ(kTestContent, content);
   EXPECT_EQ("", err);
 }
@@ -142,25 +145,29 @@ TEST_F(DiskInterfaceTest, RemoveDirectory) {
   EXPECT_EQ(1, disk_.RemoveFile("does not exist"));
 }
 
-struct StatTest : public StateTestWithBuiltinRules,
-                  public DiskInterface {
+struct StatTest : public StateTestWithBuiltinRules, public DiskInterface {
   StatTest() : scan_(&state_, nullptr, nullptr, this, nullptr) {}
 
   // DiskInterface implementation.
-  virtual TimeStamp Stat(const string& path, string* err) const;
-  virtual bool WriteFile(const string& path, const string& contents) {
+  virtual TimeStamp
+  Stat(const string& path, string* err) const;
+  virtual bool
+  WriteFile(const string& path, const string& contents) {
     assert(false);
     return true;
   }
-  virtual bool MakeDir(const string& path) {
+  virtual bool
+  MakeDir(const string& path) {
     assert(false);
     return false;
   }
-  virtual Status ReadFile(const string& path, string* contents, string* err) {
+  virtual Status
+  ReadFile(const string& path, string* contents, string* err) {
     assert(false);
     return NotFound;
   }
-  virtual int RemoveFile(const string& path) {
+  virtual int
+  RemoveFile(const string& path) {
     assert(false);
     return 0;
   }
@@ -170,17 +177,17 @@ struct StatTest : public StateTestWithBuiltinRules,
   mutable vector<string> stats_;
 };
 
-TimeStamp StatTest::Stat(const string& path, string* err) const {
+TimeStamp
+StatTest::Stat(const string& path, string* err) const {
   stats_.push_back(path);
   map<string, TimeStamp>::const_iterator i = mtimes_.find(path);
   if (i == mtimes_.end())
-    return 0;  // File not found.
+    return 0; // File not found.
   return i->second;
 }
 
 TEST_F(StatTest, Simple) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(&state_,
-"build out: cat in\n"));
+  ASSERT_NO_FATAL_FAILURE(AssertParse(&state_, "build out: cat in\n"));
 
   Node* out = GetNode("out");
   string err;
@@ -190,13 +197,15 @@ TEST_F(StatTest, Simple) {
   scan_.RecomputeDirty(out, nullptr, nullptr);
   ASSERT_EQ(2u, stats_.size());
   ASSERT_EQ("out", stats_[0]);
-  ASSERT_EQ("in",  stats_[1]);
+  ASSERT_EQ("in", stats_[1]);
 }
 
 TEST_F(StatTest, TwoStep) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(&state_,
-"build out: cat mid\n"
-"build mid: cat in\n"));
+  ASSERT_NO_FATAL_FAILURE(AssertParse(
+      &state_,
+      "build out: cat mid\n"
+      "build mid: cat in\n"
+  ));
 
   Node* out = GetNode("out");
   string err;
@@ -207,16 +216,18 @@ TEST_F(StatTest, TwoStep) {
   ASSERT_EQ(3u, stats_.size());
   ASSERT_EQ("out", stats_[0]);
   ASSERT_TRUE(GetNode("out")->dirty());
-  ASSERT_EQ("mid",  stats_[1]);
+  ASSERT_EQ("mid", stats_[1]);
   ASSERT_TRUE(GetNode("mid")->dirty());
-  ASSERT_EQ("in",  stats_[2]);
+  ASSERT_EQ("in", stats_[2]);
 }
 
 TEST_F(StatTest, Tree) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(&state_,
-"build out: cat mid1 mid2\n"
-"build mid1: cat in11 in12\n"
-"build mid2: cat in21 in22\n"));
+  ASSERT_NO_FATAL_FAILURE(AssertParse(
+      &state_,
+      "build out: cat mid1 mid2\n"
+      "build mid1: cat in11 in12\n"
+      "build mid2: cat in21 in22\n"
+  ));
 
   Node* out = GetNode("out");
   string err;
@@ -231,12 +242,14 @@ TEST_F(StatTest, Tree) {
 }
 
 TEST_F(StatTest, Middle) {
-  ASSERT_NO_FATAL_FAILURE(AssertParse(&state_,
-"build out: cat mid\n"
-"build mid: cat in\n"));
+  ASSERT_NO_FATAL_FAILURE(AssertParse(
+      &state_,
+      "build out: cat mid\n"
+      "build mid: cat in\n"
+  ));
 
   mtimes_["in"] = 1;
-  mtimes_["mid"] = 0;  // missing
+  mtimes_["mid"] = 0; // missing
   mtimes_["out"] = 1;
 
   Node* out = GetNode("out");
@@ -250,4 +263,4 @@ TEST_F(StatTest, Middle) {
   ASSERT_TRUE(GetNode("out")->dirty());
 }
 
-}  // namespace
+} // namespace

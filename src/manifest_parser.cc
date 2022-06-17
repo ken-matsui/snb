@@ -14,86 +14,89 @@
 
 #include "manifest_parser.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-
 #include "graph.h"
 #include "state.h"
 #include "util.h"
 #include "version.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+
 using namespace std;
 
-ManifestParser::ManifestParser(State* state, FileReader* file_reader,
-                               ManifestParserOptions options)
-    : Parser(state, file_reader),
-      options_(options), quiet_(false) {
+ManifestParser::ManifestParser(
+    State* state, FileReader* file_reader, ManifestParserOptions options
+)
+    : Parser(state, file_reader), options_(options), quiet_(false) {
   env_ = &state->bindings_;
 }
 
-bool ManifestParser::Parse(const string& filename, const string& input,
-                           string* err) {
+bool
+ManifestParser::Parse(
+    const string& filename, const string& input, string* err
+) {
   lexer_.Start(filename, input);
 
   for (;;) {
     Lexer::Token token = lexer_.ReadToken();
     switch (token) {
-    case Lexer::POOL:
-      if (!ParsePool(err))
-        return false;
-      break;
-    case Lexer::BUILD:
-      if (!ParseEdge(err))
-        return false;
-      break;
-    case Lexer::RULE:
-      if (!ParseRule(err))
-        return false;
-      break;
-    case Lexer::DEFAULT:
-      if (!ParseDefault(err))
-        return false;
-      break;
-    case Lexer::IDENT: {
-      lexer_.UnreadToken();
-      string name;
-      EvalString let_value;
-      if (!ParseLet(&name, &let_value, err))
-        return false;
-      string value = let_value.Evaluate(env_);
-      // Check ninja_required_version immediately so we can exit
-      // before encountering any syntactic surprises.
-      if (name == "ninja_required_version")
-        CheckNinjaVersion(value);
-      env_->AddBinding(name, value);
-      break;
-    }
-    case Lexer::INCLUDE:
-      if (!ParseFileInclude(false, err))
-        return false;
-      break;
-    case Lexer::SUBNINJA:
-      if (!ParseFileInclude(true, err))
-        return false;
-      break;
-    case Lexer::ERROR: {
-      return lexer_.Error(lexer_.DescribeLastError(), err);
-    }
-    case Lexer::TEOF:
-      return true;
-    case Lexer::NEWLINE:
-      break;
-    default:
-      return lexer_.Error(string("unexpected ") + Lexer::TokenName(token),
-                          err);
+      case Lexer::POOL:
+        if (!ParsePool(err))
+          return false;
+        break;
+      case Lexer::BUILD:
+        if (!ParseEdge(err))
+          return false;
+        break;
+      case Lexer::RULE:
+        if (!ParseRule(err))
+          return false;
+        break;
+      case Lexer::DEFAULT:
+        if (!ParseDefault(err))
+          return false;
+        break;
+      case Lexer::IDENT: {
+        lexer_.UnreadToken();
+        string name;
+        EvalString let_value;
+        if (!ParseLet(&name, &let_value, err))
+          return false;
+        string value = let_value.Evaluate(env_);
+        // Check ninja_required_version immediately so we can exit
+        // before encountering any syntactic surprises.
+        if (name == "ninja_required_version")
+          CheckNinjaVersion(value);
+        env_->AddBinding(name, value);
+        break;
+      }
+      case Lexer::INCLUDE:
+        if (!ParseFileInclude(false, err))
+          return false;
+        break;
+      case Lexer::SUBNINJA:
+        if (!ParseFileInclude(true, err))
+          return false;
+        break;
+      case Lexer::ERROR: {
+        return lexer_.Error(lexer_.DescribeLastError(), err);
+      }
+      case Lexer::TEOF:
+        return true;
+      case Lexer::NEWLINE:
+        break;
+      default:
+        return lexer_.Error(
+            string("unexpected ") + Lexer::TokenName(token), err
+        );
     }
   }
-  return false;  // not reached
+  return false; // not reached
 }
 
-
-bool ManifestParser::ParsePool(string* err) {
+bool
+ManifestParser::ParsePool(string* err) {
   string name;
   if (!lexer_.ReadIdent(&name))
     return lexer_.Error("expected pool name", err);
@@ -129,8 +132,8 @@ bool ManifestParser::ParsePool(string* err) {
   return true;
 }
 
-
-bool ManifestParser::ParseRule(string* err) {
+bool
+ManifestParser::ParseRule(string* err) {
   string name;
   if (!lexer_.ReadIdent(&name))
     return lexer_.Error("expected rule name", err);
@@ -141,7 +144,7 @@ bool ManifestParser::ParseRule(string* err) {
   if (env_->LookupRuleCurrentScope(name) != NULL)
     return lexer_.Error("duplicate rule '" + name + "'", err);
 
-  Rule* rule = new Rule(name);  // XXX scoped_ptr
+  Rule* rule = new Rule(name); // XXX scoped_ptr
 
   while (lexer_.PeekToken(Lexer::INDENT)) {
     string key;
@@ -158,10 +161,13 @@ bool ManifestParser::ParseRule(string* err) {
     }
   }
 
-  if (rule->bindings_["rspfile"].empty() !=
-      rule->bindings_["rspfile_content"].empty()) {
-    return lexer_.Error("rspfile and rspfile_content need to be "
-                        "both specified", err);
+  if (rule->bindings_["rspfile"].empty()
+      != rule->bindings_["rspfile_content"].empty()) {
+    return lexer_.Error(
+        "rspfile and rspfile_content need to be "
+        "both specified",
+        err
+    );
   }
 
   if (rule->bindings_["command"].empty())
@@ -171,7 +177,8 @@ bool ManifestParser::ParseRule(string* err) {
   return true;
 }
 
-bool ManifestParser::ParseLet(string* key, EvalString* value, string* err) {
+bool
+ManifestParser::ParseLet(string* key, EvalString* value, string* err) {
   if (!lexer_.ReadIdent(key))
     return lexer_.Error("expected variable name", err);
   if (!ExpectToken(Lexer::EQUALS, err))
@@ -181,7 +188,8 @@ bool ManifestParser::ParseLet(string* key, EvalString* value, string* err) {
   return true;
 }
 
-bool ManifestParser::ParseDefault(string* err) {
+bool
+ManifestParser::ParseDefault(string* err) {
   EvalString eval;
   if (!lexer_.ReadPath(&eval, err))
     return false;
@@ -192,7 +200,7 @@ bool ManifestParser::ParseDefault(string* err) {
     string path = eval.Evaluate(env_);
     if (path.empty())
       return lexer_.Error("empty path", err);
-    uint64_t slash_bits;  // Unused because this only does lookup.
+    uint64_t slash_bits; // Unused because this only does lookup.
     CanonicalizePath(&path, &slash_bits);
     std::string default_err;
     if (!state_->AddDefault(path, &default_err))
@@ -206,7 +214,8 @@ bool ManifestParser::ParseDefault(string* err) {
   return ExpectToken(Lexer::NEWLINE, err);
 }
 
-bool ManifestParser::ParseEdge(string* err) {
+bool
+ManifestParser::ParseEdge(string* err) {
   vector<EvalString> ins, outs, validations;
 
   {
@@ -343,7 +352,8 @@ bool ManifestParser::ParseEdge(string* err) {
           Warning(
               "multiple rules generate %s. builds involving this target will "
               "not be correct; continuing anyway",
-              path.c_str());
+              path.c_str()
+          );
         }
         if (e - i <= static_cast<size_t>(implicit_outs))
           --implicit_outs;
@@ -374,7 +384,7 @@ bool ManifestParser::ParseEdge(string* err) {
 
   edge->validations_.reserve(validations.size());
   for (std::vector<EvalString>::iterator v = validations.begin();
-      v != validations.end(); ++v) {
+       v != validations.end(); ++v) {
     string path = v->Evaluate(env);
     if (path.empty())
       return lexer_.Error("empty path", err);
@@ -383,8 +393,8 @@ bool ManifestParser::ParseEdge(string* err) {
     state_->AddValidation(edge, path, slash_bits);
   }
 
-  if (options_.phony_cycle_action_ == kPhonyCycleActionWarn &&
-      edge->maybe_phonycycle_diagnostic()) {
+  if (options_.phony_cycle_action_ == kPhonyCycleActionWarn
+      && edge->maybe_phonycycle_diagnostic()) {
     // CMake 2.8.12.x and 3.0.x incorrectly write phony build statements
     // that reference themselves.  Ninja used to tolerate these in the
     // build graph but that has since been fixed.  Filter them out to
@@ -395,9 +405,11 @@ bool ManifestParser::ParseEdge(string* err) {
     if (new_end != edge->inputs_.end()) {
       edge->inputs_.erase(new_end, edge->inputs_.end());
       if (!quiet_) {
-        Warning("phony target '%s' names itself as an input; "
-                "ignoring [-w phonycycle=warn]",
-                out->path().c_str());
+        Warning(
+            "phony target '%s' names itself as an input; "
+            "ignoring [-w phonycycle=warn]",
+            out->path().c_str()
+        );
       }
     }
   }
@@ -412,7 +424,7 @@ bool ManifestParser::ParseEdge(string* err) {
     edge->dyndep_ = state_->GetNode(dyndep, slash_bits);
     edge->dyndep_->set_dyndep_pending(true);
     vector<Node*>::iterator dgi =
-      std::find(edge->inputs_.begin(), edge->inputs_.end(), edge->dyndep_);
+        std::find(edge->inputs_.begin(), edge->inputs_.end(), edge->dyndep_);
     if (dgi == edge->inputs_.end()) {
       return lexer_.Error("dyndep '" + dyndep + "' is not an input", err);
     }
@@ -421,7 +433,8 @@ bool ManifestParser::ParseEdge(string* err) {
   return true;
 }
 
-bool ManifestParser::ParseFileInclude(bool new_scope, string* err) {
+bool
+ManifestParser::ParseFileInclude(bool new_scope, string* err) {
   EvalString eval;
   if (!lexer_.ReadPath(&eval, err))
     return false;

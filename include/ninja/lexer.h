@@ -20,7 +20,7 @@
 
 // Windows may #define ERROR.
 #ifdef ERROR
-#undef ERROR
+#  undef ERROR
 #endif
 
 struct EvalString;
@@ -50,53 +50,66 @@ struct Lexer {
   };
 
   /// Return a human-readable form of a token, used in error messages.
-  static const char* TokenName(Token t);
+  static const char*
+  TokenName(Token t);
 
   /// Return a human-readable token hint, used in error messages.
-  static const char* TokenErrorHint(Token expected);
+  static const char*
+  TokenErrorHint(Token expected);
 
   /// If the last token read was an ERROR token, provide more info
   /// or the empty string.
-  std::string DescribeLastError();
+  std::string
+  DescribeLastError();
 
   /// Start parsing some input.
-  void Start(std::string_view filename, std::string_view input);
+  void
+  Start(std::string_view filename, std::string_view input);
 
   /// Read a Token from the Token enum.
-  Token ReadToken();
+  Token
+  ReadToken();
 
   /// Rewind to the last read Token.
-  void UnreadToken();
+  void
+  UnreadToken();
 
   /// If the next token is \a token, read it and return true.
-  bool PeekToken(Token token);
+  bool
+  PeekToken(Token token);
 
   /// Read a simple identifier (a rule or variable name).
   /// Returns false if a name can't be read.
-  bool ReadIdent(std::string* out);
+  bool
+  ReadIdent(std::string* out);
 
   /// Read a path (complete with $escapes).
   /// Returns false only on error, returned path may be empty if a delimiter
   /// (space, newline) is hit.
-  bool ReadPath(EvalString* path, std::string* err) {
+  bool
+  ReadPath(EvalString* path, std::string* err) {
     return ReadEvalString(path, true, err);
   }
 
   /// Read the value side of a var = value line (complete with $escapes).
   /// Returns false only on error.
-  bool ReadVarValue(EvalString* value, std::string* err) {
+  bool
+  ReadVarValue(EvalString* value, std::string* err) {
     return ReadEvalString(value, false, err);
   }
 
   /// Construct an error message with context.
-  bool Error(const std::string& message, std::string* err);
+  bool
+  Error(const std::string& message, std::string* err);
 
 private:
   /// Skip past whitespace (called after each read token/ident/etc.).
-  void EatWhitespace();
+  void
+  EatWhitespace();
 
   /// Read a $-escaped string.
-  bool ReadEvalString(EvalString* eval, bool path, std::string* err);
+  bool
+  ReadEvalString(EvalString* eval, bool path, std::string* err);
 
   std::string_view filename_;
   std::string_view input_;

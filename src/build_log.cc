@@ -15,12 +15,13 @@
 // On AIX, inttypes.h gets indirectly included by build_log.h.
 // It's easiest just to ask for the printf format macros right away.
 #ifndef _WIN32
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
+#  ifndef __STDC_FORMAT_MACROS
+#    define __STDC_FORMAT_MACROS
+#  endif
 #endif
 
 #include "build_log.h"
+
 #include "disk_interface.h"
 
 #include <cassert>
@@ -29,8 +30,8 @@
 #include <string.h>
 
 #ifndef _WIN32
-#include <inttypes.h>
-#include <unistd.h>
+#  include <inttypes.h>
+#  include <unistd.h>
 #endif
 
 #include "build.h"
@@ -38,7 +39,7 @@
 #include "metrics.h"
 #include "util.h"
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
-#define strtoll _strtoi64
+#  define strtoll _strtoi64
 #endif
 
 using namespace std;
@@ -58,12 +59,12 @@ const int kCurrentVersion = 5;
 
 // 64bit MurmurHash2, by Austin Appleby
 #if defined(_MSC_VER)
-#define BIG_CONSTANT(x) (x)
-#else   // defined(_MSC_VER)
-#define BIG_CONSTANT(x) (x##LLU)
+#  define BIG_CONSTANT(x) (x)
+#else // defined(_MSC_VER)
+#  define BIG_CONSTANT(x) (x##LLU)
 #endif // !defined(_MSC_VER)
-inline
-uint64_t MurmurHash64A(const void* key, size_t len) {
+inline uint64_t
+MurmurHash64A(const void* key, size_t len) {
   static const uint64_t seed = 0xDECAFBADDECAFBADull;
   const uint64_t m = BIG_CONSTANT(0xc6a4a7935bd1e995);
   const int r = 47;
@@ -80,22 +81,28 @@ uint64_t MurmurHash64A(const void* key, size_t len) {
     data += 8;
     len -= 8;
   }
-  switch (len & 7)
-  {
-  case 7: h ^= uint64_t(data[6]) << 48;
-          [[fallthrough]];
-  case 6: h ^= uint64_t(data[5]) << 40;
-          [[fallthrough]];
-  case 5: h ^= uint64_t(data[4]) << 32;
-          [[fallthrough]];
-  case 4: h ^= uint64_t(data[3]) << 24;
-          [[fallthrough]];
-  case 3: h ^= uint64_t(data[2]) << 16;
-          [[fallthrough]];
-  case 2: h ^= uint64_t(data[1]) << 8;
-          [[fallthrough]];
-  case 1: h ^= uint64_t(data[0]);
-          h *= m;
+  switch (len & 7) {
+    case 7:
+      h ^= uint64_t(data[6]) << 48;
+      [[fallthrough]];
+    case 6:
+      h ^= uint64_t(data[5]) << 40;
+      [[fallthrough]];
+    case 5:
+      h ^= uint64_t(data[4]) << 32;
+      [[fallthrough]];
+    case 4:
+      h ^= uint64_t(data[3]) << 24;
+      [[fallthrough]];
+    case 3:
+      h ^= uint64_t(data[2]) << 16;
+      [[fallthrough]];
+    case 2:
+      h ^= uint64_t(data[1]) << 8;
+      [[fallthrough]];
+    case 1:
+      h ^= uint64_t(data[0]);
+      h *= m;
   };
   h ^= h >> r;
   h *= m;
@@ -104,45 +111,46 @@ uint64_t MurmurHash64A(const void* key, size_t len) {
 }
 #undef BIG_CONSTANT
 
-
-}  // namespace
+} // namespace
 
 // static
-uint64_t BuildLog::LogEntry::HashCommand(std::string_view command) {
+uint64_t
+BuildLog::LogEntry::HashCommand(std::string_view command) {
   return MurmurHash64A(command.data(), command.size());
 }
 
-BuildLog::LogEntry::LogEntry(const string& output)
-  : output(output) {}
+BuildLog::LogEntry::LogEntry(const string& output) : output(output) {}
 
-BuildLog::LogEntry::LogEntry(const string& output, uint64_t command_hash,
-  int start_time, int end_time, TimeStamp mtime)
-  : output(output), command_hash(command_hash),
-    start_time(start_time), end_time(end_time), mtime(mtime)
-{}
+BuildLog::LogEntry::LogEntry(
+    const string& output, uint64_t command_hash, int start_time, int end_time,
+    TimeStamp mtime
+)
+    : output(output), command_hash(command_hash), start_time(start_time),
+      end_time(end_time), mtime(mtime) {}
 
-BuildLog::BuildLog()
-  : log_file_(nullptr), needs_recompaction_(false) {}
+BuildLog::BuildLog() : log_file_(nullptr), needs_recompaction_(false) {}
 
-BuildLog::~BuildLog() {
-  Close();
-}
+BuildLog::~BuildLog() { Close(); }
 
-bool BuildLog::OpenForWrite(const string& path, const BuildLogUser& user,
-                            string* err) {
+bool
+BuildLog::OpenForWrite(
+    const string& path, const BuildLogUser& user, string* err
+) {
   if (needs_recompaction_) {
     if (!Recompact(path, user, err))
       return false;
   }
 
   assert(!log_file_);
-  log_file_path_ = path;  // we don't actually open the file right now, but will
-                          // do so on the first write attempt
+  log_file_path_ = path; // we don't actually open the file right now, but will
+                         // do so on the first write attempt
   return true;
 }
 
-bool BuildLog::RecordCommand(Edge* edge, int start_time, int end_time,
-                             TimeStamp mtime) {
+bool
+BuildLog::RecordCommand(
+    Edge* edge, int start_time, int end_time, TimeStamp mtime
+) {
   string command = edge->EvaluateCommand(true);
   uint64_t command_hash = LogEntry::HashCommand(command);
   for (vector<Node*>::iterator out = edge->outputs_.begin();
@@ -169,21 +177,23 @@ bool BuildLog::RecordCommand(Edge* edge, int start_time, int end_time,
       if (!WriteEntry(log_file_, *log_entry))
         return false;
       if (fflush(log_file_) != 0) {
-          return false;
+        return false;
       }
     }
   }
   return true;
 }
 
-void BuildLog::Close() {
-  OpenForWriteIfNeeded();  // create the file even if nothing has been recorded
+void
+BuildLog::Close() {
+  OpenForWriteIfNeeded(); // create the file even if nothing has been recorded
   if (log_file_)
     fclose(log_file_);
   log_file_ = nullptr;
 }
 
-bool BuildLog::OpenForWriteIfNeeded() {
+bool
+BuildLog::OpenForWriteIfNeeded() {
   if (log_file_ || log_file_path_.empty()) {
     return true;
   }
@@ -210,15 +220,16 @@ bool BuildLog::OpenForWriteIfNeeded() {
 
 struct LineReader {
   explicit LineReader(FILE* file)
-    : file_(file), buf_end_(buf_), line_start_(buf_), line_end_(nullptr) {
-      memset(buf_, 0, sizeof(buf_));
+      : file_(file), buf_end_(buf_), line_start_(buf_), line_end_(nullptr) {
+    memset(buf_, 0, sizeof(buf_));
   }
 
   // Reads a \n-terminated line from the file passed to the constructor.
   // On return, *line_start points to the beginning of the next line, and
   // *line_end points to the \n at the end of the line. If no newline is seen
   // in a fixed buffer size, *line_end is set to nullptr. Returns false on EOF.
-  bool ReadLine(char** line_start, char** line_end) {
+  bool
+  ReadLine(char** line_start, char** line_end) {
     if (line_start_ >= buf_end_ || !line_end_) {
       // Buffer empty, refill.
       size_t size_read = fread(buf_, 1, sizeof(buf_), file_);
@@ -249,17 +260,18 @@ struct LineReader {
     return true;
   }
 
- private:
+private:
   FILE* file_;
   char buf_[256 << 10];
-  char* buf_end_;  // Points one past the last valid byte in |buf_|.
+  char* buf_end_; // Points one past the last valid byte in |buf_|.
 
   char* line_start_;
   // Points at the next \n in buf_ after line_start, or nullptr.
   char* line_end_;
 };
 
-LoadStatus BuildLog::Load(const string& path, string* err) {
+LoadStatus
+BuildLog::Load(const string& path, string* err) {
   METRIC_RECORD(".ninja_log load");
   FILE* file = fopen(path.c_str(), "r");
   if (!file) {
@@ -281,8 +293,9 @@ LoadStatus BuildLog::Load(const string& path, string* err) {
       sscanf(line_start, kFileSignature, &log_version);
 
       if (log_version < kOldestSupportedVersion) {
-        *err = ("build log version invalid, perhaps due to being too old; "
-                "starting over");
+        *err =
+            ("build log version invalid, perhaps due to being too old; "
+             "starting over");
         fclose(file);
         unlink(path.c_str());
         // Don't report this as a failure.  An empty build log will cause
@@ -347,12 +360,13 @@ LoadStatus BuildLog::Load(const string& path, string* err) {
     entry->end_time = end_time;
     entry->mtime = mtime;
     if (log_version >= 5) {
-      char c = *end; *end = '\0';
+      char c = *end;
+      *end = '\0';
       entry->command_hash = (uint64_t)strtoull(start, nullptr, 16);
       *end = c;
     } else {
-      entry->command_hash = LogEntry::HashCommand(std::string_view(start,
-                                                              end - start));
+      entry->command_hash =
+          LogEntry::HashCommand(std::string_view(start, end - start));
     }
   }
   fclose(file);
@@ -368,29 +382,33 @@ LoadStatus BuildLog::Load(const string& path, string* err) {
   int kCompactionRatio = 3;
   if (log_version < kCurrentVersion) {
     needs_recompaction_ = true;
-  } else if (total_entry_count > kMinCompactionEntryCount &&
-             total_entry_count > unique_entry_count * kCompactionRatio) {
+  } else if (total_entry_count > kMinCompactionEntryCount && total_entry_count > unique_entry_count * kCompactionRatio) {
     needs_recompaction_ = true;
   }
 
   return LOAD_SUCCESS;
 }
 
-BuildLog::LogEntry* BuildLog::LookupByOutput(const string& path) {
+BuildLog::LogEntry*
+BuildLog::LookupByOutput(const string& path) {
   Entries::iterator i = entries_.find(path);
   if (i != entries_.end())
     return std::to_address(i->second);
   return nullptr;
 }
 
-bool BuildLog::WriteEntry(FILE* f, const LogEntry& entry) {
-  return fprintf(f, "%d\t%d\t%" PRId64 "\t%s\t%" PRIx64 "\n",
-          entry.start_time, entry.end_time, entry.mtime,
-          entry.output.c_str(), entry.command_hash) > 0;
+bool
+BuildLog::WriteEntry(FILE* f, const LogEntry& entry) {
+  return fprintf(
+             f, "%d\t%d\t%" PRId64 "\t%s\t%" PRIx64 "\n", entry.start_time,
+             entry.end_time, entry.mtime, entry.output.c_str(),
+             entry.command_hash
+         )
+         > 0;
 }
 
-bool BuildLog::Recompact(const string& path, const BuildLogUser& user,
-                         string* err) {
+bool
+BuildLog::Recompact(const string& path, const BuildLogUser& user, string* err) {
   METRIC_RECORD(".ninja_log recompact");
 
   Close();
@@ -438,10 +456,11 @@ bool BuildLog::Recompact(const string& path, const BuildLogUser& user,
   return true;
 }
 
-bool BuildLog::Restat(const std::string_view path,
-                      const DiskInterface& disk_interface,
-                      const int output_count, char** outputs,
-                      std::string* const err) {
+bool
+BuildLog::Restat(
+    const std::string_view path, const DiskInterface& disk_interface,
+    const int output_count, char** outputs, std::string* const err
+) {
   METRIC_RECORD(".ninja_log restat");
 
   Close();

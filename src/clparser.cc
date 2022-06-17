@@ -14,36 +14,38 @@
 
 #include "clparser.h"
 
+#include "metrics.h"
+#include "string_piece_util.h"
+#include "util.h"
+
 #include <algorithm>
 #include <assert.h>
 #include <string.h>
-
-#include "metrics.h"
-#include "string_piece_util.h"
-
-#include "util.h"
 
 using namespace std;
 
 namespace {
 
 /// Return true if \a input ends with \a needle.
-bool EndsWith(const string& input, const string& needle) {
-  return (input.size() >= needle.size() &&
-          input.substr(input.size() - needle.size()) == needle);
+bool
+EndsWith(const string& input, const string& needle) {
+  return (
+      input.size() >= needle.size()
+      && input.substr(input.size() - needle.size()) == needle
+  );
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
 // static
-string CLParser::FilterShowIncludes(const string& line,
-                                    const string& deps_prefix) {
+string
+CLParser::FilterShowIncludes(const string& line, const string& deps_prefix) {
   const string kDepsPrefixEnglish = "Note: including file: ";
   const char* in = line.c_str();
   const char* end = in + line.size();
   const string& prefix = deps_prefix.empty() ? kDepsPrefixEnglish : deps_prefix;
-  if (end - in > (int)prefix.size() &&
-      memcmp(in, prefix.c_str(), (int)prefix.size()) == 0) {
+  if (end - in > (int)prefix.size()
+      && memcmp(in, prefix.c_str(), (int)prefix.size()) == 0) {
     in += prefix.size();
     while (*in == ' ')
       ++in;
@@ -53,27 +55,31 @@ string CLParser::FilterShowIncludes(const string& line,
 }
 
 // static
-bool CLParser::IsSystemInclude(string path) {
+bool
+CLParser::IsSystemInclude(string path) {
   transform(path.begin(), path.end(), path.begin(), ToLowerASCII);
   // TODO: this is a heuristic, perhaps there's a better way?
-  return (path.find("program files") != string::npos ||
-          path.find("microsoft visual studio") != string::npos);
+  return (
+      path.find("program files") != string::npos
+      || path.find("microsoft visual studio") != string::npos
+  );
 }
 
 // static
-bool CLParser::FilterInputFilename(string line) {
+bool
+CLParser::FilterInputFilename(string line) {
   transform(line.begin(), line.end(), line.begin(), ToLowerASCII);
   // TODO: other extensions, like .asm?
-  return EndsWith(line, ".c") ||
-      EndsWith(line, ".cc") ||
-      EndsWith(line, ".cxx") ||
-      EndsWith(line, ".cpp") ||
-      EndsWith(line, ".c++");
+  return EndsWith(line, ".c") || EndsWith(line, ".cc") || EndsWith(line, ".cxx")
+         || EndsWith(line, ".cpp") || EndsWith(line, ".c++");
 }
 
 // static
-bool CLParser::Parse(const string& output, const string& deps_prefix,
-                     string* filtered_output, string* err) {
+bool
+CLParser::Parse(
+    const string& output, const string& deps_prefix, string* filtered_output,
+    string* err
+) {
   METRIC_RECORD("CLParser::Parse");
 
   // Loop over all lines in the output to process them.

@@ -17,7 +17,8 @@
 #include <cstdio>
 #include <string>
 
-std::string EncodeJSONString(const std::string& in) {
+std::string
+EncodeJSONString(const std::string& in) {
   static const char* hex_digits = "0123456789abcdef";
   std::string out;
   out.reserve(in.length() * 1.2);
@@ -47,7 +48,8 @@ std::string EncodeJSONString(const std::string& in) {
   return out;
 }
 
-void PrintJSONString(const std::string& in) {
+void
+PrintJSONString(const std::string& in) {
   std::string out = EncodeJSONString(in);
   fwrite(out.c_str(), 1, out.length(), stdout);
 }

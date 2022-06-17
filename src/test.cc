@@ -14,23 +14,23 @@
 
 #include "test.h"
 
-#include <algorithm>
-
-#include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
-
 #include "build_log.h"
 #include "graph.h"
 #include "manifest_parser.h"
 #include "util.h"
 
+#include <algorithm>
+#include <errno.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #ifdef _AIX
 extern "C" {
-        // GCC "helpfully" strips the definition of mkdtemp out on AIX.
-        // The function is still present, so if we define it ourselves
-        // it will work perfectly fine.
-        extern char* mkdtemp(char* name_template);
+// GCC "helpfully" strips the definition of mkdtemp out on AIX.
+// The function is still present, so if we define it ourselves
+// it will work perfectly fine.
+extern char*
+mkdtemp(char* name_template);
 }
 #endif
 
@@ -38,32 +38,35 @@ using namespace std;
 
 namespace {
 
-string GetSystemTempDir() {
+string
+GetSystemTempDir() {
   const char* tempdir = getenv("TMPDIR");
   if (tempdir)
     return tempdir;
   return "/tmp";
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
-StateTestWithBuiltinRules::StateTestWithBuiltinRules() {
-  AddCatRule(&state_);
+StateTestWithBuiltinRules::StateTestWithBuiltinRules() { AddCatRule(&state_); }
+
+void
+StateTestWithBuiltinRules::AddCatRule(State* state) {
+  AssertParse(
+      state,
+      "rule cat\n"
+      "  command = cat $in > $out\n"
+  );
 }
 
-void StateTestWithBuiltinRules::AddCatRule(State* state) {
-  AssertParse(state,
-"rule cat\n"
-"  command = cat $in > $out\n");
-}
-
-Node* StateTestWithBuiltinRules::GetNode(const string& path) {
+Node*
+StateTestWithBuiltinRules::GetNode(const string& path) {
   EXPECT_FALSE(strpbrk(path.c_str(), "/\\"));
   return state_.GetNode(path, 0);
 }
 
-void AssertParse(State* state, const char* input,
-                 ManifestParserOptions opts) {
+void
+AssertParse(State* state, const char* input, ManifestParserOptions opts) {
   ManifestParser parser(state, nullptr, opts);
   string err;
   EXPECT_TRUE(parser.ParseTest(input, &err));
@@ -71,11 +74,13 @@ void AssertParse(State* state, const char* input,
   VerifyGraph(*state);
 }
 
-void AssertHash(const char* expected, uint64_t actual) {
+void
+AssertHash(const char* expected, uint64_t actual) {
   ASSERT_EQ(BuildLog::LogEntry::HashCommand(expected), actual);
 }
 
-void VerifyGraph(const State& state) {
+void
+VerifyGraph(const State& state) {
   for (vector<Edge*>::const_iterator e = state.edges_.begin();
        e != state.edges_.end(); ++e) {
     // All edges need at least one output.
@@ -84,8 +89,7 @@ void VerifyGraph(const State& state) {
     for (vector<Node*>::const_iterator in_node = (*e)->inputs_.begin();
          in_node != (*e)->inputs_.end(); ++in_node) {
       const vector<Edge*>& out_edges = (*in_node)->out_edges();
-      EXPECT_NE(find(out_edges.begin(), out_edges.end(), *e),
-                out_edges.end());
+      EXPECT_NE(find(out_edges.begin(), out_edges.end(), *e), out_edges.end());
     }
     // Check that the edge's outputs have the edge as in-edge.
     for (vector<Node*>::const_iterator out_node = (*e)->outputs_.begin();
@@ -107,14 +111,15 @@ void VerifyGraph(const State& state) {
   EXPECT_EQ(node_edge_set, edge_set);
 }
 
-void VirtualFileSystem::Create(const string& path,
-                               const string& contents) {
+void
+VirtualFileSystem::Create(const string& path, const string& contents) {
   files_[path].mtime = now_;
   files_[path].contents = contents;
   files_created_.insert(path);
 }
 
-TimeStamp VirtualFileSystem::Stat(const string& path, string* err) const {
+TimeStamp
+VirtualFileSystem::Stat(const string& path, string* err) const {
   FileMap::const_iterator i = files_.find(path);
   if (i != files_.end()) {
     *err = i->second.stat_error;
@@ -123,19 +128,20 @@ TimeStamp VirtualFileSystem::Stat(const string& path, string* err) const {
   return 0;
 }
 
-bool VirtualFileSystem::WriteFile(const string& path, const string& contents) {
+bool
+VirtualFileSystem::WriteFile(const string& path, const string& contents) {
   Create(path, contents);
   return true;
 }
 
-bool VirtualFileSystem::MakeDir(const string& path) {
+bool
+VirtualFileSystem::MakeDir(const string& path) {
   directories_made_.push_back(path);
-  return true;  // success
+  return true; // success
 }
 
-FileReader::Status VirtualFileSystem::ReadFile(const string& path,
-                                               string* contents,
-                                               string* err) {
+FileReader::Status
+VirtualFileSystem::ReadFile(const string& path, string* contents, string* err) {
   files_read_.push_back(path);
   FileMap::iterator i = files_.find(path);
   if (i != files_.end()) {
@@ -146,7 +152,8 @@ FileReader::Status VirtualFileSystem::ReadFile(const string& path,
   return NotFound;
 }
 
-int VirtualFileSystem::RemoveFile(const string& path) {
+int
+VirtualFileSystem::RemoveFile(const string& path) {
   if (find(directories_made_.begin(), directories_made_.end(), path)
       != directories_made_.end())
     return -1;
@@ -160,7 +167,8 @@ int VirtualFileSystem::RemoveFile(const string& path) {
   }
 }
 
-void ScopedTempDir::CreateAndEnter(const string& name) {
+void
+ScopedTempDir::CreateAndEnter(const string& name) {
   // First change into the system temp dir and save it for cleanup.
   start_dir_ = GetSystemTempDir();
   if (start_dir_.empty())
@@ -182,9 +190,10 @@ void ScopedTempDir::CreateAndEnter(const string& name) {
     Fatal("chdir: %s", strerror(errno));
 }
 
-void ScopedTempDir::Cleanup() {
+void
+ScopedTempDir::Cleanup() {
   if (temp_dir_name_.empty())
-    return;  // Something went wrong earlier.
+    return; // Something went wrong earlier.
 
   // Move out of the directory we're about to clobber.
   if (chdir(start_dir_.c_str()) < 0)

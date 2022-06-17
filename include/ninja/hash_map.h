@@ -15,13 +15,14 @@
 #ifndef NINJA_MAP_H_
 #define NINJA_MAP_H_
 
-#include <algorithm>
-#include <string.h>
 #include "util.h"
 
+#include <algorithm>
+#include <string.h>
+
 // MurmurHash2, by Austin Appleby
-static inline
-unsigned int MurmurHash2(const void* key, size_t len) {
+static inline unsigned int
+MurmurHash2(const void* key, size_t len) {
   static const unsigned int seed = 0xDECAFBAD;
   const unsigned int m = 0x5bd1e995;
   const int r = 24;
@@ -39,12 +40,15 @@ unsigned int MurmurHash2(const void* key, size_t len) {
     len -= 4;
   }
   switch (len) {
-  case 3: h ^= data[2] << 16;
-          [[fallthrough]];
-  case 2: h ^= data[1] << 8;
-          [[fallthrough]];
-  case 1: h ^= data[0];
-    h *= m;
+    case 3:
+      h ^= data[2] << 16;
+      [[fallthrough]];
+    case 2:
+      h ^= data[1] << 8;
+      [[fallthrough]];
+    case 1:
+      h ^= data[0];
+      h *= m;
   };
   h ^= h >> 13;
   h *= m;

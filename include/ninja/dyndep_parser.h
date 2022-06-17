@@ -22,26 +22,31 @@ struct DyndepFile;
 struct EvalString;
 
 /// Parses dyndep files.
-struct DyndepParser: public Parser {
-  DyndepParser(State* state, FileReader* file_reader,
-               DyndepFile* dyndep_file);
+struct DyndepParser : public Parser {
+  DyndepParser(State* state, FileReader* file_reader, DyndepFile* dyndep_file);
 
   /// Parse a text string of input.  Used by tests.
-  bool ParseTest(const std::string& input, std::string* err) {
+  bool
+  ParseTest(const std::string& input, std::string* err) {
     return Parse("input", input, err);
   }
 
 private:
   /// Parse a file, given its contents as a string.
-  bool Parse(const std::string& filename, const std::string& input,
-             std:: string* err);
+  bool
+  Parse(
+      const std::string& filename, const std::string& input, std::string* err
+  );
 
-  bool ParseDyndepVersion(std::string* err);
-  bool ParseLet(std::string* key, EvalString* val, std::string* err);
-  bool ParseEdge(std::string* err);
+  bool
+  ParseDyndepVersion(std::string* err);
+  bool
+  ParseLet(std::string* key, EvalString* val, std::string* err);
+  bool
+  ParseEdge(std::string* err);
 
   DyndepFile* dyndep_file_;
   BindingEnv env_;
 };
 
-#endif  // NINJA_DYNDEP_PARSER_H_
+#endif // NINJA_DYNDEP_PARSER_H_

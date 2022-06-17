@@ -14,15 +14,16 @@
 
 #include "graphviz.h"
 
-#include <stdio.h>
-#include <algorithm>
-
 #include "dyndep.h"
 #include "graph.h"
 
+#include <algorithm>
+#include <stdio.h>
+
 using namespace std;
 
-void GraphViz::AddTarget(Node* node) {
+void
+GraphViz::AddTarget(Node* node) {
   if (visited_nodes_.find(node) != visited_nodes_.end())
     return;
 
@@ -54,11 +55,15 @@ void GraphViz::AddTarget(Node* node) {
     // Can draw simply.
     // Note extra space before label text -- this is cosmetic and feels
     // like a graphviz bug.
-    printf("\"%p\" -> \"%p\" [label=\" %s\"]\n",
-           edge->inputs_[0], edge->outputs_[0], edge->rule_->name().c_str());
+    printf(
+        "\"%p\" -> \"%p\" [label=\" %s\"]\n", edge->inputs_[0],
+        edge->outputs_[0], edge->rule_->name().c_str()
+    );
   } else {
-    printf("\"%p\" [label=\"%s\", shape=ellipse]\n",
-           edge, edge->rule_->name().c_str());
+    printf(
+        "\"%p\" [label=\"%s\", shape=ellipse]\n", edge,
+        edge->rule_->name().c_str()
+    );
     for (vector<Node*>::iterator out = edge->outputs_.begin();
          out != edge->outputs_.end(); ++out) {
       printf("\"%p\" -> \"%p\"\n", edge, *out);
@@ -78,13 +83,15 @@ void GraphViz::AddTarget(Node* node) {
   }
 }
 
-void GraphViz::Start() {
+void
+GraphViz::Start() {
   printf("digraph ninja {\n");
   printf("rankdir=\"LR\"\n");
   printf("node [fontsize=10, shape=box, height=0.25]\n");
   printf("edge [fontsize=10]\n");
 }
 
-void GraphViz::Finish() {
+void
+GraphViz::Finish() {
   printf("}\n");
 }

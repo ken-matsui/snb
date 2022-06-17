@@ -37,7 +37,7 @@ struct Dyndeps {
 /// to its dynamically-discovered dependency information.
 /// This is a struct rather than a typedef so that we can
 /// forward-declare it in other headers.
-struct DyndepFile: public std::map<Edge*, Dyndeps> {};
+struct DyndepFile : public std::map<Edge*, Dyndeps> {};
 
 /// DyndepLoader loads dynamically discovered dependencies, as
 /// referenced via the "dyndep" attribute in build files.
@@ -49,16 +49,20 @@ struct DyndepLoader {
   /// build graph with the new information.  One overload accepts
   /// a caller-owned 'DyndepFile' object in which to store the
   /// information loaded from the dyndep file.
-  bool LoadDyndeps(Node* node, std::string* err) const;
-  bool LoadDyndeps(Node* node, DyndepFile* ddf, std::string* err) const;
+  bool
+  LoadDyndeps(Node* node, std::string* err) const;
+  bool
+  LoadDyndeps(Node* node, DyndepFile* ddf, std::string* err) const;
 
- private:
-  bool LoadDyndepFile(Node* file, DyndepFile* ddf, std::string* err) const;
+private:
+  bool
+  LoadDyndepFile(Node* file, DyndepFile* ddf, std::string* err) const;
 
-  bool UpdateEdge(Edge* edge, Dyndeps const* dyndeps, std::string* err) const;
+  bool
+  UpdateEdge(Edge* edge, Dyndeps const* dyndeps, std::string* err) const;
 
   State* state_;
   DiskInterface* disk_interface_;
 };
 
-#endif  // NINJA_DYNDEP_LOADER_H_
+#endif // NINJA_DYNDEP_LOADER_H_

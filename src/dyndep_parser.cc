@@ -14,24 +14,23 @@
 
 #include "dyndep_parser.h"
 
-#include <vector>
-
 #include "dyndep.h"
 #include "graph.h"
 #include "state.h"
 #include "util.h"
 #include "version.h"
 
+#include <vector>
+
 using namespace std;
 
-DyndepParser::DyndepParser(State* state, FileReader* file_reader,
-                           DyndepFile* dyndep_file)
-    : Parser(state, file_reader)
-    , dyndep_file_(dyndep_file) {
-}
+DyndepParser::DyndepParser(
+    State* state, FileReader* file_reader, DyndepFile* dyndep_file
+)
+    : Parser(state, file_reader), dyndep_file_(dyndep_file) {}
 
-bool DyndepParser::Parse(const string& filename, const string& input,
-                         string* err) {
+bool
+DyndepParser::Parse(const string& filename, const string& input, string* err) {
   lexer_.Start(filename, input);
 
   // Require a supported ninja_dyndep_version value immediately so
@@ -41,40 +40,43 @@ bool DyndepParser::Parse(const string& filename, const string& input,
   for (;;) {
     Lexer::Token token = lexer_.ReadToken();
     switch (token) {
-    case Lexer::BUILD: {
-      if (!haveDyndepVersion)
-        return lexer_.Error("expected 'ninja_dyndep_version = ...'", err);
-      if (!ParseEdge(err))
-        return false;
-      break;
-    }
-    case Lexer::IDENT: {
-      lexer_.UnreadToken();
-      if (haveDyndepVersion)
-        return lexer_.Error(string("unexpected ") + Lexer::TokenName(token),
-                            err);
-      if (!ParseDyndepVersion(err))
-        return false;
-      haveDyndepVersion = true;
-      break;
-    }
-    case Lexer::ERROR:
-      return lexer_.Error(lexer_.DescribeLastError(), err);
-    case Lexer::TEOF:
-      if (!haveDyndepVersion)
-        return lexer_.Error("expected 'ninja_dyndep_version = ...'", err);
-      return true;
-    case Lexer::NEWLINE:
-      break;
-    default:
-      return lexer_.Error(string("unexpected ") + Lexer::TokenName(token),
-                          err);
+      case Lexer::BUILD: {
+        if (!haveDyndepVersion)
+          return lexer_.Error("expected 'ninja_dyndep_version = ...'", err);
+        if (!ParseEdge(err))
+          return false;
+        break;
+      }
+      case Lexer::IDENT: {
+        lexer_.UnreadToken();
+        if (haveDyndepVersion)
+          return lexer_.Error(
+              string("unexpected ") + Lexer::TokenName(token), err
+          );
+        if (!ParseDyndepVersion(err))
+          return false;
+        haveDyndepVersion = true;
+        break;
+      }
+      case Lexer::ERROR:
+        return lexer_.Error(lexer_.DescribeLastError(), err);
+      case Lexer::TEOF:
+        if (!haveDyndepVersion)
+          return lexer_.Error("expected 'ninja_dyndep_version = ...'", err);
+        return true;
+      case Lexer::NEWLINE:
+        break;
+      default:
+        return lexer_.Error(
+            string("unexpected ") + Lexer::TokenName(token), err
+        );
     }
   }
-  return false;  // not reached
+  return false; // not reached
 }
 
-bool DyndepParser::ParseDyndepVersion(string* err) {
+bool
+DyndepParser::ParseDyndepVersion(string* err) {
   string name;
   EvalString let_value;
   if (!ParseLet(&name, &let_value, err))
@@ -87,13 +89,15 @@ bool DyndepParser::ParseDyndepVersion(string* err) {
   ParseVersion(version, &major, &minor);
   if (major != 1 || minor != 0) {
     return lexer_.Error(
-      string("unsupported 'ninja_dyndep_version = ") + version + "'", err);
+        string("unsupported 'ninja_dyndep_version = ") + version + "'", err
+    );
     return false;
   }
   return true;
 }
 
-bool DyndepParser::ParseLet(string* key, EvalString* value, string* err) {
+bool
+DyndepParser::ParseLet(string* key, EvalString* value, string* err) {
   if (!lexer_.ReadIdent(key))
     return lexer_.Error("expected variable name", err);
   if (!ExpectToken(Lexer::EQUALS, err))
@@ -103,7 +107,8 @@ bool DyndepParser::ParseLet(string* key, EvalString* value, string* err) {
   return true;
 }
 
-bool DyndepParser::ParseEdge(string* err) {
+bool
+DyndepParser::ParseEdge(string* err) {
   // Parse one explicit output.  We expect it to already have an edge.
   // We will record its dynamically-discovered dependency information.
   Dyndeps* dyndeps = nullptr;
@@ -124,7 +129,7 @@ bool DyndepParser::ParseEdge(string* err) {
       return lexer_.Error("no build statement exists for '" + path + "'", err);
     Edge* edge = node->in_edge();
     std::pair<DyndepFile::iterator, bool> res =
-      dyndep_file_->insert(DyndepFile::value_type(edge, Dyndeps()));
+        dyndep_file_->insert(DyndepFile::value_type(edge, Dyndeps()));
     if (!res.second)
       return lexer_.Error("multiple statements for '" + path + "'", err);
     dyndeps = &res.first->second;

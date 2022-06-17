@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "clparser.h"
 #include "metrics.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int
+main(int argc, char* argv[]) {
   // Output of /showIncludes from #include <iostream>
   string perf_testdata =
       "Note: including file: C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\INCLUDE\\iostream\r\n"
@@ -133,7 +134,7 @@ int main(int argc, char* argv[]) {
       "Note: including file:         C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\INCLUDE\\cerrno\r\n"
       "Note: including file:        C:\\Program Files (x86)\\Windows Kits\\10\\include\\10.0.10240.0\\ucrt\\share.h\r\n";
 
-  for (int limit = 1 << 10; limit < (1<<20); limit *= 2) {
+  for (int limit = 1 << 10; limit < (1 << 20); limit *= 2) {
     int64_t start = GetTimeMillis();
     for (int rep = 0; rep < limit; ++rep) {
       string output;
@@ -149,8 +150,10 @@ int main(int argc, char* argv[]) {
 
     if (end - start > 2000) {
       int delta_ms = (int)(end - start);
-      printf("Parse %d times in %dms avg %.1fus\n",
-             limit, delta_ms, float(delta_ms * 1000) / limit);
+      printf(
+          "Parse %d times in %dms avg %.1fus\n", limit, delta_ms,
+          float(delta_ms * 1000) / limit
+      );
       break;
     }
   }

@@ -15,10 +15,10 @@
 #ifndef NINJA_METRICS_H_
 #define NINJA_METRICS_H_
 
+#include "util.h" // For int64_t.
+
 #include <string>
 #include <vector>
-
-#include "util.h"  // For int64_t.
 
 /// The Metrics module is used for the debug mode that dumps timing stats of
 /// various actions.  To use, see METRIC_RECORD below.
@@ -31,7 +31,6 @@ struct Metric {
   /// Total time (in micros) we've spent on the code path.
   int64_t sum;
 };
-
 
 /// A scoped object for recording a metric across the body of a function.
 /// Used by the METRIC_RECORD macro.
@@ -48,10 +47,12 @@ private:
 
 /// The singleton that stores metrics and prints the report.
 struct Metrics {
-  Metric* NewMetric(const std::string& name);
+  Metric*
+  NewMetric(const std::string& name);
 
   /// Print a summary report to stdout.
-  void Report();
+  void
+  Report();
 
 private:
   std::vector<Metric*> metrics_;
@@ -59,31 +60,37 @@ private:
 
 /// Get the current time as relative to some epoch.
 /// Epoch varies between platforms; only useful for measuring elapsed time.
-int64_t GetTimeMillis();
+int64_t
+GetTimeMillis();
 
 /// A simple stopwatch which returns the time
 /// in seconds since Restart() was called.
 struct Stopwatch {
- public:
+public:
   Stopwatch() : started_(0) {}
 
   /// Seconds since Restart() call.
-  double Elapsed() const {
+  double
+  Elapsed() const {
     return 1e-6 * static_cast<double>(Now() - started_);
   }
 
-  void Restart() { started_ = Now(); }
+  void
+  Restart() {
+    started_ = Now();
+  }
 
- private:
+private:
   uint64_t started_;
-  uint64_t Now() const;
+  uint64_t
+  Now() const;
 };
 
 /// The primary interface to metrics.  Use METRIC_RECORD("foobar") at the top
 /// of a function to get timing stats recorded for each call of the function.
-#define METRIC_RECORD(name)                                             \
-  static Metric* metrics_h_metric =                                     \
-      g_metrics ? g_metrics->NewMetric(name) : NULL;                    \
+#define METRIC_RECORD(name)                          \
+  static Metric* metrics_h_metric =                  \
+      g_metrics ? g_metrics->NewMetric(name) : NULL; \
   ScopedMetric metrics_h_scoped(metrics_h_metric);
 
 extern Metrics* g_metrics;

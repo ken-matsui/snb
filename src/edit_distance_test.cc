@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "edit_distance.h"
-
 #include "test.h"
 
 TEST(EditDistanceTest, TestEmpty) {
@@ -25,9 +24,12 @@ TEST(EditDistanceTest, TestEmpty) {
 TEST(EditDistanceTest, TestMaxDistance) {
   const bool allow_replacements = true;
   for (int max_distance = 1; max_distance < 7; ++max_distance) {
-    EXPECT_EQ(max_distance + 1,
-              EditDistance("abcdefghijklmnop", "ponmlkjihgfedcba",
-                           allow_replacements, max_distance));
+    EXPECT_EQ(
+        max_distance + 1, EditDistance(
+                              "abcdefghijklmnop", "ponmlkjihgfedcba",
+                              allow_replacements, max_distance
+                          )
+    );
   }
 }
 

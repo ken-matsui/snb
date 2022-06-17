@@ -13,27 +13,27 @@
 // limitations under the License.
 
 #include "includes_normalize.h"
-
-#include <algorithm>
-
-#include <direct.h>
-
 #include "string_piece_util.h"
 #include "test.h"
 #include "util.h"
+
+#include <algorithm>
+#include <direct.h>
 
 using namespace std;
 
 namespace {
 
-string GetCurDir() {
+string
+GetCurDir() {
   char buf[_MAX_PATH];
   _getcwd(buf, sizeof(buf));
   vector<StringPiece> parts = SplitStringPiece(buf, '\\');
   return parts[parts.size() - 1].AsString();
 }
 
-string NormalizeAndCheckNoError(const string& input) {
+string
+NormalizeAndCheckNoError(const string& input) {
   string result, err;
   IncludesNormalize normalizer(".");
   EXPECT_TRUE(normalizer.Normalize(input, &result, &err));
@@ -41,8 +41,10 @@ string NormalizeAndCheckNoError(const string& input) {
   return result;
 }
 
-string NormalizeRelativeAndCheckNoError(const string& input,
-                                        const string& relative_to) {
+string
+NormalizeRelativeAndCheckNoError(
+    const string& input, const string& relative_to
+) {
   string result, err;
   IncludesNormalize normalizer(relative_to);
   EXPECT_TRUE(normalizer.Normalize(input, &result, &err));
@@ -50,7 +52,7 @@ string NormalizeRelativeAndCheckNoError(const string& input,
   return result;
 }
 
-}  // namespace
+} // namespace
 
 TEST(IncludesNormalize, Simple) {
   EXPECT_EQ("b", NormalizeAndCheckNoError("a\\..\\b"));
@@ -63,13 +65,18 @@ TEST(IncludesNormalize, WithRelative) {
   string err;
   string currentdir = GetCurDir();
   EXPECT_EQ("c", NormalizeRelativeAndCheckNoError("a/b/c", "a/b"));
-  EXPECT_EQ("a",
-            NormalizeAndCheckNoError(IncludesNormalize::AbsPath("a", &err)));
+  EXPECT_EQ(
+      "a", NormalizeAndCheckNoError(IncludesNormalize::AbsPath("a", &err))
+  );
   EXPECT_EQ("", err);
-  EXPECT_EQ(string("../") + currentdir + string("/a"),
-            NormalizeRelativeAndCheckNoError("a", "../b"));
-  EXPECT_EQ(string("../") + currentdir + string("/a/b"),
-            NormalizeRelativeAndCheckNoError("a/b", "../c"));
+  EXPECT_EQ(
+      string("../") + currentdir + string("/a"),
+      NormalizeRelativeAndCheckNoError("a", "../b")
+  );
+  EXPECT_EQ(
+      string("../") + currentdir + string("/a/b"),
+      NormalizeRelativeAndCheckNoError("a/b", "../c")
+  );
   EXPECT_EQ("../../a", NormalizeRelativeAndCheckNoError("a", "b/c"));
   EXPECT_EQ(".", NormalizeRelativeAndCheckNoError("a", "a"));
 }
@@ -84,19 +91,31 @@ TEST(IncludesNormalize, Case) {
 }
 
 TEST(IncludesNormalize, DifferentDrive) {
-  EXPECT_EQ("stuff.h",
-            NormalizeRelativeAndCheckNoError("p:\\vs08\\stuff.h", "p:\\vs08"));
-  EXPECT_EQ("stuff.h",
-            NormalizeRelativeAndCheckNoError("P:\\Vs08\\stuff.h", "p:\\vs08"));
-  EXPECT_EQ("p:/vs08/stuff.h",
-            NormalizeRelativeAndCheckNoError("p:\\vs08\\stuff.h", "c:\\vs08"));
-  EXPECT_EQ("P:/vs08/stufF.h", NormalizeRelativeAndCheckNoError(
-                                   "P:\\vs08\\stufF.h", "D:\\stuff/things"));
-  EXPECT_EQ("P:/vs08/stuff.h", NormalizeRelativeAndCheckNoError(
-                                   "P:/vs08\\stuff.h", "D:\\stuff/things"));
-  EXPECT_EQ("P:/wee/stuff.h",
-            NormalizeRelativeAndCheckNoError("P:/vs08\\../wee\\stuff.h",
-                                             "D:\\stuff/things"));
+  EXPECT_EQ(
+      "stuff.h",
+      NormalizeRelativeAndCheckNoError("p:\\vs08\\stuff.h", "p:\\vs08")
+  );
+  EXPECT_EQ(
+      "stuff.h",
+      NormalizeRelativeAndCheckNoError("P:\\Vs08\\stuff.h", "p:\\vs08")
+  );
+  EXPECT_EQ(
+      "p:/vs08/stuff.h",
+      NormalizeRelativeAndCheckNoError("p:\\vs08\\stuff.h", "c:\\vs08")
+  );
+  EXPECT_EQ(
+      "P:/vs08/stufF.h",
+      NormalizeRelativeAndCheckNoError("P:\\vs08\\stufF.h", "D:\\stuff/things")
+  );
+  EXPECT_EQ(
+      "P:/vs08/stuff.h",
+      NormalizeRelativeAndCheckNoError("P:/vs08\\stuff.h", "D:\\stuff/things")
+  );
+  EXPECT_EQ(
+      "P:/wee/stuff.h", NormalizeRelativeAndCheckNoError(
+                            "P:/vs08\\../wee\\stuff.h", "D:\\stuff/things"
+                        )
+  );
 }
 
 TEST(IncludesNormalize, LongInvalidPath) {
@@ -109,10 +128,8 @@ TEST(IncludesNormalize, LongInvalidPath) {
   // Too long, won't be canonicalized. Ensure doesn't crash.
   string result, err;
   IncludesNormalize normalizer(".");
-  EXPECT_FALSE(
-      normalizer.Normalize(kLongInputString, &result, &err));
+  EXPECT_FALSE(normalizer.Normalize(kLongInputString, &result, &err));
   EXPECT_EQ("path too long", err);
-
 
   // Construct max size path having cwd prefix.
   // kExactlyMaxPath = "$cwd\\a\\aaaa...aaaa\0";
@@ -140,8 +157,10 @@ TEST(IncludesNormalize, LongInvalidPath) {
   string forward_slashes(kExactlyMaxPath);
   replace(forward_slashes.begin(), forward_slashes.end(), '\\', '/');
   // Make sure a path that's exactly _MAX_PATH long is canonicalized.
-  EXPECT_EQ(forward_slashes.substr(cwd_len + 1),
-            NormalizeAndCheckNoError(kExactlyMaxPath));
+  EXPECT_EQ(
+      forward_slashes.substr(cwd_len + 1),
+      NormalizeAndCheckNoError(kExactlyMaxPath)
+  );
 }
 
 TEST(IncludesNormalize, ShortRelativeButTooLongAbsolutePath) {

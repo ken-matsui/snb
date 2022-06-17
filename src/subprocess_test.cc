@@ -13,15 +13,14 @@
 // limitations under the License.
 
 #include "subprocess.h"
-
 #include "test.h"
 
 #ifndef _WIN32
 // SetWithLots need setrlimit.
-#include <stdio.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <unistd.h>
+#  include <stdio.h>
+#  include <sys/resource.h>
+#  include <sys/time.h>
+#  include <unistd.h>
 #endif
 
 using namespace std;
@@ -34,12 +33,12 @@ struct SubprocessTest : public testing::Test {
   SubprocessSet subprocs_;
 };
 
-}  // anonymous namespace
+} // anonymous namespace
 
 // Run a command that fails and emits to stderr.
 TEST_F(SubprocessTest, BadCommandStderr) {
   Subprocess* subproc = subprocs_.Add("cmd /c ninja_no_such_command");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     // Pretend we discovered that stderr was ready for writing.
@@ -53,7 +52,7 @@ TEST_F(SubprocessTest, BadCommandStderr) {
 // Run a command that does not exist
 TEST_F(SubprocessTest, NoSuchCommand) {
   Subprocess* subproc = subprocs_.Add("ninja_no_such_command");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     // Pretend we discovered that stderr was ready for writing.
@@ -68,7 +67,7 @@ TEST_F(SubprocessTest, NoSuchCommand) {
 
 TEST_F(SubprocessTest, InterruptChild) {
   Subprocess* subproc = subprocs_.Add("kill -INT $$");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     subprocs_.DoWork();
@@ -79,7 +78,7 @@ TEST_F(SubprocessTest, InterruptChild) {
 
 TEST_F(SubprocessTest, InterruptParent) {
   Subprocess* subproc = subprocs_.Add("kill -INT $PPID ; sleep 1");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     bool interrupted = subprocs_.DoWork();
@@ -92,7 +91,7 @@ TEST_F(SubprocessTest, InterruptParent) {
 
 TEST_F(SubprocessTest, InterruptChildWithSigTerm) {
   Subprocess* subproc = subprocs_.Add("kill -TERM $$");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     subprocs_.DoWork();
@@ -103,7 +102,7 @@ TEST_F(SubprocessTest, InterruptChildWithSigTerm) {
 
 TEST_F(SubprocessTest, InterruptParentWithSigTerm) {
   Subprocess* subproc = subprocs_.Add("kill -TERM $PPID ; sleep 1");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     bool interrupted = subprocs_.DoWork();
@@ -116,7 +115,7 @@ TEST_F(SubprocessTest, InterruptParentWithSigTerm) {
 
 TEST_F(SubprocessTest, InterruptChildWithSigHup) {
   Subprocess* subproc = subprocs_.Add("kill -HUP $$");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     subprocs_.DoWork();
@@ -127,7 +126,7 @@ TEST_F(SubprocessTest, InterruptChildWithSigHup) {
 
 TEST_F(SubprocessTest, InterruptParentWithSigHup) {
   Subprocess* subproc = subprocs_.Add("kill -HUP $PPID ; sleep 1");
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     bool interrupted = subprocs_.DoWork();
@@ -157,7 +156,7 @@ TEST_F(SubprocessTest, Console) {
 
 TEST_F(SubprocessTest, SetWithSingle) {
   Subprocess* subproc = subprocs_.Add(kSimpleCommand);
-  ASSERT_NE((Subprocess *) 0, subproc);
+  ASSERT_NE((Subprocess*)0, subproc);
 
   while (!subproc->Done()) {
     subprocs_.DoWork();
@@ -171,14 +170,14 @@ TEST_F(SubprocessTest, SetWithSingle) {
 TEST_F(SubprocessTest, SetWithMulti) {
   Subprocess* processes[3];
   const char* kCommands[3] = {
-    kSimpleCommand,
-    "id -u",
-    "pwd",
+      kSimpleCommand,
+      "id -u",
+      "pwd",
   };
 
   for (int i = 0; i < 3; ++i) {
     processes[i] = subprocs_.Add(kCommands[i]);
-    ASSERT_NE((Subprocess *) 0, processes[i]);
+    ASSERT_NE((Subprocess*)0, processes[i]);
   }
 
   ASSERT_EQ(3u, subprocs_.running_.size());
@@ -187,8 +186,8 @@ TEST_F(SubprocessTest, SetWithMulti) {
     ASSERT_EQ("", processes[i]->GetOutput());
   }
 
-  while (!processes[0]->Done() || !processes[1]->Done() ||
-         !processes[2]->Done()) {
+  while (!processes[0]->Done() || !processes[1]->Done() || !processes[2]->Done()
+  ) {
     ASSERT_GT(subprocs_.running_.size(), 0u);
     subprocs_.DoWork();
   }
@@ -213,15 +212,17 @@ TEST_F(SubprocessTest, SetWithLots) {
   rlimit rlim;
   ASSERT_EQ(0, getrlimit(RLIMIT_NOFILE, &rlim));
   if (rlim.rlim_cur < kNumProcs) {
-    printf("Raise [ulimit -n] above %u (currently %lu) to make this test go\n",
-           kNumProcs, rlim.rlim_cur);
+    printf(
+        "Raise [ulimit -n] above %u (currently %lu) to make this test go\n",
+        kNumProcs, rlim.rlim_cur
+    );
     return;
   }
 
   vector<Subprocess*> procs;
   for (size_t i = 0; i < kNumProcs; ++i) {
     Subprocess* subproc = subprocs_.Add("/bin/echo");
-    ASSERT_NE((Subprocess *) 0, subproc);
+    ASSERT_NE((Subprocess*)0, subproc);
     procs.push_back(subproc);
   }
   while (!subprocs_.running_.empty())
@@ -232,7 +233,7 @@ TEST_F(SubprocessTest, SetWithLots) {
   }
   ASSERT_EQ(kNumProcs, subprocs_.finished_.size());
 }
-#endif  // !__APPLE__ && !_WIN32
+#endif // !__APPLE__ && !_WIN32
 
 // TODO: this test could work on Windows, just not sure how to simply
 // read stdin.
@@ -247,4 +248,4 @@ TEST_F(SubprocessTest, ReadStdin) {
   ASSERT_EQ(ExitSuccess, subproc->Finish());
   ASSERT_EQ(1u, subprocs_.finished_.size());
 }
-#endif  // _WIN32
+#endif // _WIN32

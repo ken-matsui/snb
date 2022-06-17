@@ -16,12 +16,12 @@
 
 #include <sys/stat.h>
 #ifndef _WIN32
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 
 #include "graph.h"
-#include "util.h"
 #include "test.h"
+#include "util.h"
 
 using namespace std;
 
@@ -30,11 +30,13 @@ namespace {
 const char kTestFilename[] = "DepsLogTest-tempfile";
 
 struct DepsLogTest : public testing::Test {
-  virtual void SetUp() {
+  virtual void
+  SetUp() {
     // In case a crashing test left a stale file behind.
     unlink(kTestFilename);
   }
-  virtual void TearDown() {
+  virtual void
+  TearDown() {
     unlink(kTestFilename);
   }
 };
@@ -90,7 +92,7 @@ TEST_F(DepsLogTest, WriteRead) {
 }
 
 TEST_F(DepsLogTest, LotsOfDeps) {
-  const int kNumDeps = 100000;  // More than 64k.
+  const int kNumDeps = 100000; // More than 64k.
 
   State state1;
   DepsLog log1;
@@ -171,11 +173,11 @@ TEST_F(DepsLogTest, DoubleEntry) {
 // Verify that adding the new deps works and can be compacted away.
 TEST_F(DepsLogTest, Recompact) {
   const char kManifest[] =
-"rule cc\n"
-"  command = cc\n"
-"  deps = gcc\n"
-"build out.o: cc\n"
-"build other_out.o: cc\n";
+      "rule cc\n"
+      "  command = cc\n"
+      "  deps = gcc\n"
+      "build out.o: cc\n"
+      "build other_out.o: cc\n";
 
   // Write some deps to the file and grab its size.
   int file_size;
@@ -326,12 +328,12 @@ TEST_F(DepsLogTest, Recompact) {
 
 // Verify that invalid file headers cause a new build.
 TEST_F(DepsLogTest, InvalidHeader) {
-  const char *kInvalidHeaders[] = {
-    "",                              // Empty file.
-    "# ninjad",                      // Truncated first line.
-    "# ninjadeps\n",                 // No version int.
-    "# ninjadeps\n\001\002",         // Truncated version int.
-    "# ninjadeps\n\001\002\003\004"  // Invalid version int.
+  const char* kInvalidHeaders[] = {
+      "", // Empty file.
+      "# ninjad", // Truncated first line.
+      "# ninjadeps\n", // No version int.
+      "# ninjadeps\n\001\002", // Truncated version int.
+      "# ninjadeps\n\001\002\003\004" // Invalid version int.
   };
   for (size_t i = 0; i < sizeof(kInvalidHeaders) / sizeof(kInvalidHeaders[0]);
        ++i) {
@@ -339,8 +341,9 @@ TEST_F(DepsLogTest, InvalidHeader) {
     ASSERT_TRUE(deps_log != NULL);
     ASSERT_EQ(
         strlen(kInvalidHeaders[i]),
-        fwrite(kInvalidHeaders[i], 1, strlen(kInvalidHeaders[i]), deps_log));
-    ASSERT_EQ(0 ,fclose(deps_log));
+        fwrite(kInvalidHeaders[i], 1, strlen(kInvalidHeaders[i]), deps_log)
+    );
+    ASSERT_EQ(0, fclose(deps_log));
 
     string err;
     DepsLog log;
@@ -498,11 +501,13 @@ TEST_F(DepsLogTest, ReverseDepsNodes) {
   log.Close();
 
   Node* rev_deps = log.GetFirstReverseDepsNode(state.GetNode("foo.h", 0));
-  EXPECT_TRUE(rev_deps == state.GetNode("out.o", 0) ||
-              rev_deps == state.GetNode("out2.o", 0));
+  EXPECT_TRUE(
+      rev_deps == state.GetNode("out.o", 0)
+      || rev_deps == state.GetNode("out2.o", 0)
+  );
 
   rev_deps = log.GetFirstReverseDepsNode(state.GetNode("bar.h", 0));
   EXPECT_TRUE(rev_deps == state.GetNode("out.o", 0));
 }
 
-}  // anonymous namespace
+} // anonymous namespace
