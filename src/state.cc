@@ -67,22 +67,22 @@ const Rule State::kPhonyRule("phony");
 
 State::State() {
   bindings_.AddRule(&kPhonyRule);
-  AddPool(&kDefaultPool);
-  AddPool(&kConsolePool);
+  AddPool(std::make_unique<Pool>(kDefaultPool));
+  AddPool(std::make_unique<Pool>(kConsolePool));
 }
 
 void
-State::AddPool(Pool* pool) {
+State::AddPool(std::unique_ptr<Pool> pool) {
   assert(LookupPool(pool->name()) == nullptr);
-  pools_[pool->name()] = pool;
+  pools_[pool->name()] = std::move(pool);
 }
 
 Pool*
 State::LookupPool(const std::string& pool_name) {
-  std::map<std::string, Pool*>::iterator i = pools_.find(pool_name);
+  auto i = pools_.find(pool_name);
   if (i == pools_.end())
     return nullptr;
-  return i->second;
+  return i->second.get();
 }
 
 Edge*
@@ -213,10 +213,9 @@ State::Dump() {
   }
   if (!pools_.empty()) {
     printf("resource_pools:\n");
-    for (std::map<std::string, Pool*>::const_iterator it = pools_.begin();
-         it != pools_.end(); ++it) {
-      if (!it->second->name().empty()) {
-        it->second->Dump();
+    for (const auto& pool : pools_) {
+      if (!pool.second->name().empty()) {
+        pool.second->Dump();
       }
     }
   }

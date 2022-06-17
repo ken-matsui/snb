@@ -121,7 +121,7 @@ struct State {
   State();
 
   void
-  AddPool(Pool* pool);
+  AddPool(std::unique_ptr<Pool> pool);
   Pool*
   LookupPool(const std::string& pool_name);
 
@@ -165,7 +165,7 @@ struct State {
   Paths paths_;
 
   /// All the pools used in the graph.
-  std::map<std::string, Pool*> pools_;
+  std::map<std::string, std::unique_ptr<Pool>> pools_;
 
   /// All the edges of the graph.
   std::vector<std::unique_ptr<Edge>> edges_;
