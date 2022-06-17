@@ -27,6 +27,8 @@
 #include "line_printer.h"
 #include "test.h"
 
+#include <cstring>
+
 using namespace std;
 
 struct RegisteredTest {
