@@ -82,15 +82,13 @@ VerifyGraph(const State& state) {
     // All edges need at least one output.
     EXPECT_FALSE(edge->outputs_.empty());
     // Check that the edge's inputs have the edge as out-edge.
-    for (auto in_node = edge->inputs_.begin();
-         in_node != edge->inputs_.end(); ++in_node) {
-      const std::vector<Edge*>& out_edges = (*in_node)->out_edges();
+    for (Node* in_node : edge->inputs_) {
+      const std::vector<Edge*>& out_edges = in_node->out_edges();
       EXPECT_NE(find(out_edges.begin(), out_edges.end(), edge.get()), out_edges.end());
     }
     // Check that the edge's outputs have the edge as in-edge.
-    for (std::vector<Node*>::const_iterator out_node = edge->outputs_.begin();
-         out_node != edge->outputs_.end(); ++out_node) {
-      EXPECT_EQ((*out_node)->in_edge(), edge.get());
+    for (Node* out_node : edge->outputs_) {
+      EXPECT_EQ(out_node->in_edge(), edge.get());
     }
   }
 
