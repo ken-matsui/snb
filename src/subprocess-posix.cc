@@ -90,7 +90,7 @@ Subprocess::Start(SubprocessSet* set, const string& command) {
     flags |= POSIX_SPAWN_SETPGROUP;
     // No need to posix_spawnattr_setpgroup(&attr, 0), it's the default.
 
-    // Open /dev/nullptr over stdin.
+    // Open /dev/null over stdin.
     err =
         posix_spawn_file_actions_addopen(&action, 0, "/dev/null", O_RDONLY, 0);
     if (err != 0) {
