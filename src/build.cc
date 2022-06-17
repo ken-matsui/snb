@@ -14,12 +14,12 @@
 
 #include "build.hpp"
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <functional>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #if defined(__SVR4) && defined(__sun)
 #  include <sys/termios.h>

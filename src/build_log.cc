@@ -25,14 +25,11 @@
 #include "disk_interface.hpp"
 
 #include <cassert>
-#include <errno.h>
-#include <stdlib.h>
-#include <string.h>
-
-#ifndef _WIN32
-#  include <inttypes.h>
-#  include <unistd.h>
-#endif
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
+#include <cinttypes>
+#include <unistd.h>
 
 #include "build.hpp"
 #include "graph.hpp"

@@ -16,8 +16,8 @@
 
 #include "debug_flags.hpp"
 
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <cstdlib>
 
 using namespace std;
 

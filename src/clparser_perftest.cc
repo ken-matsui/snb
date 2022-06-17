@@ -15,8 +15,8 @@
 #include "clparser.hpp"
 #include "metrics.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 using namespace std;
 

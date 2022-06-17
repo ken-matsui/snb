@@ -14,11 +14,11 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <errno.h>
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cerrno>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #ifdef _AIX
 #  include "getopt.h"

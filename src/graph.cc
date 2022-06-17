@@ -25,9 +25,9 @@
 #include "util.hpp"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 #include <deque>
-#include <stdio.h>
+#include <cstdio>
 
 using namespace std;
 

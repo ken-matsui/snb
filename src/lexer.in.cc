@@ -17,7 +17,7 @@
 #include "eval_env.hpp"
 #include "util.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace std;
 

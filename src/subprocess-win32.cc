@@ -16,8 +16,8 @@
 #include "util.hpp"
 
 #include <algorithm>
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstdio>
 
 using namespace std;
 

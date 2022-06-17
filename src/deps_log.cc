@@ -19,10 +19,10 @@
 #include "state.hpp"
 #include "util.hpp"
 
-#include <assert.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include <cassert>
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
 #include <unistd.h>
 
 using namespace std;

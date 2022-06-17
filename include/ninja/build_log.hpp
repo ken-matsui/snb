@@ -20,7 +20,7 @@
 #include "util.hpp" // uint64_t
 
 #include <memory>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <unordered_map>

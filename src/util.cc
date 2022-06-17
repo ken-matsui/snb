@@ -14,22 +14,13 @@
 
 #include "util.hpp"
 
-#ifdef __CYGWIN__
-#  include <io.h>
-#  include <windows.h>
-#elif defined(_WIN32)
-#  include <io.h>
-#  include <share.h>
-#  include <windows.h>
-#endif
-
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <fcntl.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>
 

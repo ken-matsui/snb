@@ -16,8 +16,8 @@
 #include "graph.hpp"
 #include "test.hpp"
 
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstdio>
 
 using namespace std;
 

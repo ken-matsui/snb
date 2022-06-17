@@ -22,7 +22,7 @@
 #include "util.hpp"
 
 #include <iostream>
-#include <string.h>
+#include <cstring>
 
 namespace {
 
