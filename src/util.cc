@@ -440,14 +440,14 @@ struct MountPoint {
   std::string_view deviceId;
   std::string_view root;
   std::string_view mountPoint;
-  vector<std::string_view> options;
-  vector<std::string_view> optionalFields;
+  std::vector<std::string_view> options;
+  std::vector<std::string_view> optionalFields;
   std::string_view fsType;
   std::string_view mountSource;
-  vector<std::string_view> superOptions;
+  std::vector<std::string_view> superOptions;
   bool
-  parse(const string& line) {
-    vector<std::string_view> pieces = SplitStringPiece(line, ' ');
+  parse(const std::string& line) {
+    std::vector<std::string_view> pieces = SplitStringPiece(line, ' ');
     if (pieces.size() < 10)
       return false;
     size_t optionalStart = 0;
@@ -468,21 +468,21 @@ struct MountPoint {
     mountPoint = pieces[4];
     options = SplitStringPiece(pieces[5], ',');
     optionalFields =
-        vector<std::string_view>(&pieces[6], &pieces[optionalStart - 1]);
+        std::vector<std::string_view>(&pieces[6], &pieces[optionalStart - 1]);
     fsType = pieces[optionalStart];
     mountSource = pieces[optionalStart + 1];
     superOptions = SplitStringPiece(pieces[optionalStart + 2], ',');
     return true;
   }
-  string
-  translate(string& path) const {
+  std::string
+  translate(std::string& path) const {
     // path must be sub dir of root
     if (path.compare(0, root.size(), root.data(), root.size()) != 0) {
-      return string();
+      return std::string();
     }
     path.erase(0, root.size());
     if (path == ".." || (path.length() > 2 && path.compare(0, 3, "../") == 0)) {
-      return string();
+      return std::string();
     }
     return std::string(mountPoint) + "/" + path;
   }
@@ -490,21 +490,21 @@ struct MountPoint {
 
 struct CGroupSubSys {
   int id;
-  string name;
-  vector<string> subsystems;
+  std::string name;
+  std::vector<string> subsystems;
   bool
-  parse(string& line) {
+  parse(std::string& line) {
     size_t first = line.find(':');
-    if (first == string::npos)
+    if (first == std::string::npos)
       return false;
     line[first] = '\0';
     size_t second = line.find(':', first + 1);
-    if (second == string::npos)
+    if (second == std::string::npos)
       return false;
     line[second] = '\0';
     id = atoi(line.c_str());
     name = line.substr(second + 1);
-    vector<std::string_view> pieces =
+    std::vector<std::string_view> pieces =
         SplitStringPiece(std::string_view(line.c_str() + first + 1), ',');
     for (size_t i = 0; i < pieces.size(); i++) {
       subsystems.emplace_back(std::string(pieces[i]));
@@ -513,14 +513,14 @@ struct CGroupSubSys {
   }
 };
 
-map<string, string>
-ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
-  map<string, string> cgroups;
+std::map<std::string, std::string>
+ParseMountInfo(std::map<std::string, CGroupSubSys>& subsystems) {
+  std::map<std::string, std::string> cgroups;
   ifstream mountinfo("/proc/self/mountinfo");
   if (!mountinfo.is_open())
     return cgroups;
   while (!mountinfo.eof()) {
-    string line;
+    std::string line;
     getline(mountinfo, line);
     MountPoint mp;
     if (!mp.parse(line))
@@ -528,11 +528,11 @@ ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
     if (mp.fsType != "cgroup")
       continue;
     for (size_t i = 0; i < mp.superOptions.size(); i++) {
-      string opt(mp.superOptions[i]);
-      map<string, CGroupSubSys>::iterator subsys = subsystems.find(opt);
+      std::string opt(mp.superOptions[i]);
+      std::map<std::string, CGroupSubSys>::iterator subsys = subsystems.find(opt);
       if (subsys == subsystems.end())
         continue;
-      string newPath = mp.translate(subsys->second.name);
+      std::string newPath = mp.translate(subsys->second.name);
       if (!newPath.empty())
         cgroups.insert(make_pair(opt, newPath));
     }
@@ -540,13 +540,13 @@ ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
   return cgroups;
 }
 
-map<string, CGroupSubSys>
+std::map<std::string, CGroupSubSys>
 ParseSelfCGroup() {
-  map<string, CGroupSubSys> cgroups;
+  std::map<std::string, CGroupSubSys> cgroups;
   ifstream cgroup("/proc/self/cgroup");
   if (!cgroup.is_open())
     return cgroups;
-  string line;
+  std::string line;
   while (!cgroup.eof()) {
     getline(cgroup, line);
     CGroupSubSys subsys;
@@ -561,9 +561,9 @@ ParseSelfCGroup() {
 
 int
 ParseCPUFromCGroup() {
-  map<string, CGroupSubSys> subsystems = ParseSelfCGroup();
-  map<string, string> cgroups = ParseMountInfo(subsystems);
-  map<string, string>::iterator cpu = cgroups.find("cpu");
+  std::map<std::string, CGroupSubSys> subsystems = ParseSelfCGroup();
+  std::map<std::string, std::string> cgroups = ParseMountInfo(subsystems);
+  std::map<std::string, std::string>::iterator cpu = cgroups.find("cpu");
   if (cpu == cgroups.end())
     return -1;
   std::pair<int64_t, bool> quota = readCount(cpu->second + "/cpu.cfs_quota_us");
