@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "depfile_parser.h"
+#include "metrics.h"
+#include "util.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "depfile_parser.h"
-#include "util.h"
-#include "metrics.h"
-
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int
+main(int argc, char* argv[]) {
   if (argc < 2) {
     printf("usage: %s <file1> <file2...>\n", argv[0]);
     return 1;
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]) {
   for (int i = 1; i < argc; ++i) {
     const char* filename = argv[i];
 
-    for (int limit = 1 << 10; limit < (1<<20); limit *= 2) {
+    for (int limit = 1 << 10; limit < (1 << 20); limit *= 2) {
       int64_t start = GetTimeMillis();
       for (int rep = 0; rep < limit; ++rep) {
         string buf;
@@ -51,7 +52,7 @@ int main(int argc, char* argv[]) {
 
       if (end - start > 100) {
         int delta = (int)(end - start);
-        float time = delta*1000 / (float)limit;
+        float time = delta * 1000 / (float)limit;
         printf("%s: %.1fus\n", filename, time);
         times.push_back(time);
         break;
@@ -71,8 +72,9 @@ int main(int argc, char* argv[]) {
         max = times[i];
     }
 
-    printf("min %.1fus  max %.1fus  avg %.1fus\n",
-           min, max, total / times.size());
+    printf(
+        "min %.1fus  max %.1fus  avg %.1fus\n", min, max, total / times.size()
+    );
   }
 
   return 0;

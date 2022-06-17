@@ -14,46 +14,45 @@
 
 #include "clean.h"
 
-#include <assert.h>
-#include <stdio.h>
-
 #include "disk_interface.h"
 #include "graph.h"
 #include "state.h"
 #include "util.h"
 
+#include <assert.h>
+#include <stdio.h>
+
 using namespace std;
 
-Cleaner::Cleaner(State* state,
-                 const BuildConfig& config,
-                 DiskInterface* disk_interface)
-  : state_(state),
-    config_(config),
-    dyndep_loader_(state, disk_interface),
-    cleaned_files_count_(0),
-    disk_interface_(disk_interface),
-    status_(0) {
-}
+Cleaner::Cleaner(
+    State* state, const BuildConfig& config, DiskInterface* disk_interface
+)
+    : state_(state), config_(config), dyndep_loader_(state, disk_interface),
+      cleaned_files_count_(0), disk_interface_(disk_interface), status_(0) {}
 
-int Cleaner::RemoveFile(const string& path) {
+int
+Cleaner::RemoveFile(const string& path) {
   return disk_interface_->RemoveFile(path);
 }
 
-bool Cleaner::FileExists(const string& path) {
+bool
+Cleaner::FileExists(const string& path) {
   string err;
   TimeStamp mtime = disk_interface_->Stat(path, &err);
   if (mtime == -1)
     Error("%s", err.c_str());
-  return mtime > 0;  // Treat Stat() errors as "file does not exist".
+  return mtime > 0; // Treat Stat() errors as "file does not exist".
 }
 
-void Cleaner::Report(const string& path) {
+void
+Cleaner::Report(const string& path) {
   ++cleaned_files_count_;
   if (IsVerbose())
     printf("Remove %s\n", path.c_str());
 }
 
-void Cleaner::Remove(const string& path) {
+void
+Cleaner::Remove(const string& path) {
   if (!IsAlreadyRemoved(path)) {
     removed_.insert(path);
     if (config_.dry_run) {
@@ -69,12 +68,14 @@ void Cleaner::Remove(const string& path) {
   }
 }
 
-bool Cleaner::IsAlreadyRemoved(const string& path) {
+bool
+Cleaner::IsAlreadyRemoved(const string& path) {
   set<string>::iterator i = removed_.find(path);
   return (i != removed_.end());
 }
 
-void Cleaner::RemoveEdgeFiles(Edge* edge) {
+void
+Cleaner::RemoveEdgeFiles(Edge* edge) {
   string depfile = edge->GetUnescapedDepfile();
   if (!depfile.empty())
     Remove(depfile);
@@ -84,7 +85,8 @@ void Cleaner::RemoveEdgeFiles(Edge* edge) {
     Remove(rspfile);
 }
 
-void Cleaner::PrintHeader() {
+void
+Cleaner::PrintHeader() {
   if (config_.verbosity == BuildConfig::QUIET)
     return;
   printf("Cleaning...");
@@ -95,13 +97,15 @@ void Cleaner::PrintHeader() {
   fflush(stdout);
 }
 
-void Cleaner::PrintFooter() {
+void
+Cleaner::PrintFooter() {
   if (config_.verbosity == BuildConfig::QUIET)
     return;
   printf("%d files.\n", cleaned_files_count_);
 }
 
-int Cleaner::CleanAll(bool generator) {
+int
+Cleaner::CleanAll(bool generator) {
   Reset();
   PrintHeader();
   LoadDyndeps();
@@ -124,10 +128,12 @@ int Cleaner::CleanAll(bool generator) {
   return status_;
 }
 
-int Cleaner::CleanDead(const BuildLog::Entries& entries) {
+int
+Cleaner::CleanDead(const BuildLog::Entries& entries) {
   Reset();
   PrintHeader();
-  for (BuildLog::Entries::const_iterator i = entries.begin(); i != entries.end(); ++i) {
+  for (BuildLog::Entries::const_iterator i = entries.begin();
+       i != entries.end(); ++i) {
     Node* n = state_->LookupNode(i->first);
     // Detecting stale outputs works as follows:
     //
@@ -146,7 +152,8 @@ int Cleaner::CleanDead(const BuildLog::Entries& entries) {
   return status_;
 }
 
-void Cleaner::DoCleanTarget(Node* target) {
+void
+Cleaner::DoCleanTarget(Node* target) {
   if (Edge* e = target->in_edge()) {
     // Do not try to remove phony targets
     if (!e->is_phony()) {
@@ -167,7 +174,8 @@ void Cleaner::DoCleanTarget(Node* target) {
   cleaned_.insert(target);
 }
 
-int Cleaner::CleanTarget(Node* target) {
+int
+Cleaner::CleanTarget(Node* target) {
   assert(target);
 
   Reset();
@@ -178,7 +186,8 @@ int Cleaner::CleanTarget(Node* target) {
   return status_;
 }
 
-int Cleaner::CleanTarget(const char* target) {
+int
+Cleaner::CleanTarget(const char* target) {
   assert(target);
 
   Reset();
@@ -192,7 +201,8 @@ int Cleaner::CleanTarget(const char* target) {
   return status_;
 }
 
-int Cleaner::CleanTargets(int target_count, char* targets[]) {
+int
+Cleaner::CleanTargets(int target_count, char* targets[]) {
   Reset();
   PrintHeader();
   LoadDyndeps();
@@ -219,7 +229,8 @@ int Cleaner::CleanTargets(int target_count, char* targets[]) {
   return status_;
 }
 
-void Cleaner::DoCleanRule(const Rule* rule) {
+void
+Cleaner::DoCleanRule(const Rule* rule) {
   assert(rule);
 
   for (vector<Edge*>::iterator e = state_->edges_.begin();
@@ -234,7 +245,8 @@ void Cleaner::DoCleanRule(const Rule* rule) {
   }
 }
 
-int Cleaner::CleanRule(const Rule* rule) {
+int
+Cleaner::CleanRule(const Rule* rule) {
   assert(rule);
 
   Reset();
@@ -245,7 +257,8 @@ int Cleaner::CleanRule(const Rule* rule) {
   return status_;
 }
 
-int Cleaner::CleanRule(const char* rule) {
+int
+Cleaner::CleanRule(const char* rule) {
   assert(rule);
 
   Reset();
@@ -259,7 +272,8 @@ int Cleaner::CleanRule(const char* rule) {
   return status_;
 }
 
-int Cleaner::CleanRules(int rule_count, char* rules[]) {
+int
+Cleaner::CleanRules(int rule_count, char* rules[]) {
   assert(rules);
 
   Reset();
@@ -281,14 +295,16 @@ int Cleaner::CleanRules(int rule_count, char* rules[]) {
   return status_;
 }
 
-void Cleaner::Reset() {
+void
+Cleaner::Reset() {
   status_ = 0;
   cleaned_files_count_ = 0;
   removed_.clear();
   cleaned_.clear();
 }
 
-void Cleaner::LoadDyndeps() {
+void
+Cleaner::LoadDyndeps() {
   // Load dyndep files that exist, before they are cleaned.
   for (vector<Edge*>::iterator e = state_->edges_.begin();
        e != state_->edges_.end(); ++e) {

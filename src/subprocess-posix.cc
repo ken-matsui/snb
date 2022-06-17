@@ -14,20 +14,20 @@
 
 #include "subprocess.h"
 
-#include <sys/select.h>
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
+#include <spawn.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/select.h>
 #include <sys/wait.h>
-#include <spawn.h>
+#include <unistd.h>
 
 #if defined(USE_PPOLL)
-#include <poll.h>
+#  include <poll.h>
 #else
-#include <sys/select.h>
+#  include <sys/select.h>
 #endif
 
 extern char** environ;
@@ -36,9 +36,8 @@ extern char** environ;
 
 using namespace std;
 
-Subprocess::Subprocess(bool use_console) : fd_(-1), pid_(-1),
-                                           use_console_(use_console) {
-}
+Subprocess::Subprocess(bool use_console)
+    : fd_(-1), pid_(-1), use_console_(use_console) {}
 
 Subprocess::~Subprocess() {
   if (fd_ >= 0)
@@ -48,7 +47,8 @@ Subprocess::~Subprocess() {
     Finish();
 }
 
-bool Subprocess::Start(SubprocessSet* set, const string& command) {
+bool
+Subprocess::Start(SubprocessSet* set, const string& command) {
   int output_pipe[2];
   if (pipe(output_pipe) < 0)
     Fatal("pipe: %s", strerror(errno));
@@ -58,7 +58,7 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
   // and so must avoid overly-large FDs.
   if (fd_ >= static_cast<int>(FD_SETSIZE))
     Fatal("pipe: %s", strerror(EMFILE));
-#endif  // !USE_PPOLL
+#endif // !USE_PPOLL
   SetCloseOnExec(fd_);
 
   posix_spawn_file_actions_t action;
@@ -91,8 +91,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
     // No need to posix_spawnattr_setpgroup(&attr, 0), it's the default.
 
     // Open /dev/null over stdin.
-    err = posix_spawn_file_actions_addopen(&action, 0, "/dev/null", O_RDONLY,
-          0);
+    err =
+        posix_spawn_file_actions_addopen(&action, 0, "/dev/null", O_RDONLY, 0);
     if (err != 0) {
       Fatal("posix_spawn_file_actions_addopen: %s", strerror(err));
     }
@@ -117,9 +117,11 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
   if (err != 0)
     Fatal("posix_spawnattr_setflags: %s", strerror(err));
 
-  const char* spawned_args[] = { "/bin/sh", "-c", command.c_str(), NULL };
-  err = posix_spawn(&pid_, "/bin/sh", &action, &attr,
-        const_cast<char**>(spawned_args), environ);
+  const char* spawned_args[] = {"/bin/sh", "-c", command.c_str(), NULL};
+  err = posix_spawn(
+      &pid_, "/bin/sh", &action, &attr, const_cast<char**>(spawned_args),
+      environ
+  );
   if (err != 0)
     Fatal("posix_spawn: %s", strerror(err));
 
@@ -134,7 +136,8 @@ bool Subprocess::Start(SubprocessSet* set, const string& command) {
   return true;
 }
 
-void Subprocess::OnPipeReady() {
+void
+Subprocess::OnPipeReady() {
   char buf[4 << 10];
   ssize_t len = read(fd_, buf, sizeof(buf));
   if (len > 0) {
@@ -147,7 +150,8 @@ void Subprocess::OnPipeReady() {
   }
 }
 
-ExitStatus Subprocess::Finish() {
+ExitStatus
+Subprocess::Finish() {
   assert(pid_ != -1);
   int status;
   if (waitpid(pid_, &status, 0) < 0)
@@ -176,21 +180,25 @@ ExitStatus Subprocess::Finish() {
   return ExitFailure;
 }
 
-bool Subprocess::Done() const {
+bool
+Subprocess::Done() const {
   return fd_ == -1;
 }
 
-const string& Subprocess::GetOutput() const {
+const string&
+Subprocess::GetOutput() const {
   return buf_;
 }
 
 int SubprocessSet::interrupted_;
 
-void SubprocessSet::SetInterruptedFlag(int signum) {
+void
+SubprocessSet::SetInterruptedFlag(int signum) {
   interrupted_ = signum;
 }
 
-void SubprocessSet::HandlePendingInterruption() {
+void
+SubprocessSet::HandlePendingInterruption() {
   sigset_t pending;
   sigemptyset(&pending);
   if (sigpending(&pending) == -1) {
@@ -238,8 +246,9 @@ SubprocessSet::~SubprocessSet() {
     Fatal("sigprocmask: %s", strerror(errno));
 }
 
-Subprocess *SubprocessSet::Add(const string& command, bool use_console) {
-  Subprocess *subprocess = new Subprocess(use_console);
+Subprocess*
+SubprocessSet::Add(const string& command, bool use_console) {
+  Subprocess* subprocess = new Subprocess(use_console);
   if (!subprocess->Start(this, command)) {
     delete subprocess;
     return 0;
@@ -249,16 +258,17 @@ Subprocess *SubprocessSet::Add(const string& command, bool use_console) {
 }
 
 #ifdef USE_PPOLL
-bool SubprocessSet::DoWork() {
+bool
+SubprocessSet::DoWork() {
   vector<pollfd> fds;
   nfds_t nfds = 0;
 
-  for (vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i) {
+  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
+       ++i) {
     int fd = (*i)->fd_;
     if (fd < 0)
       continue;
-    pollfd pfd = { fd, POLLIN | POLLPRI, 0 };
+    pollfd pfd = {fd, POLLIN | POLLPRI, 0};
     fds.push_back(pfd);
     ++nfds;
   }
@@ -279,7 +289,7 @@ bool SubprocessSet::DoWork() {
 
   nfds_t cur_nfd = 0;
   for (vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ) {
+       i != running_.end();) {
     int fd = (*i)->fd_;
     if (fd < 0)
       continue;
@@ -298,19 +308,20 @@ bool SubprocessSet::DoWork() {
   return IsInterrupted();
 }
 
-#else  // !defined(USE_PPOLL)
-bool SubprocessSet::DoWork() {
+#else // !defined(USE_PPOLL)
+bool
+SubprocessSet::DoWork() {
   fd_set set;
   int nfds = 0;
   FD_ZERO(&set);
 
-  for (vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i) {
+  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
+       ++i) {
     int fd = (*i)->fd_;
     if (fd >= 0) {
       FD_SET(fd, &set);
-      if (nfds < fd+1)
-        nfds = fd+1;
+      if (nfds < fd + 1)
+        nfds = fd + 1;
     }
   }
 
@@ -329,7 +340,7 @@ bool SubprocessSet::DoWork() {
     return true;
 
   for (vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ) {
+       i != running_.end();) {
     int fd = (*i)->fd_;
     if (fd >= 0 && FD_ISSET(fd, &set)) {
       (*i)->OnPipeReady();
@@ -344,9 +355,10 @@ bool SubprocessSet::DoWork() {
 
   return IsInterrupted();
 }
-#endif  // !defined(USE_PPOLL)
+#endif // !defined(USE_PPOLL)
 
-Subprocess* SubprocessSet::NextFinished() {
+Subprocess*
+SubprocessSet::NextFinished() {
   if (finished_.empty())
     return NULL;
   Subprocess* subproc = finished_.front();
@@ -354,15 +366,16 @@ Subprocess* SubprocessSet::NextFinished() {
   return subproc;
 }
 
-void SubprocessSet::Clear() {
-  for (vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i)
+void
+SubprocessSet::Clear() {
+  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
+       ++i)
     // Since the foreground process is in our process group, it will receive
     // the interruption signal (i.e. SIGINT or SIGTERM) at the same time as us.
     if (!(*i)->use_console_)
       kill(-(*i)->pid_, interrupted_);
-  for (vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i)
+  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
+       ++i)
     delete *i;
   running_.clear();
 }

@@ -17,9 +17,10 @@
 
 #include <string_view>
 
-int EditDistance(std::string_view s1,
-                 std::string_view s2,
-                 bool allow_replacements = true,
-                 int max_edit_distance = 0);
+int
+EditDistance(
+    std::string_view s1, std::string_view s2, bool allow_replacements = true,
+    int max_edit_distance = 0
+);
 
-#endif  // NINJA_EDIT_DISTANCE_H_
+#endif // NINJA_EDIT_DISTANCE_H_

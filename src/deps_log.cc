@@ -14,16 +14,16 @@
 
 #include "deps_log.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "graph.h"
 #include "metrics.h"
 #include "state.h"
 #include "util.h"
+
+#include <assert.h>
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -36,30 +36,30 @@ const int kCurrentVersion = 4;
 // internal buffers having to have this size.
 const unsigned kMaxRecordSize = (1 << 19) - 1;
 
-DepsLog::~DepsLog() {
-  Close();
-}
+DepsLog::~DepsLog() { Close(); }
 
-bool DepsLog::OpenForWrite(const string& path, string* err) {
+bool
+DepsLog::OpenForWrite(const string& path, string* err) {
   if (needs_recompaction_) {
     if (!Recompact(path, err))
       return false;
   }
 
   assert(!file_);
-  file_path_ = path;  // we don't actually open the file right now, but will do
-                      // so on the first write attempt
+  file_path_ = path; // we don't actually open the file right now, but will do
+                     // so on the first write attempt
   return true;
 }
 
-bool DepsLog::RecordDeps(Node* node, TimeStamp mtime,
-                         const vector<Node*>& nodes) {
-  return RecordDeps(node, mtime, nodes.size(),
-                    nodes.empty() ? NULL : (Node**)&nodes.front());
+bool
+DepsLog::RecordDeps(Node* node, TimeStamp mtime, const vector<Node*>& nodes) {
+  return RecordDeps(
+      node, mtime, nodes.size(), nodes.empty() ? NULL : (Node**)&nodes.front()
+  );
 }
 
-bool DepsLog::RecordDeps(Node* node, TimeStamp mtime,
-                         int node_count, Node** nodes) {
+bool
+DepsLog::RecordDeps(Node* node, TimeStamp mtime, int node_count, Node** nodes) {
   // Track whether there's any new data to be recorded.
   bool made_change = false;
 
@@ -80,9 +80,7 @@ bool DepsLog::RecordDeps(Node* node, TimeStamp mtime,
   // See if the new data is different than the existing data, if any.
   if (!made_change) {
     Deps* deps = GetDeps(node);
-    if (!deps ||
-        deps->mtime != mtime ||
-        deps->node_count != node_count) {
+    if (!deps || deps->mtime != mtime || deps->node_count != node_count) {
       made_change = true;
     } else {
       for (int i = 0; i < node_count; ++i) {
@@ -108,7 +106,7 @@ bool DepsLog::RecordDeps(Node* node, TimeStamp mtime,
   if (!OpenForWriteIfNeeded()) {
     return false;
   }
-  size |= 0x80000000;  // Deps record: set high bit.
+  size |= 0x80000000; // Deps record: set high bit.
   if (fwrite(&size, 4, 1, file_) < 1)
     return false;
   int id = node->id();
@@ -137,14 +135,16 @@ bool DepsLog::RecordDeps(Node* node, TimeStamp mtime,
   return true;
 }
 
-void DepsLog::Close() {
-  OpenForWriteIfNeeded();  // create the file even if nothing has been recorded
+void
+DepsLog::Close() {
+  OpenForWriteIfNeeded(); // create the file even if nothing has been recorded
   if (file_)
     fclose(file_);
   file_ = NULL;
 }
 
-LoadStatus DepsLog::Load(const string& path, State* state, string* err) {
+LoadStatus
+DepsLog::Load(const string& path, State* state, string* err) {
   METRIC_RECORD(".ninja_deps load");
   char buf[kMaxRecordSize + 1];
   FILE* f = fopen(path.c_str(), "rb");
@@ -163,8 +163,8 @@ LoadStatus DepsLog::Load(const string& path, State* state, string* err) {
   // But the v1 format could sometimes (rarely) end up with invalid data, so
   // don't migrate v1 to v3 to force a rebuild. (v2 only existed for a few days,
   // and there was no release with it, so pretend that it never happened.)
-  if (!valid_header || strcmp(buf, kFileSignature) != 0 ||
-      version != kCurrentVersion) {
+  if (!valid_header || strcmp(buf, kFileSignature) != 0
+      || version != kCurrentVersion) {
     if (version == 1)
       *err = "deps log version change; rebuilding";
     else
@@ -202,8 +202,9 @@ LoadStatus DepsLog::Load(const string& path, State* state, string* err) {
       int* deps_data = reinterpret_cast<int*>(buf);
       int out_id = deps_data[0];
       TimeStamp mtime;
-      mtime = (TimeStamp)(((uint64_t)(unsigned int)deps_data[2] << 32) |
-                          (uint64_t)(unsigned int)deps_data[1]);
+      mtime = (TimeStamp
+      )(((uint64_t)(unsigned int)deps_data[2] << 32)
+        | (uint64_t)(unsigned int)deps_data[1]);
       deps_data += 3;
       int deps_count = (size / 4) - 3;
 
@@ -219,11 +220,14 @@ LoadStatus DepsLog::Load(const string& path, State* state, string* err) {
         ++unique_dep_record_count;
     } else {
       int path_size = size - 4;
-      assert(path_size > 0);  // CanonicalizePath() rejects empty paths.
+      assert(path_size > 0); // CanonicalizePath() rejects empty paths.
       // There can be up to 3 bytes of padding.
-      if (buf[path_size - 1] == '\0') --path_size;
-      if (buf[path_size - 1] == '\0') --path_size;
-      if (buf[path_size - 1] == '\0') --path_size;
+      if (buf[path_size - 1] == '\0')
+        --path_size;
+      if (buf[path_size - 1] == '\0')
+        --path_size;
+      if (buf[path_size - 1] == '\0')
+        --path_size;
       std::string_view subpath(buf, path_size);
       // It is not necessary to pass in a correct slash_bits here. It will
       // either be a Node that's in the manifest (in which case it will already
@@ -274,15 +278,16 @@ LoadStatus DepsLog::Load(const string& path, State* state, string* err) {
   // Rebuild the log if there are too many dead records.
   int kMinCompactionEntryCount = 1000;
   int kCompactionRatio = 3;
-  if (total_dep_record_count > kMinCompactionEntryCount &&
-      total_dep_record_count > unique_dep_record_count * kCompactionRatio) {
+  if (total_dep_record_count > kMinCompactionEntryCount
+      && total_dep_record_count > unique_dep_record_count * kCompactionRatio) {
     needs_recompaction_ = true;
   }
 
   return LOAD_SUCCESS;
 }
 
-DepsLog::Deps* DepsLog::GetDeps(Node* node) {
+DepsLog::Deps*
+DepsLog::GetDeps(Node* node) {
   // Abort if the node has no id (never referenced in the deps) or if
   // there's no deps recorded for the node.
   if (node->id() < 0 || node->id() >= (int)deps_.size())
@@ -290,7 +295,8 @@ DepsLog::Deps* DepsLog::GetDeps(Node* node) {
   return deps_[node->id()];
 }
 
-Node* DepsLog::GetFirstReverseDepsNode(Node* node) {
+Node*
+DepsLog::GetFirstReverseDepsNode(Node* node) {
   for (size_t id = 0; id < deps_.size(); ++id) {
     Deps* deps = deps_[id];
     if (!deps)
@@ -303,7 +309,8 @@ Node* DepsLog::GetFirstReverseDepsNode(Node* node) {
   return NULL;
 }
 
-bool DepsLog::Recompact(const string& path, string* err) {
+bool
+DepsLog::Recompact(const string& path, string* err) {
   METRIC_RECORD(".ninja_deps recompact");
 
   Close();
@@ -325,13 +332,15 @@ bool DepsLog::Recompact(const string& path, string* err) {
   // Write out all deps again.
   for (int old_id = 0; old_id < (int)deps_.size(); ++old_id) {
     Deps* deps = deps_[old_id];
-    if (!deps) continue;  // If nodes_[old_id] is a leaf, it has no deps.
+    if (!deps)
+      continue; // If nodes_[old_id] is a leaf, it has no deps.
 
     if (!IsDepsEntryLiveFor(nodes_[old_id]))
       continue;
 
-    if (!new_log.RecordDeps(nodes_[old_id], deps->mtime,
-                            deps->node_count, deps->nodes)) {
+    if (!new_log.RecordDeps(
+            nodes_[old_id], deps->mtime, deps->node_count, deps->nodes
+        )) {
       new_log.Close();
       return false;
     }
@@ -356,7 +365,8 @@ bool DepsLog::Recompact(const string& path, string* err) {
   return true;
 }
 
-bool DepsLog::IsDepsEntryLiveFor(Node* node) {
+bool
+DepsLog::IsDepsEntryLiveFor(Node* node) {
   // Skip entries that don't have in-edges or whose edges don't have a
   // "deps" attribute. They were in the deps log from previous builds, but
   // the the files they were for were removed from the build and their deps
@@ -366,7 +376,8 @@ bool DepsLog::IsDepsEntryLiveFor(Node* node) {
   return node->in_edge() && !node->in_edge()->GetBinding("deps").empty();
 }
 
-bool DepsLog::UpdateDeps(int out_id, Deps* deps) {
+bool
+DepsLog::UpdateDeps(int out_id, Deps* deps) {
   if (out_id >= (int)deps_.size())
     deps_.resize(out_id + 1);
 
@@ -377,9 +388,10 @@ bool DepsLog::UpdateDeps(int out_id, Deps* deps) {
   return delete_old;
 }
 
-bool DepsLog::RecordId(Node* node) {
+bool
+DepsLog::RecordId(Node* node) {
   int path_size = node->path().size();
-  int padding = (4 - path_size % 4) % 4;  // Pad path to 4 byte boundary.
+  int padding = (4 - path_size % 4) % 4; // Pad path to 4 byte boundary.
 
   unsigned size = path_size + padding + 4;
   if (size > kMaxRecordSize) {
@@ -411,7 +423,8 @@ bool DepsLog::RecordId(Node* node) {
   return true;
 }
 
-bool DepsLog::OpenForWriteIfNeeded() {
+bool
+DepsLog::OpenForWriteIfNeeded() {
   if (file_path_.empty()) {
     return true;
   }

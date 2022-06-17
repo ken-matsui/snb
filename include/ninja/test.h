@@ -30,32 +30,51 @@ namespace testing {
 class Test {
   bool failed_;
   int assertion_failures_;
- public:
+
+public:
   Test() : failed_(false), assertion_failures_(0) {}
   virtual ~Test() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-  virtual void Run() = 0;
+  virtual void
+  SetUp() {}
+  virtual void
+  TearDown() {}
+  virtual void
+  Run() = 0;
 
-  bool Failed() const { return failed_; }
-  int AssertionFailures() const { return assertion_failures_; }
-  void AddAssertionFailure() { assertion_failures_++; }
-  bool Check(bool condition, const char* file, int line, const char* error);
+  bool
+  Failed() const {
+    return failed_;
+  }
+  int
+  AssertionFailures() const {
+    return assertion_failures_;
+  }
+  void
+  AddAssertionFailure() {
+    assertion_failures_++;
+  }
+  bool
+  Check(bool condition, const char* file, int line, const char* error);
 };
-}
+} // namespace testing
 
-void RegisterTest(testing::Test* (*)(), const char*);
+void
+RegisterTest(testing::Test* (*)(), const char*);
 
 extern testing::Test* g_current_test;
-#define TEST_F_(x, y, name)                                           \
-  struct y : public x {                                               \
-    static testing::Test* Create() { return g_current_test = new y; } \
-    virtual void Run();                                               \
-  };                                                                  \
-  struct Register##y {                                                \
-    Register##y() { RegisterTest(y::Create, name); }                  \
-  };                                                                  \
-  Register##y g_register_##y;                                         \
+#define TEST_F_(x, y, name)                          \
+  struct y : public x {                              \
+    static testing::Test*                            \
+    Create() {                                       \
+      return g_current_test = new y;                 \
+    }                                                \
+    virtual void                                     \
+    Run();                                           \
+  };                                                 \
+  struct Register##y {                               \
+    Register##y() { RegisterTest(y::Create, name); } \
+  };                                                 \
+  Register##y g_register_##y;                        \
   void y::Run()
 
 #define TEST_F(x, y) TEST_F_(x, x##y, #x "." #y)
@@ -78,22 +97,46 @@ extern testing::Test* g_current_test;
 #define EXPECT_FALSE(a) \
   g_current_test->Check(!static_cast<bool>(a), __FILE__, __LINE__, #a)
 
-#define ASSERT_EQ(a, b) \
-  if (!EXPECT_EQ(a, b)) { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_NE(a, b) \
-  if (!EXPECT_NE(a, b)) { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_GT(a, b) \
-  if (!EXPECT_GT(a, b)) { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_LT(a, b) \
-  if (!EXPECT_LT(a, b)) { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_GE(a, b) \
-  if (!EXPECT_GE(a, b)) { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_LE(a, b) \
-  if (!EXPECT_LE(a, b)) { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_TRUE(a)  \
-  if (!EXPECT_TRUE(a))  { g_current_test->AddAssertionFailure(); return; }
-#define ASSERT_FALSE(a) \
-  if (!EXPECT_FALSE(a)) { g_current_test->AddAssertionFailure(); return; }
+#define ASSERT_EQ(a, b)                    \
+  if (!EXPECT_EQ(a, b)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_NE(a, b)                    \
+  if (!EXPECT_NE(a, b)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_GT(a, b)                    \
+  if (!EXPECT_GT(a, b)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_LT(a, b)                    \
+  if (!EXPECT_LT(a, b)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_GE(a, b)                    \
+  if (!EXPECT_GE(a, b)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_LE(a, b)                    \
+  if (!EXPECT_LE(a, b)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_TRUE(a)                     \
+  if (!EXPECT_TRUE(a)) {                   \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
+#define ASSERT_FALSE(a)                    \
+  if (!EXPECT_FALSE(a)) {                  \
+    g_current_test->AddAssertionFailure(); \
+    return;                                \
+  }
 #define ASSERT_NO_FATAL_FAILURE(a)                           \
   {                                                          \
     int fail_count = g_current_test->AssertionFailures();    \
@@ -115,18 +158,25 @@ struct StateTestWithBuiltinRules : public testing::Test {
 
   /// Add a "cat" rule to \a state.  Used by some tests; it's
   /// otherwise done by the ctor to state_.
-  void AddCatRule(State* state);
+  void
+  AddCatRule(State* state);
 
   /// Short way to get a Node by its path from state_.
-  Node* GetNode(const std::string& path);
+  Node*
+  GetNode(const std::string& path);
 
   State state_;
 };
 
-void AssertParse(State* state, const char* input,
-                 ManifestParserOptions = ManifestParserOptions());
-void AssertHash(const char* expected, uint64_t actual);
-void VerifyGraph(const State& state);
+void
+AssertParse(
+    State* state, const char* input,
+    ManifestParserOptions = ManifestParserOptions()
+);
+void
+AssertHash(const char* expected, uint64_t actual);
+void
+VerifyGraph(const State& state);
 
 /// An implementation of DiskInterface that uses an in-memory representation
 /// of disk state.  It also logs file accesses and directory creations
@@ -135,26 +185,32 @@ struct VirtualFileSystem : public DiskInterface {
   VirtualFileSystem() : now_(1) {}
 
   /// "Create" a file with contents.
-  void Create(const std::string& path, const std::string& contents);
+  void
+  Create(const std::string& path, const std::string& contents);
 
   /// Tick "time" forwards; subsequent file operations will be newer than
   /// previous ones.
-  int Tick() {
+  int
+  Tick() {
     return ++now_;
   }
 
   // DiskInterface
-  virtual TimeStamp Stat(const std::string& path, std::string* err) const;
-  virtual bool WriteFile(const std::string& path, const std::string& contents);
-  virtual bool MakeDir(const std::string& path);
-  virtual Status ReadFile(const std::string& path, std::string* contents,
-                          std::string* err);
-  virtual int RemoveFile(const std::string& path);
+  virtual TimeStamp
+  Stat(const std::string& path, std::string* err) const;
+  virtual bool
+  WriteFile(const std::string& path, const std::string& contents);
+  virtual bool
+  MakeDir(const std::string& path);
+  virtual Status
+  ReadFile(const std::string& path, std::string* contents, std::string* err);
+  virtual int
+  RemoveFile(const std::string& path);
 
   /// An entry for a single in-memory file.
   struct Entry {
     int mtime;
-    std::string stat_error;  // If mtime is -1.
+    std::string stat_error; // If mtime is -1.
     std::string contents;
   };
 
@@ -171,10 +227,12 @@ struct VirtualFileSystem : public DiskInterface {
 
 struct ScopedTempDir {
   /// Create a temporary directory and chdir into it.
-  void CreateAndEnter(const std::string& name);
+  void
+  CreateAndEnter(const std::string& name);
 
   /// Clean up the temporary directory.
-  void Cleanup();
+  void
+  Cleanup();
 
   /// The temp directory containing our dir.
   std::string start_dir_;

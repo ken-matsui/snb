@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "util.h"
-
 #include "test.h"
+#include "util.h"
 
 using namespace std;
 
 namespace {
 
-void CanonicalizePath(string* path) {
+void
+CanonicalizePath(string* path) {
   uint64_t unused;
   ::CanonicalizePath(path, &unused);
 }
 
-}  // namespace
+} // namespace
 
 TEST(CanonicalizePath, PathSamples) {
   string path;
@@ -130,7 +130,7 @@ TEST(CanonicalizePath, NotNullTerminated) {
   uint64_t unused;
 
   path = "foo/. bar/.";
-  len = strlen("foo/.");  // Canonicalize only the part before the space.
+  len = strlen("foo/."); // Canonicalize only the part before the space.
   CanonicalizePath(&path[0], &len, &unused);
   EXPECT_EQ(strlen("foo"), len);
   EXPECT_EQ("foo/. bar/.", string(path));
@@ -183,11 +183,14 @@ TEST(StripAnsiEscapeCodes, EscapeAtEnd) {
 
 TEST(StripAnsiEscapeCodes, StripColors) {
   // An actual clang warning.
-  string input = "\33[1maffixmgr.cxx:286:15: \33[0m\33[0;1;35mwarning: "
-                 "\33[0m\33[1musing the result... [-Wparentheses]\33[0m";
+  string input =
+      "\33[1maffixmgr.cxx:286:15: \33[0m\33[0;1;35mwarning: "
+      "\33[0m\33[1musing the result... [-Wparentheses]\33[0m";
   string stripped = StripAnsiEscapeCodes(input);
-  EXPECT_EQ("affixmgr.cxx:286:15: warning: using the result... [-Wparentheses]",
-            stripped);
+  EXPECT_EQ(
+      "affixmgr.cxx:286:15: warning: using the result... [-Wparentheses]",
+      stripped
+  );
 }
 
 TEST(ElideMiddle, NothingToElide) {

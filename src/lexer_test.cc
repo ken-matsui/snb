@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "lexer.h"
-
 #include "eval_env.h"
+#include "lexer.h"
 #include "test.h"
 
 using namespace std;
@@ -25,8 +24,7 @@ TEST(Lexer, ReadVarValue) {
   string err;
   EXPECT_TRUE(lexer.ReadVarValue(&eval, &err));
   EXPECT_EQ("", err);
-  EXPECT_EQ("[plain text ][$var][ ][$VaR][ ][$x]",
-            eval.Serialize());
+  EXPECT_EQ("[plain text ][$var][ ][$VaR][ ][$x]", eval.Serialize());
 }
 
 TEST(Lexer, ReadEvalStringEscapes) {
@@ -35,8 +33,7 @@ TEST(Lexer, ReadEvalStringEscapes) {
   string err;
   EXPECT_TRUE(lexer.ReadVarValue(&eval, &err));
   EXPECT_EQ("", err);
-  EXPECT_EQ("[ $ab c: cde]",
-            eval.Serialize());
+  EXPECT_EQ("[ $ab c: cde]", eval.Serialize());
 }
 
 TEST(Lexer, ReadIdent) {
@@ -64,8 +61,7 @@ TEST(Lexer, ReadIdentCurlies) {
   string err;
   EXPECT_TRUE(lexer.ReadVarValue(&eval, &err));
   EXPECT_EQ("", err);
-  EXPECT_EQ("[$bar][.dots ][$bar.dots]",
-            eval.Serialize());
+  EXPECT_EQ("[$bar][.dots ][$bar.dots]", eval.Serialize());
 }
 
 TEST(Lexer, Error) {
@@ -73,10 +69,12 @@ TEST(Lexer, Error) {
   EvalString eval;
   string err;
   ASSERT_FALSE(lexer.ReadVarValue(&eval, &err));
-  EXPECT_EQ("input:2: bad $-escape (literal $ must be written as $$)\n"
-            "bad $\n"
-            "    ^ near here"
-            , err);
+  EXPECT_EQ(
+      "input:2: bad $-escape (literal $ must be written as $$)\n"
+      "bad $\n"
+      "    ^ near here",
+      err
+  );
 }
 
 TEST(Lexer, CommentEOF) {

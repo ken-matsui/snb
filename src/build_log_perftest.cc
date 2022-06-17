@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "build_log.h"
 #include "graph.h"
 #include "manifest_parser.h"
+#include "metrics.h"
 #include "state.h"
 #include "util.h"
-#include "metrics.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef _WIN32
-#include <unistd.h>
+#  include <unistd.h>
 #endif
 
 using namespace std;
@@ -31,10 +31,14 @@ using namespace std;
 const char kTestFilename[] = "BuildLogPerfTest-tempfile";
 
 struct NoDeadPaths : public BuildLogUser {
-  virtual bool IsPathDead(std::string_view) const { return false; }
+  virtual bool
+  IsPathDead(std::string_view) const {
+    return false;
+  }
 };
 
-bool WriteTestData(string* err) {
+bool
+WriteTestData(string* err) {
   BuildLog log;
 
   NoDeadPaths no_dead_paths;
@@ -91,16 +95,19 @@ bool WriteTestData(string* err) {
     return false;
 
   for (int i = 0; i < kNumCommands; ++i) {
-    log.RecordCommand(state.edges_[i],
-                      /*start_time=*/100 * i,
-                      /*end_time=*/100 * i + 1,
-                      /*mtime=*/0);
+    log.RecordCommand(
+        state.edges_[i],
+        /*start_time=*/100 * i,
+        /*end_time=*/100 * i + 1,
+        /*mtime=*/0
+    );
   }
 
   return true;
 }
 
-int main() {
+int
+main() {
   vector<int> times;
   string err;
 
@@ -141,8 +148,7 @@ int main() {
       max = times[i];
   }
 
-  printf("min %dms  max %dms  avg %.1fms\n",
-         min, max, total / times.size());
+  printf("min %dms  max %dms  avg %.1fms\n", min, max, total / times.size());
 
   unlink(kTestFilename);
 

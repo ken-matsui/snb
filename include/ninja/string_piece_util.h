@@ -19,14 +19,18 @@
 #include <string_view>
 #include <vector>
 
-std::vector<std::string_view> SplitStringPiece(std::string_view input, char sep);
+std::vector<std::string_view>
+SplitStringPiece(std::string_view input, char sep);
 
-std::string JoinStringPiece(const std::vector<std::string_view>& list, char sep);
+std::string
+JoinStringPiece(const std::vector<std::string_view>& list, char sep);
 
-inline char ToLowerASCII(char c) {
+inline char
+ToLowerASCII(char c) {
   return (c >= 'A' && c <= 'Z') ? (c + ('a' - 'A')) : c;
 }
 
-bool EqualsCaseInsensitiveASCII(std::string_view a, std::string_view b);
+bool
+EqualsCaseInsensitiveASCII(std::string_view a, std::string_view b);
 
-#endif  // NINJA_STRINGPIECE_UTIL_H_
+#endif // NINJA_STRINGPIECE_UTIL_H_

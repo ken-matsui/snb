@@ -12,19 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <memory>
-
 #include "deps_log.h"
 #include "graph.h"
 #include "missing_deps.h"
 #include "state.h"
 #include "test.h"
 
+#include <memory>
+
 const char kTestDepsLogFilename[] = "MissingDepTest-tempdepslog";
 
 class MissingDependencyTestDelegate : public MissingDependencyScannerDelegate {
-  void OnMissingDep(Node* node, const std::string& path,
-                    const Rule& generator) {}
+  void
+  OnMissingDep(Node* node, const std::string& path, const Rule& generator) {}
 };
 
 struct MissingDependencyScannerTest : public testing::Test {
@@ -36,14 +36,19 @@ struct MissingDependencyScannerTest : public testing::Test {
     ASSERT_EQ("", err);
   }
 
-  MissingDependencyScanner& scanner() { return scanner_; }
+  MissingDependencyScanner&
+  scanner() {
+    return scanner_;
+  }
 
-  void RecordDepsLogDep(const std::string& from, const std::string& to) {
-    Node* node_deps[] = { state_.LookupNode(to) };
+  void
+  RecordDepsLogDep(const std::string& from, const std::string& to) {
+    Node* node_deps[] = {state_.LookupNode(to)};
     deps_log_.RecordDeps(state_.LookupNode(from), 0, 1, node_deps);
   }
 
-  void ProcessAllNodes() {
+  void
+  ProcessAllNodes() {
     std::string err;
     std::vector<Node*> nodes = state_.RootNodes(&err);
     EXPECT_EQ("", err);
@@ -53,7 +58,8 @@ struct MissingDependencyScannerTest : public testing::Test {
     }
   }
 
-  void CreateInitialState() {
+  void
+  CreateInitialState() {
     EvalString deps_type;
     deps_type.AddText("gcc");
     compile_rule_.AddBinding("deps", deps_type);
@@ -64,14 +70,17 @@ struct MissingDependencyScannerTest : public testing::Test {
     state_.AddOut(compile_edge, "compiled_object", 0);
   }
 
-  void CreateGraphDependencyBetween(const char* from, const char* to) {
+  void
+  CreateGraphDependencyBetween(const char* from, const char* to) {
     Node* from_node = state_.LookupNode(from);
     Edge* from_edge = from_node->in_edge();
     state_.AddIn(from_edge, to, 0);
   }
 
-  void AssertMissingDependencyBetween(const char* flaky, const char* generated,
-                                      Rule* rule) {
+  void
+  AssertMissingDependencyBetween(
+      const char* flaky, const char* generated, Rule* rule
+  ) {
     Node* flaky_node = state_.LookupNode(flaky);
     ASSERT_EQ(1u, scanner().nodes_missing_deps_.count(flaky_node));
     Node* generated_node = state_.LookupNode(generated);
@@ -107,8 +116,9 @@ TEST_F(MissingDependencyScannerTest, MissingDepPresent) {
   ASSERT_TRUE(scanner().HadMissingDeps());
   ASSERT_EQ(1u, scanner().nodes_missing_deps_.size());
   ASSERT_EQ(1u, scanner().missing_dep_path_count_);
-  AssertMissingDependencyBetween("compiled_object", "generated_header",
-                                 &generator_rule_);
+  AssertMissingDependencyBetween(
+      "compiled_object", "generated_header", &generator_rule_
+  );
 }
 
 TEST_F(MissingDependencyScannerTest, MissingDepFixedDirect) {
@@ -142,10 +152,12 @@ TEST_F(MissingDependencyScannerTest, CyclicMissingDep) {
   ASSERT_TRUE(scanner().HadMissingDeps());
   ASSERT_EQ(2u, scanner().nodes_missing_deps_.size());
   ASSERT_EQ(2u, scanner().missing_dep_path_count_);
-  AssertMissingDependencyBetween("compiled_object", "generated_header",
-                                 &generator_rule_);
-  AssertMissingDependencyBetween("generated_header", "compiled_object",
-                                 &compile_rule_);
+  AssertMissingDependencyBetween(
+      "compiled_object", "generated_header", &generator_rule_
+  );
+  AssertMissingDependencyBetween(
+      "generated_header", "compiled_object", &compile_rule_
+  );
 }
 
 TEST_F(MissingDependencyScannerTest, CycleInGraph) {
@@ -159,4 +171,3 @@ TEST_F(MissingDependencyScannerTest, CycleInGraph) {
   std::vector<Node*> nodes = state_.RootNodes(&err);
   ASSERT_NE("", err);
 }
-

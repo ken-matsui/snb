@@ -40,33 +40,44 @@ struct ManifestParserOptions {
 
 /// Parses .ninja files.
 struct ManifestParser : public Parser {
-  ManifestParser(State* state, FileReader* file_reader,
-                 ManifestParserOptions options = ManifestParserOptions());
+  ManifestParser(
+      State* state, FileReader* file_reader,
+      ManifestParserOptions options = ManifestParserOptions()
+  );
 
   /// Parse a text string of input.  Used by tests.
-  bool ParseTest(const std::string& input, std::string* err) {
+  bool
+  ParseTest(const std::string& input, std::string* err) {
     quiet_ = true;
     return Parse("input", input, err);
   }
 
 private:
   /// Parse a file, given its contents as a string.
-  bool Parse(const std::string& filename, const std::string& input,
-             std::string* err);
+  bool
+  Parse(
+      const std::string& filename, const std::string& input, std::string* err
+  );
 
   /// Parse various statement types.
-  bool ParsePool(std::string* err);
-  bool ParseRule(std::string* err);
-  bool ParseLet(std::string* key, EvalString* val, std::string* err);
-  bool ParseEdge(std::string* err);
-  bool ParseDefault(std::string* err);
+  bool
+  ParsePool(std::string* err);
+  bool
+  ParseRule(std::string* err);
+  bool
+  ParseLet(std::string* key, EvalString* val, std::string* err);
+  bool
+  ParseEdge(std::string* err);
+  bool
+  ParseDefault(std::string* err);
 
   /// Parse either a 'subninja' or 'include' line.
-  bool ParseFileInclude(bool new_scope, std::string* err);
+  bool
+  ParseFileInclude(bool new_scope, std::string* err);
 
   BindingEnv* env_;
   ManifestParserOptions options_;
   bool quiet_;
 };
 
-#endif  // NINJA_MANIFEST_PARSER_H_
+#endif // NINJA_MANIFEST_PARSER_H_

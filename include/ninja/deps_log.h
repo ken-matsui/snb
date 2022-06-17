@@ -15,13 +15,12 @@
 #ifndef NINJA_DEPS_LOG_H_
 #define NINJA_DEPS_LOG_H_
 
-#include <string>
-#include <vector>
-
-#include <stdio.h>
-
 #include "load_status.h"
 #include "timestamp.h"
+
+#include <stdio.h>
+#include <string>
+#include <vector>
 
 struct Node;
 struct State;
@@ -70,26 +69,34 @@ struct DepsLog {
   ~DepsLog();
 
   // Writing (build-time) interface.
-  bool OpenForWrite(const std::string& path, std::string* err);
-  bool RecordDeps(Node* node, TimeStamp mtime, const std::vector<Node*>& nodes);
-  bool RecordDeps(Node* node, TimeStamp mtime, int node_count, Node** nodes);
-  void Close();
+  bool
+  OpenForWrite(const std::string& path, std::string* err);
+  bool
+  RecordDeps(Node* node, TimeStamp mtime, const std::vector<Node*>& nodes);
+  bool
+  RecordDeps(Node* node, TimeStamp mtime, int node_count, Node** nodes);
+  void
+  Close();
 
   // Reading (startup-time) interface.
   struct Deps {
     Deps(int64_t mtime, int node_count)
         : mtime(mtime), node_count(node_count), nodes(new Node*[node_count]) {}
-    ~Deps() { delete [] nodes; }
+    ~Deps() { delete[] nodes; }
     TimeStamp mtime;
     int node_count;
     Node** nodes;
   };
-  LoadStatus Load(const std::string& path, State* state, std::string* err);
-  Deps* GetDeps(Node* node);
-  Node* GetFirstReverseDepsNode(Node* node);
+  LoadStatus
+  Load(const std::string& path, State* state, std::string* err);
+  Deps*
+  GetDeps(Node* node);
+  Node*
+  GetFirstReverseDepsNode(Node* node);
 
   /// Rewrite the known log entries, throwing away old data.
-  bool Recompact(const std::string& path, std::string* err);
+  bool
+  Recompact(const std::string& path, std::string* err);
 
   /// Returns if the deps entry for a node is still reachable from the manifest.
   ///
@@ -97,22 +104,32 @@ struct DepsLog {
   /// past but are no longer part of the manifest.  This function returns if
   /// this is the case for a given node.  This function is slow, don't call
   /// it from code that runs on every build.
-  bool IsDepsEntryLiveFor(Node* node);
+  bool
+  IsDepsEntryLiveFor(Node* node);
 
   /// Used for tests.
-  const std::vector<Node*>& nodes() const { return nodes_; }
-  const std::vector<Deps*>& deps() const { return deps_; }
+  const std::vector<Node*>&
+  nodes() const {
+    return nodes_;
+  }
+  const std::vector<Deps*>&
+  deps() const {
+    return deps_;
+  }
 
- private:
+private:
   // Updates the in-memory representation.  Takes ownership of |deps|.
   // Returns true if a prior deps record was deleted.
-  bool UpdateDeps(int out_id, Deps* deps);
+  bool
+  UpdateDeps(int out_id, Deps* deps);
   // Write a node name record, assigning it an id.
-  bool RecordId(Node* node);
+  bool
+  RecordId(Node* node);
 
   /// Should be called before using file_. When false is returned, errno will
   /// be set.
-  bool OpenForWriteIfNeeded();
+  bool
+  OpenForWriteIfNeeded();
 
   bool needs_recompaction_;
   FILE* file_;
@@ -126,4 +143,4 @@ struct DepsLog {
   friend struct DepsLogTest;
 };
 
-#endif  // NINJA_DEPS_LOG_H_
+#endif // NINJA_DEPS_LOG_H_

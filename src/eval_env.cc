@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <assert.h>
-
 #include "eval_env.h"
+
+#include <assert.h>
 
 using namespace std;
 
-string BindingEnv::LookupVariable(const string& var) {
+string
+BindingEnv::LookupVariable(const string& var) {
   map<string, string>::iterator i = bindings_.find(var);
   if (i != bindings_.end())
     return i->second;
@@ -27,23 +28,27 @@ string BindingEnv::LookupVariable(const string& var) {
   return "";
 }
 
-void BindingEnv::AddBinding(const string& key, const string& val) {
+void
+BindingEnv::AddBinding(const string& key, const string& val) {
   bindings_[key] = val;
 }
 
-void BindingEnv::AddRule(const Rule* rule) {
+void
+BindingEnv::AddRule(const Rule* rule) {
   assert(LookupRuleCurrentScope(rule->name()) == NULL);
   rules_[rule->name()] = rule;
 }
 
-const Rule* BindingEnv::LookupRuleCurrentScope(const string& rule_name) {
+const Rule*
+BindingEnv::LookupRuleCurrentScope(const string& rule_name) {
   map<string, const Rule*>::iterator i = rules_.find(rule_name);
   if (i == rules_.end())
     return NULL;
   return i->second;
 }
 
-const Rule* BindingEnv::LookupRule(const string& rule_name) {
+const Rule*
+BindingEnv::LookupRule(const string& rule_name) {
   map<string, const Rule*>::iterator i = rules_.find(rule_name);
   if (i != rules_.end())
     return i->second;
@@ -52,11 +57,13 @@ const Rule* BindingEnv::LookupRule(const string& rule_name) {
   return NULL;
 }
 
-void Rule::AddBinding(const string& key, const EvalString& val) {
+void
+Rule::AddBinding(const string& key, const EvalString& val) {
   bindings_[key] = val;
 }
 
-const EvalString* Rule::GetBinding(const string& key) const {
+const EvalString*
+Rule::GetBinding(const string& key) const {
   Bindings::const_iterator i = bindings_.find(key);
   if (i == bindings_.end())
     return NULL;
@@ -64,27 +71,23 @@ const EvalString* Rule::GetBinding(const string& key) const {
 }
 
 // static
-bool Rule::IsReservedBinding(const string& var) {
-  return var == "command" ||
-      var == "depfile" ||
-      var == "dyndep" ||
-      var == "description" ||
-      var == "deps" ||
-      var == "generator" ||
-      var == "pool" ||
-      var == "restat" ||
-      var == "rspfile" ||
-      var == "rspfile_content" ||
-      var == "msvc_deps_prefix";
+bool
+Rule::IsReservedBinding(const string& var) {
+  return var == "command" || var == "depfile" || var == "dyndep"
+         || var == "description" || var == "deps" || var == "generator"
+         || var == "pool" || var == "restat" || var == "rspfile"
+         || var == "rspfile_content" || var == "msvc_deps_prefix";
 }
 
-const map<string, const Rule*>& BindingEnv::GetRules() const {
+const map<string, const Rule*>&
+BindingEnv::GetRules() const {
   return rules_;
 }
 
-string BindingEnv::LookupWithFallback(const string& var,
-                                      const EvalString* eval,
-                                      Env* env) {
+string
+BindingEnv::LookupWithFallback(
+    const string& var, const EvalString* eval, Env* env
+) {
   map<string, string>::iterator i = bindings_.find(var);
   if (i != bindings_.end())
     return i->second;
@@ -98,7 +101,8 @@ string BindingEnv::LookupWithFallback(const string& var,
   return "";
 }
 
-string EvalString::Evaluate(Env* env) const {
+string
+EvalString::Evaluate(Env* env) const {
   string result;
   for (TokenList::const_iterator i = parsed_.begin(); i != parsed_.end(); ++i) {
     if (i->second == RAW)
@@ -109,7 +113,8 @@ string EvalString::Evaluate(Env* env) const {
   return result;
 }
 
-void EvalString::AddText(std::string_view text) {
+void
+EvalString::AddText(std::string_view text) {
   // Add it to the end of an existing RAW token if possible.
   if (!parsed_.empty() && parsed_.back().second == RAW) {
     parsed_.back().first.append(text);
@@ -117,14 +122,15 @@ void EvalString::AddText(std::string_view text) {
     parsed_.push_back(make_pair(std::string(text), RAW));
   }
 }
-void EvalString::AddSpecial(std::string_view text) {
+void
+EvalString::AddSpecial(std::string_view text) {
   parsed_.push_back(make_pair(std::string(text), SPECIAL));
 }
 
-string EvalString::Serialize() const {
+string
+EvalString::Serialize() const {
   string result;
-  for (TokenList::const_iterator i = parsed_.begin();
-       i != parsed_.end(); ++i) {
+  for (TokenList::const_iterator i = parsed_.begin(); i != parsed_.end(); ++i) {
     result.append("[");
     if (i->second == SPECIAL)
       result.append("$");
@@ -134,10 +140,10 @@ string EvalString::Serialize() const {
   return result;
 }
 
-string EvalString::Unparse() const {
+string
+EvalString::Unparse() const {
   string result;
-  for (TokenList::const_iterator i = parsed_.begin();
-       i != parsed_.end(); ++i) {
+  for (TokenList::const_iterator i = parsed_.begin(); i != parsed_.end(); ++i) {
     bool special = (i->second == SPECIAL);
     if (special)
       result.append("${");

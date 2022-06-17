@@ -14,14 +14,14 @@
 
 #include "line_printer.h"
 
+#include "util.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
-#include <termios.h>
 #include <sys/time.h>
-
-#include "util.h"
+#include <termios.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -45,7 +45,8 @@ LinePrinter::LinePrinter() : have_blank_line_(true), console_locked_(false) {
   }
 }
 
-void LinePrinter::Print(string to_print, LineType type) {
+void
+LinePrinter::Print(string to_print, LineType type) {
   if (console_locked_) {
     line_buffer_ = to_print;
     line_type_ = type;
@@ -53,7 +54,7 @@ void LinePrinter::Print(string to_print, LineType type) {
   }
 
   if (smart_terminal_) {
-    printf("\r");  // Print over previous line, if any.
+    printf("\r"); // Print over previous line, if any.
     // On Windows, calling a C library function writing to stdout also handles
     // pausing the executable when the "Pause" key or Ctrl-S is pressed.
   }
@@ -66,7 +67,7 @@ void LinePrinter::Print(string to_print, LineType type) {
       to_print = ElideMiddle(to_print, size.ws_col);
     }
     printf("%s", to_print.c_str());
-    printf("\x1B[K");  // Clear to end of line.
+    printf("\x1B[K"); // Clear to end of line.
     fflush(stdout);
 
     have_blank_line_ = false;
@@ -75,7 +76,8 @@ void LinePrinter::Print(string to_print, LineType type) {
   }
 }
 
-void LinePrinter::PrintOrBuffer(const char* data, size_t size) {
+void
+LinePrinter::PrintOrBuffer(const char* data, size_t size) {
   if (console_locked_) {
     output_buffer_.append(data, size);
   } else {
@@ -85,7 +87,8 @@ void LinePrinter::PrintOrBuffer(const char* data, size_t size) {
   }
 }
 
-void LinePrinter::PrintOnNewLine(const string& to_print) {
+void
+LinePrinter::PrintOnNewLine(const string& to_print) {
   if (console_locked_ && !line_buffer_.empty()) {
     output_buffer_.append(line_buffer_);
     output_buffer_.append(1, '\n');
@@ -100,7 +103,8 @@ void LinePrinter::PrintOnNewLine(const string& to_print) {
   have_blank_line_ = to_print.empty() || *to_print.rbegin() == '\n';
 }
 
-void LinePrinter::SetConsoleLocked(bool locked) {
+void
+LinePrinter::SetConsoleLocked(bool locked) {
   if (locked == console_locked_)
     return;
 

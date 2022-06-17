@@ -14,14 +14,15 @@
 
 #include "lexer.h"
 
-#include <stdio.h>
-
 #include "eval_env.h"
 #include "util.h"
 
+#include <stdio.h>
+
 using namespace std;
 
-bool Lexer::Error(const string& message, string* err) {
+bool
+Lexer::Error(const string& message, string* err) {
   // Compute line/column.
   int line = 1;
   const char* line_start = input_.data();
@@ -60,63 +61,83 @@ bool Lexer::Error(const string& message, string* err) {
   return false;
 }
 
-Lexer::Lexer(const char* input) {
-  Start("input", input);
-}
+Lexer::Lexer(const char* input) { Start("input", input); }
 
-void Lexer::Start(std::string_view filename, std::string_view input) {
+void
+Lexer::Start(std::string_view filename, std::string_view input) {
   filename_ = filename;
   input_ = input;
   ofs_ = input_.data();
   last_token_ = NULL;
 }
 
-const char* Lexer::TokenName(Token t) {
+const char*
+Lexer::TokenName(Token t) {
   switch (t) {
-  case ERROR:    return "lexing error";
-  case BUILD:    return "'build'";
-  case COLON:    return "':'";
-  case DEFAULT:  return "'default'";
-  case EQUALS:   return "'='";
-  case IDENT:    return "identifier";
-  case INCLUDE:  return "'include'";
-  case INDENT:   return "indent";
-  case NEWLINE:  return "newline";
-  case PIPE2:    return "'||'";
-  case PIPE:     return "'|'";
-  case PIPEAT:   return "'|@'";
-  case POOL:     return "'pool'";
-  case RULE:     return "'rule'";
-  case SUBNINJA: return "'subninja'";
-  case TEOF:     return "eof";
+    case ERROR:
+      return "lexing error";
+    case BUILD:
+      return "'build'";
+    case COLON:
+      return "':'";
+    case DEFAULT:
+      return "'default'";
+    case EQUALS:
+      return "'='";
+    case IDENT:
+      return "identifier";
+    case INCLUDE:
+      return "'include'";
+    case INDENT:
+      return "indent";
+    case NEWLINE:
+      return "newline";
+    case PIPE2:
+      return "'||'";
+    case PIPE:
+      return "'|'";
+    case PIPEAT:
+      return "'|@'";
+    case POOL:
+      return "'pool'";
+    case RULE:
+      return "'rule'";
+    case SUBNINJA:
+      return "'subninja'";
+    case TEOF:
+      return "eof";
   }
-  return NULL;  // not reached
+  return NULL; // not reached
 }
 
-const char* Lexer::TokenErrorHint(Token expected) {
+const char*
+Lexer::TokenErrorHint(Token expected) {
   switch (expected) {
-  case COLON:
-    return " ($ also escapes ':')";
-  default:
-    return "";
+    case COLON:
+      return " ($ also escapes ':')";
+    default:
+      return "";
   }
 }
 
-string Lexer::DescribeLastError() {
+string
+Lexer::DescribeLastError() {
   if (last_token_) {
     switch (last_token_[0]) {
-    case '\t':
-      return "tabs are not allowed, use spaces";
+      case '\t':
+        return "tabs are not allowed, use spaces";
     }
   }
   return "lexing error";
 }
 
-void Lexer::UnreadToken() {
+void
+Lexer::UnreadToken() {
   ofs_ = last_token_;
 }
 
-Lexer::Token Lexer::ReadToken() {
+Lexer::Token
+Lexer::ReadToken() {
   const char* p = ofs_;
   const char* q;
   const char* start;
@@ -161,7 +182,8 @@ Lexer::Token Lexer::ReadToken() {
   return token;
 }
 
-bool Lexer::PeekToken(Token token) {
+bool
+Lexer::PeekToken(Token token) {
   Token t = ReadToken();
   if (t == token)
     return true;
@@ -169,7 +191,8 @@ bool Lexer::PeekToken(Token token) {
   return false;
 }
 
-void Lexer::EatWhitespace() {
+void
+Lexer::EatWhitespace() {
   const char* p = ofs_;
   const char* q;
   for (;;) {
@@ -184,7 +207,8 @@ void Lexer::EatWhitespace() {
   }
 }
 
-bool Lexer::ReadIdent(string* out) {
+bool
+Lexer::ReadIdent(string* out) {
   const char* p = ofs_;
   const char* start;
   for (;;) {
@@ -206,7 +230,8 @@ bool Lexer::ReadIdent(string* out) {
   return true;
 }
 
-bool Lexer::ReadEvalString(EvalString* eval, bool path, string* err) {
+bool
+Lexer::ReadEvalString(EvalString* eval, bool path, string* err) {
   const char* p = ofs_;
   const char* q;
   const char* start;

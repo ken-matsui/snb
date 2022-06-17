@@ -14,17 +14,16 @@
 
 #include "status.h"
 
+#include "debug_flags.h"
+
 #include <stdarg.h>
 #include <stdlib.h>
-
-#include "debug_flags.h"
 
 using namespace std;
 
 StatusPrinter::StatusPrinter(const BuildConfig& config)
-    : config_(config),
-      started_edges_(0), finished_edges_(0), total_edges_(0), running_edges_(0),
-      time_millis_(0), progress_status_format_(NULL),
+    : config_(config), started_edges_(0), finished_edges_(0), total_edges_(0),
+      running_edges_(0), time_millis_(0), progress_status_format_(NULL),
       current_rate_(config.parallelism) {
 
   // Don't do anything fancy in verbose mode.
@@ -36,12 +35,13 @@ StatusPrinter::StatusPrinter(const BuildConfig& config)
     progress_status_format_ = "[%f/%t] ";
 }
 
-void StatusPrinter::PlanHasTotalEdges(int total) {
+void
+StatusPrinter::PlanHasTotalEdges(int total) {
   total_edges_ = total;
 }
 
-void StatusPrinter::BuildEdgeStarted(const Edge* edge,
-                                     int64_t start_time_millis) {
+void
+StatusPrinter::BuildEdgeStarted(const Edge* edge, int64_t start_time_millis) {
   ++started_edges_;
   ++running_edges_;
   time_millis_ = start_time_millis;
@@ -53,8 +53,10 @@ void StatusPrinter::BuildEdgeStarted(const Edge* edge,
     printer_.SetConsoleLocked(true);
 }
 
-void StatusPrinter::BuildEdgeFinished(Edge* edge, int64_t end_time_millis,
-                                      bool success, const string& output) {
+void
+StatusPrinter::BuildEdgeFinished(
+    Edge* edge, int64_t end_time_millis, bool success, const string& output
+) {
   time_millis_ = end_time_millis;
   ++finished_edges_;
 
@@ -77,9 +79,14 @@ void StatusPrinter::BuildEdgeFinished(Edge* edge, int64_t end_time_millis,
       outputs += (*o)->path() + " ";
 
     if (printer_.supports_color()) {
-        printer_.PrintOnNewLine("\x1B[31m" "FAILED: " "\x1B[0m" + outputs + "\n");
+      printer_.PrintOnNewLine(
+          "\x1B[31m"
+          "FAILED: "
+          "\x1B[0m"
+          + outputs + "\n"
+      );
     } else {
-        printer_.PrintOnNewLine("FAILED: " + outputs + "\n");
+      printer_.PrintOnNewLine("FAILED: " + outputs + "\n");
     }
     printer_.PrintOnNewLine(edge->EvaluateCommand() + "\n");
   }
@@ -106,7 +113,8 @@ void StatusPrinter::BuildEdgeFinished(Edge* edge, int64_t end_time_millis,
   }
 }
 
-void StatusPrinter::BuildLoadDyndeps() {
+void
+StatusPrinter::BuildLoadDyndeps() {
   // The DependencyScan calls EXPLAIN() to print lines explaining why
   // it considers a portion of the graph to be out of date.  Normally
   // this is done before the build starts, but our caller is about to
@@ -120,90 +128,94 @@ void StatusPrinter::BuildLoadDyndeps() {
     printer_.PrintOnNewLine("");
 }
 
-void StatusPrinter::BuildStarted() {
+void
+StatusPrinter::BuildStarted() {
   started_edges_ = 0;
   finished_edges_ = 0;
   running_edges_ = 0;
 }
 
-void StatusPrinter::BuildFinished() {
+void
+StatusPrinter::BuildFinished() {
   printer_.SetConsoleLocked(false);
   printer_.PrintOnNewLine("");
 }
 
-string StatusPrinter::FormatProgressStatus(const char* progress_status_format,
-                                           int64_t time_millis) const {
+string
+StatusPrinter::FormatProgressStatus(
+    const char* progress_status_format, int64_t time_millis
+) const {
   string out;
   char buf[32];
   for (const char* s = progress_status_format; *s != '\0'; ++s) {
     if (*s == '%') {
       ++s;
       switch (*s) {
-      case '%':
-        out.push_back('%');
-        break;
+        case '%':
+          out.push_back('%');
+          break;
 
-        // Started edges.
-      case 's':
-        snprintf(buf, sizeof(buf), "%d", started_edges_);
-        out += buf;
-        break;
+          // Started edges.
+        case 's':
+          snprintf(buf, sizeof(buf), "%d", started_edges_);
+          out += buf;
+          break;
 
-        // Total edges.
-      case 't':
-        snprintf(buf, sizeof(buf), "%d", total_edges_);
-        out += buf;
-        break;
+          // Total edges.
+        case 't':
+          snprintf(buf, sizeof(buf), "%d", total_edges_);
+          out += buf;
+          break;
 
-        // Running edges.
-      case 'r': {
-        snprintf(buf, sizeof(buf), "%d", running_edges_);
-        out += buf;
-        break;
-      }
+          // Running edges.
+        case 'r': {
+          snprintf(buf, sizeof(buf), "%d", running_edges_);
+          out += buf;
+          break;
+        }
 
-        // Unstarted edges.
-      case 'u':
-        snprintf(buf, sizeof(buf), "%d", total_edges_ - started_edges_);
-        out += buf;
-        break;
+          // Unstarted edges.
+        case 'u':
+          snprintf(buf, sizeof(buf), "%d", total_edges_ - started_edges_);
+          out += buf;
+          break;
 
-        // Finished edges.
-      case 'f':
-        snprintf(buf, sizeof(buf), "%d", finished_edges_);
-        out += buf;
-        break;
+          // Finished edges.
+        case 'f':
+          snprintf(buf, sizeof(buf), "%d", finished_edges_);
+          out += buf;
+          break;
 
-        // Overall finished edges per second.
-      case 'o':
-        SnprintfRate(finished_edges_ / (time_millis / 1e3), buf, "%.1f");
-        out += buf;
-        break;
+          // Overall finished edges per second.
+        case 'o':
+          SnprintfRate(finished_edges_ / (time_millis / 1e3), buf, "%.1f");
+          out += buf;
+          break;
 
-        // Current rate, average over the last '-j' jobs.
-      case 'c':
-        current_rate_.UpdateRate(finished_edges_, time_millis);
-        SnprintfRate(current_rate_.rate(), buf, "%.1f");
-        out += buf;
-        break;
+          // Current rate, average over the last '-j' jobs.
+        case 'c':
+          current_rate_.UpdateRate(finished_edges_, time_millis);
+          SnprintfRate(current_rate_.rate(), buf, "%.1f");
+          out += buf;
+          break;
 
-        // Percentage
-      case 'p': {
-        int percent = (100 * finished_edges_) / total_edges_;
-        snprintf(buf, sizeof(buf), "%3i%%", percent);
-        out += buf;
-        break;
-      }
+          // Percentage
+        case 'p': {
+          int percent = (100 * finished_edges_) / total_edges_;
+          snprintf(buf, sizeof(buf), "%3i%%", percent);
+          out += buf;
+          break;
+        }
 
-      case 'e': {
-        snprintf(buf, sizeof(buf), "%.3f", time_millis / 1e3);
-        out += buf;
-        break;
-      }
+        case 'e': {
+          snprintf(buf, sizeof(buf), "%.3f", time_millis / 1e3);
+          out += buf;
+          break;
+        }
 
-      default:
-        Fatal("unknown placeholder '%%%c' in $NINJA_STATUS", *s);
-        return "";
+        default:
+          Fatal("unknown placeholder '%%%c' in $NINJA_STATUS", *s);
+          return "";
       }
     } else {
       out.push_back(*s);
@@ -213,7 +225,8 @@ string StatusPrinter::FormatProgressStatus(const char* progress_status_format,
   return out;
 }
 
-void StatusPrinter::PrintStatus(const Edge* edge, int64_t time_millis) {
+void
+StatusPrinter::PrintStatus(const Edge* edge, int64_t time_millis) {
   if (config_.verbosity == BuildConfig::QUIET
       || config_.verbosity == BuildConfig::NO_STATUS_UPDATE)
     return;
@@ -224,28 +237,32 @@ void StatusPrinter::PrintStatus(const Edge* edge, int64_t time_millis) {
   if (to_print.empty() || force_full_command)
     to_print = edge->GetBinding("command");
 
-  to_print = FormatProgressStatus(progress_status_format_, time_millis)
-      + to_print;
+  to_print =
+      FormatProgressStatus(progress_status_format_, time_millis) + to_print;
 
-  printer_.Print(to_print,
-                 force_full_command ? LinePrinter::FULL : LinePrinter::ELIDE);
+  printer_.Print(
+      to_print, force_full_command ? LinePrinter::FULL : LinePrinter::ELIDE
+  );
 }
 
-void StatusPrinter::Warning(const char* msg, ...) {
+void
+StatusPrinter::Warning(const char* msg, ...) {
   va_list ap;
   va_start(ap, msg);
   ::Warning(msg, ap);
   va_end(ap);
 }
 
-void StatusPrinter::Error(const char* msg, ...) {
+void
+StatusPrinter::Error(const char* msg, ...) {
   va_list ap;
   va_start(ap, msg);
   ::Error(msg, ap);
   va_end(ap);
 }
 
-void StatusPrinter::Info(const char* msg, ...) {
+void
+StatusPrinter::Info(const char* msg, ...) {
   va_list ap;
   va_start(ap, msg);
   ::Info(msg, ap);

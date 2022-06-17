@@ -45,4 +45,4 @@ TEST(State, Basic) {
   EXPECT_FALSE(state.GetNode("out", 0)->dirty());
 }
 
-}  // namespace
+} // namespace

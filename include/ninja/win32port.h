@@ -16,10 +16,10 @@
 #define NINJA_WIN32PORT_H_
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-#include <inttypes.h>
+#  ifndef __STDC_FORMAT_MACROS
+#    define __STDC_FORMAT_MACROS
+#  endif
+#  include <inttypes.h>
 #endif
 
 using int16_t = signed short;
@@ -30,10 +30,9 @@ using uint64_t = unsigned long long;
 
 // printf format specifier for uint64_t, from C99.
 #ifndef PRIu64
-#define PRId64 "I64d"
-#define PRIu64 "I64u"
-#define PRIx64 "I64x"
+#  define PRId64 "I64d"
+#  define PRIu64 "I64u"
+#  define PRIx64 "I64x"
 #endif
 
 #endif // NINJA_WIN32PORT_H_
-

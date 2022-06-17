@@ -13,14 +13,13 @@
 // limitations under the License.
 
 #include "build_log.h"
-
-#include "util.h"
 #include "test.h"
+#include "util.h"
 
+#include <cassert>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <cassert>
 
 using namespace std;
 
@@ -29,20 +28,27 @@ namespace {
 const char kTestFilename[] = "BuildLogTest-tempfile";
 
 struct BuildLogTest : public StateTestWithBuiltinRules, public BuildLogUser {
-  virtual void SetUp() {
+  virtual void
+  SetUp() {
     // In case a crashing test left a stale file behind.
     unlink(kTestFilename);
   }
-  virtual void TearDown() {
+  virtual void
+  TearDown() {
     unlink(kTestFilename);
   }
-  virtual bool IsPathDead(std::string_view s) const { return false; }
+  virtual bool
+  IsPathDead(std::string_view s) const {
+    return false;
+  }
 };
 
 TEST_F(BuildLogTest, WriteRead) {
-  AssertParse(&state_,
-"build out: cat mid\n"
-"build mid: cat in\n");
+  AssertParse(
+      &state_,
+      "build out: cat mid\n"
+      "build mid: cat in\n"
+  );
 
   BuildLog log1;
   string err;
@@ -69,7 +75,7 @@ TEST_F(BuildLogTest, WriteRead) {
 
 TEST_F(BuildLogTest, FirstWriteAddsSignature) {
   const char kExpectedVersion[] = "# ninja log vX\n";
-  const size_t kVersionPos = strlen(kExpectedVersion) - 2;  // Points at 'X'.
+  const size_t kVersionPos = strlen(kExpectedVersion) - 2; // Points at 'X'.
 
   BuildLog log;
   string contents, err;
@@ -115,9 +121,11 @@ TEST_F(BuildLogTest, DoubleEntry) {
 }
 
 TEST_F(BuildLogTest, Truncate) {
-  AssertParse(&state_,
-"build out: cat mid\n"
-"build mid: cat in\n");
+  AssertParse(
+      &state_,
+      "build out: cat mid\n"
+      "build mid: cat in\n"
+  );
 
   {
     BuildLog log1;
@@ -215,22 +223,27 @@ TEST_F(BuildLogTest, DuplicateVersionHeader) {
 }
 
 struct TestDiskInterface : public DiskInterface {
-  virtual TimeStamp Stat(const string& path, string* err) const {
+  virtual TimeStamp
+  Stat(const string& path, string* err) const {
     return 4;
   }
-  virtual bool WriteFile(const string& path, const string& contents) {
+  virtual bool
+  WriteFile(const string& path, const string& contents) {
     assert(false);
     return true;
   }
-  virtual bool MakeDir(const string& path) {
+  virtual bool
+  MakeDir(const string& path) {
     assert(false);
     return false;
   }
-  virtual Status ReadFile(const string& path, string* contents, string* err) {
+  virtual Status
+  ReadFile(const string& path, string* contents, string* err) {
     assert(false);
     return NotFound;
   }
-  virtual int RemoveFile(const string& path) {
+  virtual int
+  RemoveFile(const string& path) {
     assert(false);
     return 0;
   }
@@ -238,8 +251,11 @@ struct TestDiskInterface : public DiskInterface {
 
 TEST_F(BuildLogTest, Restat) {
   FILE* f = fopen(kTestFilename, "wb");
-  fprintf(f, "# ninja log v4\n"
-             "1\t2\t3\tout\tcommand\n");
+  fprintf(
+      f,
+      "# ninja log v4\n"
+      "1\t2\t3\tout\tcommand\n"
+  );
   fclose(f);
   std::string err;
   BuildLog log;
@@ -249,8 +265,8 @@ TEST_F(BuildLogTest, Restat) {
   ASSERT_EQ(3, e->mtime);
 
   TestDiskInterface testDiskInterface;
-  char out2[] = { 'o', 'u', 't', '2', 0 };
-  char* filter2[] = { out2 };
+  char out2[] = {'o', 'u', 't', '2', 0};
+  char* filter2[] = {out2};
   EXPECT_TRUE(log.Restat(kTestFilename, testDiskInterface, 1, filter2, &err));
   ASSERT_EQ("", err);
   e = log.LookupByOutput("out");
@@ -291,8 +307,7 @@ TEST_F(BuildLogTest, VeryLongInputLine) {
 }
 
 TEST_F(BuildLogTest, MultiTargetEdge) {
-  AssertParse(&state_,
-"build out out.d: cat\n");
+  AssertParse(&state_, "build out out.d: cat\n");
 
   BuildLog log;
   log.RecordCommand(state_.edges_[0], 21, 22);
@@ -311,13 +326,18 @@ TEST_F(BuildLogTest, MultiTargetEdge) {
 }
 
 struct BuildLogRecompactTest : public BuildLogTest {
-  virtual bool IsPathDead(std::string_view s) const { return s == "out2"; }
+  virtual bool
+  IsPathDead(std::string_view s) const {
+    return s == "out2";
+  }
 };
 
 TEST_F(BuildLogRecompactTest, Recompact) {
-  AssertParse(&state_,
-"build out: cat in\n"
-"build out2: cat in\n");
+  AssertParse(
+      &state_,
+      "build out: cat in\n"
+      "build out2: cat in\n"
+  );
 
   BuildLog log1;
   string err;
@@ -350,4 +370,4 @@ TEST_F(BuildLogRecompactTest, Recompact) {
   ASSERT_FALSE(log2.LookupByOutput("out2"));
 }
 
-}  // anonymous namespace
+} // anonymous namespace

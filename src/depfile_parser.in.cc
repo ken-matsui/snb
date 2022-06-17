@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include "depfile_parser.h"
+
 #include "util.h"
 
 #include <algorithm>
@@ -20,9 +21,7 @@
 using namespace std;
 
 DepfileParser::DepfileParser(DepfileParserOptions options)
-  : options_(options)
-{
-}
+    : options_(options) {}
 
 // A note on backslashes in Makefiles, from reading the docs:
 // Backslash-newline is the line continuation character.
@@ -44,7 +43,8 @@ DepfileParser::DepfileParser(DepfileParserOptions options)
 //
 // If anyone actually has depfiles that rely on the more complicated
 // behavior we can adjust this.
-bool DepfileParser::Parse(string* content, string* err) {
+bool
+DepfileParser::Parse(string* content, string* err) {
   // in: current parser input point.
   // end: end of input.
   // parsing_targets: whether we are parsing targets or dependencies.
@@ -165,7 +165,7 @@ bool DepfileParser::Parse(string* content, string* err) {
     int len = (int)(out - filename);
     const bool is_dependency = !parsing_targets;
     if (len > 0 && filename[len - 1] == ':') {
-      len--;  // Strip off trailing colon, if any.
+      len--; // Strip off trailing colon, if any.
       parsing_targets = false;
       have_target = true;
     }
@@ -173,7 +173,8 @@ bool DepfileParser::Parse(string* content, string* err) {
     if (len > 0) {
       std::string_view piece(filename, len);
       // If we've seen this as an input before, skip it.
-      std::vector<std::string_view>::iterator pos = std::find(ins_.begin(), ins_.end(), piece);
+      std::vector<std::string_view>::iterator pos =
+          std::find(ins_.begin(), ins_.end(), piece);
       if (pos == ins_.end()) {
         if (is_dependency) {
           if (poisoned_input) {

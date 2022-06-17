@@ -14,7 +14,8 @@
 
 #include <string>
 
-std::string EscapeForDepfile(const std::string& path);
+std::string
+EscapeForDepfile(const std::string& path);
 
 /// Wraps a synchronous execution of a CL subprocess.
 struct CLWrapper {
@@ -22,11 +23,15 @@ struct CLWrapper {
 
   /// Set the environment block (as suitable for CreateProcess) to be used
   /// by Run().
-  void SetEnvBlock(void* env_block) { env_block_ = env_block; }
+  void
+  SetEnvBlock(void* env_block) {
+    env_block_ = env_block;
+  }
 
   /// Start a process and gather its raw output.  Returns its exit code.
   /// Crashes (calls Fatal()) on error.
-  int Run(const std::string& command, std::string* output);
+  int
+  Run(const std::string& command, std::string* output);
 
   void* env_block_;
 };

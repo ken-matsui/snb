@@ -15,14 +15,14 @@
 #ifndef NINJA_SUBPROCESS_H_
 #define NINJA_SUBPROCESS_H_
 
+#include <queue>
 #include <string>
 #include <vector>
-#include <queue>
 
 #ifdef _WIN32
-#include <windows.h>
+#  include <windows.h>
 #else
-#include <signal.h>
+#  include <signal.h>
 #endif
 
 // ppoll() exists on FreeBSD, but only on newer versions.
@@ -44,23 +44,29 @@ struct Subprocess {
 
   /// Returns ExitSuccess on successful process exit, ExitInterrupted if
   /// the process was interrupted, ExitFailure if it otherwise failed.
-  ExitStatus Finish();
+  ExitStatus
+  Finish();
 
-  bool Done() const;
+  bool
+  Done() const;
 
-  const std::string& GetOutput() const;
+  const std::string&
+  GetOutput() const;
 
- private:
+private:
   Subprocess(bool use_console);
-  bool Start(struct SubprocessSet* set, const std::string& command);
-  void OnPipeReady();
+  bool
+  Start(struct SubprocessSet* set, const std::string& command);
+  void
+  OnPipeReady();
 
   std::string buf_;
 
 #ifdef _WIN32
   /// Set up pipe_ as the parent-side pipe of the subprocess; return the
   /// other end of the pipe, usable in the child process.
-  HANDLE SetupPipe(HANDLE ioport);
+  HANDLE
+  SetupPipe(HANDLE ioport);
 
   HANDLE child_;
   HANDLE pipe_;
@@ -83,25 +89,35 @@ struct SubprocessSet {
   SubprocessSet();
   ~SubprocessSet();
 
-  Subprocess* Add(const std::string& command, bool use_console = false);
-  bool DoWork();
-  Subprocess* NextFinished();
-  void Clear();
+  Subprocess*
+  Add(const std::string& command, bool use_console = false);
+  bool
+  DoWork();
+  Subprocess*
+  NextFinished();
+  void
+  Clear();
 
   std::vector<Subprocess*> running_;
   std::queue<Subprocess*> finished_;
 
 #ifdef _WIN32
-  static BOOL WINAPI NotifyInterrupted(DWORD dwCtrlType);
+  static BOOL WINAPI
+  NotifyInterrupted(DWORD dwCtrlType);
   static HANDLE ioport_;
 #else
-  static void SetInterruptedFlag(int signum);
-  static void HandlePendingInterruption();
+  static void
+  SetInterruptedFlag(int signum);
+  static void
+  HandlePendingInterruption();
   /// Store the signal number that causes the interruption.
   /// 0 if not interruption.
   static int interrupted_;
 
-  static bool IsInterrupted() { return interrupted_ != 0; }
+  static bool
+  IsInterrupted() {
+    return interrupted_ != 0;
+  }
 
   struct sigaction old_int_act_;
   struct sigaction old_term_act_;

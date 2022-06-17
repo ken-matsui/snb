@@ -25,13 +25,13 @@ struct DepfileParserOptions {
 
 /// Parser for the dependency information emitted by gcc's -M flags.
 struct DepfileParser {
-  explicit DepfileParser(DepfileParserOptions options =
-                         DepfileParserOptions());
+  explicit DepfileParser(DepfileParserOptions options = DepfileParserOptions());
 
   /// Parse an input file.  Input must be NUL-terminated.
   /// Warning: may mutate the content in-place and parsed StringPieces are
   /// pointers within it.
-  bool Parse(std::string* content, std::string* err);
+  bool
+  Parse(std::string* content, std::string* err);
 
   std::vector<std::string_view> outs_;
   std::vector<std::string_view> ins_;

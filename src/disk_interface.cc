@@ -14,48 +14,49 @@
 
 #include "disk_interface.h"
 
-#include <algorithm>
+#include "metrics.h"
+#include "util.h"
 
+#include <algorithm>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
 #include <unistd.h>
-
-#include "metrics.h"
-#include "util.h"
 
 using namespace std;
 
 namespace {
 
-string DirName(const string& path) {
+string
+DirName(const string& path) {
   static const char kPathSeparators[] = "/";
   static const char* const kEnd = kPathSeparators + sizeof(kPathSeparators) - 1;
 
   string::size_type slash_pos = path.find_last_of(kPathSeparators);
   if (slash_pos == string::npos)
-    return string();  // Nothing to do.
-  while (slash_pos > 0 &&
-         std::find(kPathSeparators, kEnd, path[slash_pos - 1]) != kEnd)
+    return string(); // Nothing to do.
+  while (slash_pos > 0
+         && std::find(kPathSeparators, kEnd, path[slash_pos - 1]) != kEnd)
     --slash_pos;
   return path.substr(0, slash_pos);
 }
 
-int MakeDir(const string& path) {
+int
+MakeDir(const string& path) {
   return mkdir(path.c_str(), 0777);
 }
 
-}  // namespace
+} // namespace
 
 // DiskInterface ---------------------------------------------------------------
 
-bool DiskInterface::MakeDirs(const string& path) {
+bool
+DiskInterface::MakeDirs(const string& path) {
   string dir = DirName(path);
   if (dir.empty())
-    return true;  // Reached root; assume it's there.
+    return true; // Reached root; assume it's there.
   string err;
   TimeStamp mtime = Stat(dir, &err);
   if (mtime < 0) {
@@ -63,7 +64,7 @@ bool DiskInterface::MakeDirs(const string& path) {
     return false;
   }
   if (mtime > 0)
-    return true;  // Exists already; we're done.
+    return true; // Exists already; we're done.
 
   // Directory doesn't exist.  Try creating its parent first.
   bool success = MakeDirs(dir);
@@ -74,7 +75,8 @@ bool DiskInterface::MakeDirs(const string& path) {
 
 // RealDiskInterface -----------------------------------------------------------
 
-TimeStamp RealDiskInterface::Stat(const string& path, string* err) const {
+TimeStamp
+RealDiskInterface::Stat(const string& path, string* err) const {
   METRIC_RECORD("node stat");
   struct stat st;
   if (stat(path.c_str(), &st) < 0) {
@@ -91,8 +93,9 @@ TimeStamp RealDiskInterface::Stat(const string& path, string* err) const {
 #if defined(_AIX)
   return (int64_t)st.st_mtime * 1000000000LL + st.st_mtime_n;
 #elif defined(__APPLE__)
-  return ((int64_t)st.st_mtimespec.tv_sec * 1000000000LL +
-          st.st_mtimespec.tv_nsec);
+  return (
+      (int64_t)st.st_mtimespec.tv_sec * 1000000000LL + st.st_mtimespec.tv_nsec
+  );
 #elif defined(st_mtime) // A macro, so we're likely on modern POSIX.
   return (int64_t)st.st_mtim.tv_sec * 1000000000LL + st.st_mtim.tv_nsec;
 #else
@@ -100,31 +103,39 @@ TimeStamp RealDiskInterface::Stat(const string& path, string* err) const {
 #endif
 }
 
-bool RealDiskInterface::WriteFile(const string& path, const string& contents) {
+bool
+RealDiskInterface::WriteFile(const string& path, const string& contents) {
   FILE* fp = fopen(path.c_str(), "w");
   if (fp == nullptr) {
-    Error("WriteFile(%s): Unable to create file. %s",
-          path.c_str(), strerror(errno));
+    Error(
+        "WriteFile(%s): Unable to create file. %s", path.c_str(),
+        strerror(errno)
+    );
     return false;
   }
 
-  if (fwrite(contents.data(), 1, contents.length(), fp) < contents.length())  {
-    Error("WriteFile(%s): Unable to write to the file. %s",
-          path.c_str(), strerror(errno));
+  if (fwrite(contents.data(), 1, contents.length(), fp) < contents.length()) {
+    Error(
+        "WriteFile(%s): Unable to write to the file. %s", path.c_str(),
+        strerror(errno)
+    );
     fclose(fp);
     return false;
   }
 
   if (fclose(fp) == EOF) {
-    Error("WriteFile(%s): Unable to close the file. %s",
-          path.c_str(), strerror(errno));
+    Error(
+        "WriteFile(%s): Unable to close the file. %s", path.c_str(),
+        strerror(errno)
+    );
     return false;
   }
 
   return true;
 }
 
-bool RealDiskInterface::MakeDir(const string& path) {
+bool
+RealDiskInterface::MakeDir(const string& path) {
   if (::MakeDir(path) < 0) {
     if (errno == EEXIST) {
       return true;
@@ -135,17 +146,20 @@ bool RealDiskInterface::MakeDir(const string& path) {
   return true;
 }
 
-FileReader::Status RealDiskInterface::ReadFile(const string& path,
-                                               string* contents,
-                                               string* err) {
+FileReader::Status
+RealDiskInterface::ReadFile(const string& path, string* contents, string* err) {
   switch (::ReadFile(path, contents, err)) {
-  case 0:       return Okay;
-  case -ENOENT: return NotFound;
-  default:      return OtherError;
+    case 0:
+      return Okay;
+    case -ENOENT:
+      return NotFound;
+    default:
+      return OtherError;
   }
 }
 
-int RealDiskInterface::RemoveFile(const string& path) {
+int
+RealDiskInterface::RemoveFile(const string& path) {
   if (remove(path.c_str()) < 0) {
     switch (errno) {
       case ENOENT:

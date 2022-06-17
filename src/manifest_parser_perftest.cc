@@ -15,19 +15,19 @@
 // Tests manifest parser performance.  Expects to be run in ninja's root
 // directory.
 
-#include <numeric>
-
 #include <errno.h>
+#include <numeric>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #ifdef _AIX
-#include "getopt.h"
-#include <unistd.h>
+#  include "getopt.h"
+
+#  include <unistd.h>
 #else
-#include <getopt.h>
-#include <unistd.h>
+#  include <getopt.h>
+#  include <unistd.h>
 #endif
 
 #include "disk_interface.h"
@@ -39,14 +39,16 @@
 
 using namespace std;
 
-bool WriteFakeManifests(const string& dir, string* err) {
+bool
+WriteFakeManifests(const string& dir, string* err) {
   RealDiskInterface disk_interface;
   TimeStamp mtime = disk_interface.Stat(dir + "/build.ninja", err);
-  if (mtime != 0)  // 0 means that the file doesn't exist yet.
+  if (mtime != 0) // 0 means that the file doesn't exist yet.
     return mtime != -1;
 
   string command = "python misc/write_fake_manifests.py " + dir;
-  printf("Creating manifest data..."); fflush(stdout);
+  printf("Creating manifest data...");
+  fflush(stdout);
   int exit_code = system(command.c_str());
   printf("done.\n");
   if (exit_code != 0)
@@ -54,7 +56,8 @@ bool WriteFakeManifests(const string& dir, string* err) {
   return exit_code == 0;
 }
 
-int LoadManifests(bool measure_command_evaluation) {
+int
+LoadManifests(bool measure_command_evaluation) {
   string err;
   RealDiskInterface disk_interface;
   State state;
@@ -73,22 +76,24 @@ int LoadManifests(bool measure_command_evaluation) {
   return optimization_guard;
 }
 
-int main(int argc, char* argv[]) {
+int
+main(int argc, char* argv[]) {
   bool measure_command_evaluation = true;
   int opt;
   while ((opt = getopt(argc, argv, const_cast<char*>("fh"))) != -1) {
     switch (opt) {
-    case 'f':
-      measure_command_evaluation = false;
-      break;
-    case 'h':
-    default:
-      printf("usage: manifest_parser_perftest\n"
-"\n"
-"options:\n"
-"  -f     only measure manifest load time, not command evaluation time\n"
-             );
-    return 1;
+      case 'f':
+        measure_command_evaluation = false;
+        break;
+      case 'h':
+      default:
+        printf(
+            "usage: manifest_parser_perftest\n"
+            "\n"
+            "options:\n"
+            "  -f     only measure manifest load time, not command evaluation time\n"
+        );
+        return 1;
     }
   }
 
