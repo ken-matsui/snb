@@ -19,6 +19,7 @@
 #include <functional>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(__SVR4) && defined(__sun)
 #  include <sys/termios.h>
