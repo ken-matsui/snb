@@ -20,6 +20,7 @@
 #include "util.h"
 
 #include <algorithm>
+#include <cstring>
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>

@@ -17,6 +17,7 @@
 #include "util.h"
 
 #include <cassert>
+#include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
