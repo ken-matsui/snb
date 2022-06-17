@@ -48,7 +48,7 @@
 #elif defined(_AIX) && !defined(__PASE__)
 #  include <libperfstat.h>
 #elif defined(linux) || defined(__GLIBC__)
-#  include "string_piece_util.h"
+#  include "string_piece_util.hpp"
 
 #  include <fstream>
 #  include <map>
