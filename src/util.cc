@@ -535,7 +535,7 @@ ParseMountInfo(std::map<std::string, CGroupSubSys>& subsystems) {
         continue;
       std::string newPath = mp.translate(subsys->second.name);
       if (!newPath.empty())
-        cgroups.insert(make_pair(opt, newPath));
+        cgroups.insert(std::make_pair(opt, newPath));
     }
   }
   return cgroups;
