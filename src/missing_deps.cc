@@ -53,15 +53,14 @@ bool
 NodeStoringImplicitDepLoader::ProcessDepfileDeps(
     Edge* edge, std::vector<std::string_view>* depfile_ins, std::string* err
 ) {
-  for (std::vector<std::string_view>::iterator i = depfile_ins->begin();
-       i != depfile_ins->end(); ++i) {
+  for (std::string_view depfile_in : *depfile_ins) {
     uint64_t slash_bits;
-    size_t size = i->size();
-    CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
+    size_t size = depfile_in.size();
+    CanonicalizePath(const_cast<char*>(depfile_in.data()), &size, &slash_bits);
     // CanonicalizePath wants to edit the size.
-    *i = i->substr(0, size);
+    depfile_in = depfile_in.substr(0, size);
 
-    Node* node = state_->GetNode(*i, slash_bits);
+    Node* node = state_->GetNode(depfile_in, slash_bits);
     dep_nodes_output_->push_back(node);
   }
   return true;
@@ -141,10 +140,9 @@ MissingDependencyScanner::ProcessNodeDeps(
     }
   }
   std::vector<Edge*> missing_deps;
-  for (std::set<Edge*>::iterator de = deplog_edges.begin();
-       de != deplog_edges.end(); ++de) {
-    if (!PathExistsBetween(*de, edge)) {
-      missing_deps.push_back(*de);
+  for (Edge* deplog_edge : deplog_edges) {
+    if (!PathExistsBetween(deplog_edge, edge)) {
+      missing_deps.push_back(deplog_edge);
     }
   }
 

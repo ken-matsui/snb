@@ -143,9 +143,8 @@ BuildLog::RecordCommand(
 ) {
   std::string command = edge->EvaluateCommand(true);
   uint64_t command_hash = LogEntry::HashCommand(command);
-  for (std::vector<Node*>::iterator out = edge->outputs_.begin();
-       out != edge->outputs_.end(); ++out) {
-    const std::string& path = (*out)->path();
+  for (Node* output : edge->outputs_) {
+    const std::string& path = output->path();
     Entries::iterator i = entries_.find(path);
     LogEntry* log_entry;
     if (i != entries_.end()) {
@@ -468,24 +467,24 @@ BuildLog::Restat(
     fclose(f);
     return false;
   }
-  for (Entries::iterator i = entries_.begin(); i != entries_.end(); ++i) {
+  for (const auto& entrie : entries_) {
     bool skip = output_count > 0;
     for (int j = 0; j < output_count; ++j) {
-      if (i->second->output == outputs[j]) {
+      if (entrie.second->output == outputs[j]) {
         skip = false;
         break;
       }
     }
     if (!skip) {
-      const TimeStamp mtime = disk_interface.Stat(i->second->output, err);
+      const TimeStamp mtime = disk_interface.Stat(entrie.second->output, err);
       if (mtime == -1) {
         fclose(f);
         return false;
       }
-      i->second->mtime = mtime;
+      entrie.second->mtime = mtime;
     }
 
-    if (!WriteEntry(f, *i->second)) {
+    if (!WriteEntry(f, *entrie.second)) {
       *err = strerror(errno);
       fclose(f);
       return false;

@@ -313,9 +313,8 @@ SubprocessSet::DoWork() {
   int nfds = 0;
   FD_ZERO(&set);
 
-  for (std::vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i) {
-    int fd = (*i)->fd_;
+  for (Subprocess* i : running_) {
+    int fd = i->fd_;
     if (fd >= 0) {
       FD_SET(fd, &set);
       if (nfds < fd + 1)
@@ -366,14 +365,12 @@ SubprocessSet::NextFinished() {
 
 void
 SubprocessSet::Clear() {
-  for (std::vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i)
+  for (Subprocess* i : running_)
     // Since the foreground process is in our process group, it will receive
     // the interruption signal (i.e. SIGINT or SIGTERM) at the same time as us.
-    if (!(*i)->use_console_)
-      kill(-(*i)->pid_, interrupted_);
-  for (std::vector<Subprocess*>::iterator i = running_.begin();
-       i != running_.end(); ++i)
-    delete *i;
+    if (!i->use_console_)
+      kill(-i->pid_, interrupted_);
+  for (Subprocess* i : running_)
+    delete i;
   running_.clear();
 }

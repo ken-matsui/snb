@@ -107,20 +107,18 @@ Cleaner::CleanAll(bool generator) {
   Reset();
   PrintHeader();
   LoadDyndeps();
-  for (std::vector<Edge*>::iterator e = state_->edges_.begin();
-       e != state_->edges_.end(); ++e) {
+  for (Edge* edge : state_->edges_) {
     // Do not try to remove phony targets
-    if ((*e)->is_phony())
+    if (edge->is_phony())
       continue;
     // Do not remove generator's files unless generator specified.
-    if (!generator && (*e)->GetBindingBool("generator"))
+    if (!generator && edge->GetBindingBool("generator"))
       continue;
-    for (std::vector<Node*>::iterator out_node = (*e)->outputs_.begin();
-         out_node != (*e)->outputs_.end(); ++out_node) {
-      Remove((*out_node)->path());
+    for (Node* output : edge->outputs_) {
+      Remove(output->path());
     }
 
-    RemoveEdgeFiles(*e);
+    RemoveEdgeFiles(edge);
   }
   PrintFooter();
   return status_;
@@ -231,13 +229,12 @@ void
 Cleaner::DoCleanRule(const Rule* rule) {
   assert(rule);
 
-  for (std::vector<Edge*>::iterator e = state_->edges_.begin();
-       e != state_->edges_.end(); ++e) {
-    if ((*e)->rule().name() == rule->name()) {
-      for (std::vector<Node*>::iterator out_node = (*e)->outputs_.begin();
-           out_node != (*e)->outputs_.end(); ++out_node) {
+  for (Edge* edge : state_->edges_) {
+    if (edge->rule().name() == rule->name()) {
+      for (std::vector<Node*>::iterator out_node = edge->outputs_.begin();
+           out_node != edge->outputs_.end(); ++out_node) {
         Remove((*out_node)->path());
-        RemoveEdgeFiles(*e);
+        RemoveEdgeFiles(edge);
       }
     }
   }
@@ -304,9 +301,8 @@ Cleaner::Reset() {
 void
 Cleaner::LoadDyndeps() {
   // Load dyndep files that exist, before they are cleaned.
-  for (std::vector<Edge*>::iterator e = state_->edges_.begin();
-       e != state_->edges_.end(); ++e) {
-    if (Node* dyndep = (*e)->dyndep_) {
+  for (Edge* edge : state_->edges_) {
+    if (Node* dyndep = edge->dyndep_) {
       // Capture and ignore errors loading the dyndep file.
       // We clean as much of the graph as we know.
       std::string err;
