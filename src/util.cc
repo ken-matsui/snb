@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "util.h"
+#include "util.hpp"
 
 #ifdef __CYGWIN__
 #  include <io.h>
@@ -59,7 +59,7 @@
 #  include <sys/cpuset.h>
 #endif
 
-#include "edit_distance.h"
+#include "edit_distance.hpp"
 
 using namespace std;
 

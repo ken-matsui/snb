@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "metrics.h"
-#include "util.h"
+#include "metrics.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 #include <string.h>

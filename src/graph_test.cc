@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build.h"
-#include "graph.h"
-#include "test.h"
+#include "build.hpp"
+#include "graph.hpp"
+#include "test.hpp"
 
 using namespace std;
 

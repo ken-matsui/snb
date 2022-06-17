@@ -15,7 +15,7 @@
 #ifndef NINJA_METRICS_H_
 #define NINJA_METRICS_H_
 
-#include "util.h" // For int64_t.
+#include "util.hpp" // For int64_t.
 
 #include <string>
 #include <vector>

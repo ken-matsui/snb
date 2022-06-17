@@ -15,7 +15,7 @@
 #ifndef NINJA_DISK_INTERFACE_H_
 #define NINJA_DISK_INTERFACE_H_
 
-#include "timestamp.h"
+#include "timestamp.hpp"
 
 #include <map>
 #include <string>

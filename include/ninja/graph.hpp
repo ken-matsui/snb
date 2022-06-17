@@ -15,10 +15,10 @@
 #ifndef NINJA_GRAPH_H_
 #define NINJA_GRAPH_H_
 
-#include "dyndep.h"
-#include "eval_env.h"
-#include "timestamp.h"
-#include "util.h"
+#include "dyndep.hpp"
+#include "eval_env.hpp"
+#include "timestamp.hpp"
+#include "util.hpp"
 
 #include <algorithm>
 #include <set>

@@ -24,8 +24,8 @@
 #  include <getopt.h>
 #endif
 
-#include "line_printer.h"
-#include "test.h"
+#include "line_printer.hpp"
+#include "test.hpp"
 
 #include <cstring>
 

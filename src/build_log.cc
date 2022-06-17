@@ -20,9 +20,9 @@
 #  endif
 #endif
 
-#include "build_log.h"
+#include "build_log.hpp"
 
-#include "disk_interface.h"
+#include "disk_interface.hpp"
 
 #include <cassert>
 #include <errno.h>
@@ -34,10 +34,10 @@
 #  include <unistd.h>
 #endif
 
-#include "build.h"
-#include "graph.h"
-#include "metrics.h"
-#include "util.h"
+#include "build.hpp"
+#include "graph.hpp"
+#include "metrics.hpp"
+#include "util.hpp"
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
 #  define strtoll _strtoi64
 #endif

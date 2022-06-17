@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "subprocess.h"
+#include "subprocess.hpp"
 
 #include <assert.h>
 #include <errno.h>
@@ -32,7 +32,7 @@
 
 extern char** environ;
 
-#include "util.h"
+#include "util.hpp"
 
 using namespace std;
 

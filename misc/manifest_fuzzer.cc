@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "disk_interface.hpp"
+#include "manifest_parser.hpp"
+#include "state.hpp"
 #include "stdint.h"
-#include <string>
-#include "disk_interface.h"
-#include "state.h"
-#include "manifest_parser.h"
+
 #include <filesystem>
+#include <string>
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {

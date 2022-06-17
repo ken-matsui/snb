@@ -15,8 +15,8 @@
 #ifndef NINJA_DYNDEP_PARSER_H_
 #define NINJA_DYNDEP_PARSER_H_
 
-#include "eval_env.h"
-#include "parser.h"
+#include "eval_env.hpp"
+#include "parser.hpp"
 
 struct DyndepFile;
 struct EvalString;

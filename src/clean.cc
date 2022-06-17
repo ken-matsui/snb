@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "clean.h"
+#include "clean.hpp"
 
-#include "disk_interface.h"
-#include "graph.h"
-#include "state.h"
-#include "util.h"
+#include "disk_interface.hpp"
+#include "graph.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 #include <assert.h>
 #include <stdio.h>

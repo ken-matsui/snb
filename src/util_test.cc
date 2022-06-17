@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "test.h"
-#include "util.h"
+#include "test.hpp"
+#include "util.hpp"
 
 #include <cstring>
 

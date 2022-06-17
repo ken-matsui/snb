@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "missing_deps.h"
+#include "missing_deps.hpp"
 
-#include "depfile_parser.h"
-#include "deps_log.h"
-#include "disk_interface.h"
-#include "graph.h"
-#include "state.h"
-#include "util.h"
+#include "depfile_parser.hpp"
+#include "deps_log.hpp"
+#include "disk_interface.hpp"
+#include "graph.hpp"
+#include "state.hpp"
+#include "util.hpp"
 
 #include <iostream>
 #include <string.h>

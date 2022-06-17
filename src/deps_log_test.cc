@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "deps_log.h"
+#include "deps_log.hpp"
 
 #include <sys/stat.h>
 #ifndef _WIN32
 #  include <unistd.h>
 #endif
 
-#include "graph.h"
-#include "test.h"
-#include "util.h"
+#include "graph.hpp"
+#include "test.hpp"
+#include "util.hpp"
 
 #include <cstring>
 

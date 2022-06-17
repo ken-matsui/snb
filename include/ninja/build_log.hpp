@@ -15,9 +15,9 @@
 #ifndef NINJA_BUILD_LOG_H_
 #define NINJA_BUILD_LOG_H_
 
-#include "load_status.h"
-#include "timestamp.h"
-#include "util.h" // uint64_t
+#include "load_status.hpp"
+#include "timestamp.hpp"
+#include "util.hpp" // uint64_t
 
 #include <memory>
 #include <stdio.h>

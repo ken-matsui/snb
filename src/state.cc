@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "state.h"
+#include "state.hpp"
 
-#include "edit_distance.h"
-#include "graph.h"
-#include "util.h"
+#include "edit_distance.hpp"
+#include "graph.hpp"
+#include "util.hpp"
 
 #include <assert.h>
 #include <stdio.h>

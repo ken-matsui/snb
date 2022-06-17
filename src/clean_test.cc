@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build.h"
-#include "clean.h"
-#include "test.h"
-#include "util.h"
+#include "build.hpp"
+#include "clean.hpp"
+#include "test.hpp"
+#include "util.hpp"
 
 #ifndef _WIN32
 #  include <unistd.h>

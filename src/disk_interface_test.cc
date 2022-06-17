@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "disk_interface.h"
-#include "graph.h"
-#include "test.h"
+#include "disk_interface.hpp"
+#include "graph.hpp"
+#include "test.hpp"
 
 #include <assert.h>
 #include <stdio.h>

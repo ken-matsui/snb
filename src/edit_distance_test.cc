@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "edit_distance.h"
-#include "test.h"
+#include "edit_distance.hpp"
+#include "test.hpp"
 
 TEST(EditDistanceTest, TestEmpty) {
   EXPECT_EQ(5, EditDistance("", "ninja"));

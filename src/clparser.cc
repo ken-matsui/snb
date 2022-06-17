@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "clparser.h"
+#include "clparser.hpp"
 
-#include "metrics.h"
-#include "string_piece_util.h"
-#include "util.h"
+#include "metrics.hpp"
+#include "string_piece_util.hpp"
+#include "util.hpp"
 
 #include <algorithm>
 #include <assert.h>

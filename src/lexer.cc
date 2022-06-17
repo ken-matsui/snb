@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "lexer.h"
+#include "lexer.hpp"
 
-#include "eval_env.h"
-#include "util.h"
+#include "eval_env.hpp"
+#include "util.hpp"
 
 #include <stdio.h>
 

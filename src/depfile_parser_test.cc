@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "depfile_parser.h"
-#include "test.h"
+#include "depfile_parser.hpp"
+#include "test.hpp"
 
 using namespace std;
 
