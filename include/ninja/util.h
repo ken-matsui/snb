@@ -135,7 +135,7 @@ GetLastErrorString();
 
 /// Calls Fatal() with a function name and GetLastErrorString.
 NORETURN void
-Win32Fatal(const char* function, const char* hint = NULL);
+Win32Fatal(const char* function, const char* hint = nullptr);
 #endif
 
 #endif // NINJA_UTIL_H_

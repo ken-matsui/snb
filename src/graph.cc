@@ -535,18 +535,18 @@ void
 Edge::Dump(const char* prefix) const {
   printf("%s[ ", prefix);
   for (vector<Node*>::const_iterator i = inputs_.begin();
-       i != inputs_.end() && *i != NULL; ++i) {
+       i != inputs_.end() && *i != nullptr; ++i) {
     printf("%s ", (*i)->path().c_str());
   }
   printf("--%s-> ", rule_->name().c_str());
   for (vector<Node*>::const_iterator i = outputs_.begin();
-       i != outputs_.end() && *i != NULL; ++i) {
+       i != outputs_.end() && *i != nullptr; ++i) {
     printf("%s ", (*i)->path().c_str());
   }
   if (!validations_.empty()) {
     printf(" validations ");
     for (std::vector<Node*>::const_iterator i = validations_.begin();
-         i != validations_.end() && *i != NULL; ++i) {
+         i != validations_.end() && *i != nullptr; ++i) {
       printf("%s ", (*i)->path().c_str());
     }
   }
@@ -555,7 +555,7 @@ Edge::Dump(const char* prefix) const {
       printf("(in pool '%s')", pool_->name().c_str());
     }
   } else {
-    printf("(null pool?)");
+    printf("(nullptr pool?)");
   }
   printf("] 0x%p\n", this);
 }
@@ -600,13 +600,13 @@ Node::Dump(const char* prefix) const {
   }
   printf(" out edges:\n");
   for (vector<Edge*>::const_iterator e = out_edges().begin();
-       e != out_edges().end() && *e != NULL; ++e) {
+       e != out_edges().end() && *e != nullptr; ++e) {
     (*e)->Dump(" +- ");
   }
   if (!validation_out_edges().empty()) {
     printf(" validation out edges:\n");
     for (std::vector<Edge*>::const_iterator e = validation_out_edges().begin();
-         e != validation_out_edges().end() && *e != NULL; ++e) {
+         e != validation_out_edges().end() && *e != nullptr; ++e) {
       (*e)->Dump(" +- ");
     }
   }
@@ -737,7 +737,7 @@ bool
 ImplicitDepLoader::LoadDepsFromLog(Edge* edge, string* err) {
   // NOTE: deps are only supported for single-target edges.
   Node* output = edge->outputs_[0];
-  DepsLog::Deps* deps = deps_log_ ? deps_log_->GetDeps(output) : NULL;
+  DepsLog::Deps* deps = deps_log_ ? deps_log_->GetDeps(output) : nullptr;
   if (!deps) {
     EXPLAIN("deps for '%s' are missing", output->path().c_str());
     return false;

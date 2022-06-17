@@ -317,7 +317,7 @@ NinjaMain::CollectTarget(const char* cpath, string* err) {
   string path = cpath;
   if (path.empty()) {
     *err = "empty path";
-    return NULL;
+    return nullptr;
   }
   uint64_t slash_bits;
   CanonicalizePath(&path, &slash_bits);
@@ -336,7 +336,7 @@ NinjaMain::CollectTarget(const char* cpath, string* err) {
         Node* rev_deps = deps_log_.GetFirstReverseDepsNode(node);
         if (!rev_deps) {
           *err = "'" + path + "' has no out edge";
-          return NULL;
+          return nullptr;
         }
         node = rev_deps;
       } else {
@@ -362,7 +362,7 @@ NinjaMain::CollectTarget(const char* cpath, string* err) {
         *err += ", did you mean '" + suggestion->path() + "'?";
       }
     }
-    return NULL;
+    return nullptr;
   }
 }
 
@@ -377,7 +377,7 @@ NinjaMain::CollectTargetsFromArgs(
 
   for (int i = 0; i < argc; ++i) {
     Node* node = CollectTarget(argv[i], err);
-    if (node == NULL)
+    if (node == nullptr)
       return false;
     targets->push_back(node);
   }
@@ -645,7 +645,7 @@ NinjaMain::ToolTargets(const Options* options, int argc, char* argv[]) {
       return ToolTargetsList(&state_);
     } else {
       const char* suggestion =
-          SpellcheckString(mode.c_str(), "rule", "depth", "all", NULL);
+          SpellcheckString(mode.c_str(), "rule", "depth", "all", nullptr);
       if (suggestion) {
         Error(
             "unknown target tool mode '%s', did you mean '%s'?", mode.c_str(),
@@ -710,7 +710,7 @@ NinjaMain::ToolRules(const Options* options, int argc, char* argv[]) {
     if (print_description) {
       const Rule* rule = i->second;
       const EvalString* description = rule->GetBinding("description");
-      if (description != NULL) {
+      if (description != nullptr) {
         printf(": %s", description->Unparse().c_str());
       }
     }
@@ -808,8 +808,8 @@ NinjaMain::ToolInputs(const Options* options, int argc, char* argv[]) {
   optind = 1;
   int opt;
   const option kLongOptions[] = {
-      {"help", no_argument, NULL, 'h'}, {NULL, 0, NULL, 0}};
-  while ((opt = getopt_long(argc, argv, "h", kLongOptions, NULL)) != -1) {
+      {"help", no_argument, nullptr, 'h'}, {nullptr, 0, nullptr, 0}};
+  while ((opt = getopt_long(argc, argv, "h", kLongOptions, nullptr)) != -1) {
     switch (opt) {
       case 'h':
       default:
@@ -984,7 +984,7 @@ NinjaMain::ToolCompilationDatabase(
 
   bool first = true;
   vector<char> cwd;
-  char* success = NULL;
+  char* success = nullptr;
 
   do {
     cwd.resize(cwd.size() + 1024);
@@ -1123,7 +1123,7 @@ NinjaMain::ToolUrtle(const Options* options, int argc, char** argv) {
 }
 
 /// Find the function to execute for \a tool_name and return it via \a func.
-/// Returns a Tool, or NULL if Ninja should exit.
+/// Returns a Tool, or nullptr if Ninja should exit.
 const Tool*
 ChooseTool(const string& tool_name) {
   static const Tool kTools[] = {
@@ -1155,8 +1155,8 @@ ChooseTool(const string& tool_name) {
       {"cleandead",
        "clean built files that are no longer produced by the manifest",
        Tool::RUN_AFTER_LOGS, &NinjaMain::ToolCleanDead},
-      {"urtle", NULL, Tool::RUN_AFTER_FLAGS, &NinjaMain::ToolUrtle},
-      {NULL, NULL, Tool::RUN_AFTER_FLAGS, NULL}};
+      {"urtle", nullptr, Tool::RUN_AFTER_FLAGS, &NinjaMain::ToolUrtle},
+      {nullptr, nullptr, Tool::RUN_AFTER_FLAGS, nullptr}};
 
   if (tool_name == "list") {
     printf("ninja subtools:\n");
@@ -1164,7 +1164,7 @@ ChooseTool(const string& tool_name) {
       if (tool->desc)
         printf("%11s  %s\n", tool->name, tool->desc);
     }
-    return NULL;
+    return nullptr;
   }
 
   for (const Tool* tool = &kTools[0]; tool->name; ++tool) {
@@ -1183,7 +1183,7 @@ ChooseTool(const string& tool_name) {
   } else {
     Fatal("unknown tool '%s'", tool_name.c_str());
   }
-  return NULL; // Not reached.
+  return nullptr; // Not reached.
 }
 
 /// Enable a debugging mode.  Returns false if Ninja should exit instead
@@ -1218,7 +1218,7 @@ DebugEnable(const string& name) {
   } else {
     const char* suggestion = SpellcheckString(
         name.c_str(), "stats", "explain", "keepdepfile", "keeprsp",
-        "nostatcache", NULL
+        "nostatcache", nullptr
     );
     if (suggestion) {
       Error(
@@ -1260,7 +1260,7 @@ WarningEnable(const string& name, Options* options) {
   } else {
     const char* suggestion = SpellcheckString(
         name.c_str(), "dupbuild=err", "dupbuild=warn", "phonycycle=err",
-        "phonycycle=warn", NULL
+        "phonycycle=warn", nullptr
     );
     if (suggestion) {
       Error(
@@ -1429,7 +1429,7 @@ NinjaMain::RunBuild(int argc, char** argv, Status* status) {
 /// generated 3 GB of output and caused ninja to crash.
 void
 TerminateHandler() {
-  CreateWin32MiniDump(NULL);
+  CreateWin32MiniDump(nullptr);
   Fatal("terminate handler called");
 }
 
@@ -1471,16 +1471,16 @@ ReadFlags(int* argc, char*** argv, Options* options, BuildConfig* config) {
 
   enum { OPT_VERSION = 1, OPT_QUIET = 2 };
   const option kLongOptions[] = {
-      {"help", no_argument, NULL, 'h'},
-      {"version", no_argument, NULL, OPT_VERSION},
-      {"verbose", no_argument, NULL, 'v'},
-      {"quiet", no_argument, NULL, OPT_QUIET},
-      {NULL, 0, NULL, 0}};
+      {"help", no_argument, nullptr, 'h'},
+      {"version", no_argument, nullptr, OPT_VERSION},
+      {"verbose", no_argument, nullptr, 'v'},
+      {"quiet", no_argument, nullptr, OPT_QUIET},
+      {nullptr, 0, nullptr, 0}};
 
   int opt;
   while (!options->tool
          && (opt = getopt_long(
-                 *argc, *argv, "d:f:j:k:l:nt:vw:C:h", kLongOptions, NULL
+                 *argc, *argv, "d:f:j:k:l:nt:vw:C:h", kLongOptions, nullptr
              )) != -1) {
     switch (opt) {
       case 'd':
@@ -1568,7 +1568,7 @@ real_main(int argc, char** argv) {
   options.input_file = "build.ninja";
   options.dupe_edges_should_err = true;
 
-  setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
+  setvbuf(stdout, nullptr, _IOLBF, BUFSIZ);
   const char* ninja_command = argv[0];
 
   int exit_code = ReadFlags(&argc, &argv, &options, &config);

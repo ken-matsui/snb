@@ -30,7 +30,7 @@
 
 using namespace std;
 
-Metrics* g_metrics = NULL;
+Metrics* g_metrics = nullptr;
 
 namespace {
 
@@ -39,7 +39,7 @@ namespace {
 int64_t
 HighResTimer() {
   timeval tv;
-  if (gettimeofday(&tv, NULL) < 0)
+  if (gettimeofday(&tv, nullptr) < 0)
     Fatal("gettimeofday: %s", strerror(errno));
   return (int64_t)tv.tv_sec * 1000 * 1000 + tv.tv_usec;
 }

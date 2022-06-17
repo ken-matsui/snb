@@ -40,7 +40,7 @@ struct Node {
   Node(const std::string& path, uint64_t slash_bits)
       : path_(path), slash_bits_(slash_bits), mtime_(-1),
         exists_(ExistenceStatusUnknown), dirty_(false), dyndep_pending_(false),
-        in_edge_(NULL), id_(-1) {}
+        in_edge_(nullptr), id_(-1) {}
 
   /// Return false on error.
   bool
@@ -219,7 +219,7 @@ struct Edge {
   enum VisitMark { VisitNone, VisitInStack, VisitDone };
 
   Edge()
-      : rule_(NULL), pool_(NULL), dyndep_(NULL), env_(NULL), mark_(VisitNone),
+      : rule_(nullptr), pool_(nullptr), dyndep_(nullptr), env_(nullptr), mark_(VisitNone),
         id_(0), outputs_ready_(false), deps_loaded_(false),
         deps_missing_(false), generated_by_dep_loader_(false),
         command_start_time_(0), implicit_deps_(0), order_only_deps_(0),

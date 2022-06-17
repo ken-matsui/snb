@@ -524,7 +524,7 @@ RealCommandRunner::StartCommand(Edge* edge) {
 bool
 RealCommandRunner::WaitForCommand(Result* result) {
   Subprocess* subproc;
-  while ((subproc = subprocs_.NextFinished()) == NULL) {
+  while ((subproc = subprocs_.NextFinished()) == nullptr) {
     bool interrupted = subprocs_.DoWork();
     if (interrupted)
       return false;
@@ -600,10 +600,10 @@ Builder::AddTarget(const string& name, string* err) {
   Node* node = state_->LookupNode(name);
   if (!node) {
     *err = "unknown target: '" + name + "'";
-    return NULL;
+    return nullptr;
   }
   if (!AddTarget(node, err))
-    return NULL;
+    return nullptr;
   return node;
 }
 

@@ -95,7 +95,7 @@ private:
 /// An Env which contains a mapping of variables to values
 /// as well as a pointer to a parent scope.
 struct BindingEnv : public Env {
-  BindingEnv() : parent_(NULL) {}
+  BindingEnv() : parent_(nullptr) {}
   explicit BindingEnv(BindingEnv* parent) : parent_(parent) {}
 
   virtual ~BindingEnv() {}
