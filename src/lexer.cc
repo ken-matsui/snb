@@ -25,8 +25,8 @@ using namespace std;
 bool Lexer::Error(const string& message, string* err) {
   // Compute line/column.
   int line = 1;
-  const char* line_start = input_.str_;
-  for (const char* p = input_.str_; p < last_token_; ++p) {
+  const char* line_start = input_.data();
+  for (const char* p = input_.data(); p < last_token_; ++p) {
     if (*p == '\n') {
       ++line;
       line_start = p + 1;
@@ -35,7 +35,7 @@ bool Lexer::Error(const string& message, string* err) {
   int col = last_token_ ? (int)(last_token_ - line_start) : 0;
 
   char buf[1024];
-  snprintf(buf, sizeof(buf), "%s:%d: ", filename_.AsString().c_str(), line);
+  snprintf(buf, sizeof(buf), "%s:%d: ", filename_.data(), line);
   *err = buf;
   *err += message + "\n";
 
@@ -65,10 +65,10 @@ Lexer::Lexer(const char* input) {
   Start("input", input);
 }
 
-void Lexer::Start(StringPiece filename, StringPiece input) {
+void Lexer::Start(std::string_view filename, std::string_view input) {
   filename_ = filename;
   input_ = input;
-  ofs_ = input_.str_;
+  ofs_ = input_.data();
   last_token_ = NULL;
 }
 
@@ -688,7 +688,7 @@ yy102:
 		goto yy102;
 	}
 	{
-      eval->AddText(StringPiece(start, p - start));
+      eval->AddText(std::string_view(start, p - start));
       continue;
     }
 yy105:
@@ -700,7 +700,7 @@ yy105:
       } else {
         if (*start == '\n')
           break;
-        eval->AddText(StringPiece(start, 1));
+        eval->AddText(std::string_view(start, 1));
         continue;
       }
     }
@@ -765,13 +765,13 @@ yy117:
 yy118:
 	++p;
 	{
-      eval->AddText(StringPiece(" ", 1));
+      eval->AddText(std::string_view(" ", 1));
       continue;
     }
 yy120:
 	++p;
 	{
-      eval->AddText(StringPiece("$", 1));
+      eval->AddText(std::string_view("$", 1));
       continue;
     }
 yy122:
@@ -780,13 +780,13 @@ yy122:
 		goto yy122;
 	}
 	{
-      eval->AddSpecial(StringPiece(start + 1, p - start - 1));
+      eval->AddSpecial(std::string_view(start + 1, p - start - 1));
       continue;
     }
 yy125:
 	++p;
 	{
-      eval->AddText(StringPiece(":", 1));
+      eval->AddText(std::string_view(":", 1));
       continue;
     }
 yy127:
@@ -812,7 +812,7 @@ yy131:
 yy134:
 	++p;
 	{
-      eval->AddSpecial(StringPiece(start + 2, p - start - 3));
+      eval->AddSpecial(std::string_view(start + 2, p - start - 3));
       continue;
     }
 }

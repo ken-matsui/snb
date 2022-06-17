@@ -583,14 +583,13 @@ bool ImplicitDepLoader::LoadDeps(Edge* edge, string* err) {
 }
 
 struct matches {
-  explicit matches(std::vector<StringPiece>::iterator i) : i_(i) {}
+  explicit matches(std::vector<std::string_view>::iterator i) : i_(i) {}
 
   bool operator()(const Node* node) const {
-    StringPiece opath = StringPiece(node->path());
-    return *i_ == opath;
+    return *i_ == node->path();
   }
 
-  std::vector<StringPiece>::iterator i_;
+  std::vector<std::string_view>::iterator i_;
 };
 
 bool ImplicitDepLoader::LoadDepFile(Edge* edge, const string& path,
@@ -629,26 +628,29 @@ bool ImplicitDepLoader::LoadDepFile(Edge* edge, const string& path,
   }
 
   uint64_t unused;
-  std::vector<StringPiece>::iterator primary_out = depfile.outs_.begin();
-  CanonicalizePath(const_cast<char*>(primary_out->str_), &primary_out->len_,
+  std::vector<std::string_view>::iterator primary_out = depfile.outs_.begin();
+  size_t size = primary_out->size();
+  CanonicalizePath(const_cast<char*>(primary_out->data()), &size,
                    &unused);
+  // CanonicalizePath wants to edit the size.
+  *primary_out = primary_out->substr(0, size);
 
   // Check that this depfile matches the edge's output, if not return false to
   // mark the edge as dirty.
   Node* first_output = edge->outputs_[0];
-  StringPiece opath = StringPiece(first_output->path());
+  std::string_view opath(first_output->path());
   if (opath != *primary_out) {
     EXPLAIN("expected depfile '%s' to mention '%s', got '%s'", path.c_str(),
-            first_output->path().c_str(), primary_out->AsString().c_str());
+            first_output->path().c_str(), primary_out->data());
     return false;
   }
 
   // Ensure that all mentioned outputs are outputs of the edge.
-  for (std::vector<StringPiece>::iterator o = depfile.outs_.begin();
+  for (std::vector<std::string_view>::iterator o = depfile.outs_.begin();
        o != depfile.outs_.end(); ++o) {
     matches m(o);
     if (std::find_if(edge->outputs_.begin(), edge->outputs_.end(), m) == edge->outputs_.end()) {
-      *err = path + ": depfile mentions '" + o->AsString() + "' as an output, but no such output was declared";
+      *err = path + ": depfile mentions '" + std::string(*o) + "' as an output, but no such output was declared";
       return false;
     }
   }
@@ -657,16 +659,20 @@ bool ImplicitDepLoader::LoadDepFile(Edge* edge, const string& path,
 }
 
 bool ImplicitDepLoader::ProcessDepfileDeps(
-    Edge* edge, std::vector<StringPiece>* depfile_ins, std::string* err) {
+    Edge* edge, std::vector<std::string_view>* depfile_ins, std::string* err) {
   // Preallocate space in edge->inputs_ to be filled in below.
   vector<Node*>::iterator implicit_dep =
       PreallocateSpace(edge, depfile_ins->size());
 
   // Add all its in-edges.
-  for (std::vector<StringPiece>::iterator i = depfile_ins->begin();
+  for (std::vector<std::string_view>::iterator i = depfile_ins->begin();
        i != depfile_ins->end(); ++i, ++implicit_dep) {
     uint64_t slash_bits;
-    CanonicalizePath(const_cast<char*>(i->str_), &i->len_, &slash_bits);
+    size_t size = i->size();
+    CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
+    // CanonicalizePath wants to edit the size.
+    *i = i->substr(0, size);
+
     Node* node = state_->GetNode(*i, slash_bits);
     *implicit_dep = node;
     node->AddOutEdge(edge);

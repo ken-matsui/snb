@@ -282,7 +282,7 @@ struct ImplicitDepLoader {
   /// Process loaded implicit dependencies for \a edge and update the graph
   /// @return false on error (without filling \a err if info is just missing)
   virtual bool ProcessDepfileDeps(Edge* edge,
-                                  std::vector<StringPiece>* depfile_ins,
+                                  std::vector<std::string_view>* depfile_ins,
                                   std::string* err);
 
   /// Load implicit dependencies for \a edge from a depfile attribute.

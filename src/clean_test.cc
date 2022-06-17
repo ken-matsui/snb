@@ -475,7 +475,7 @@ struct CleanDeadTest : public CleanTest, public BuildLogUser{
   virtual void TearDown() {
     unlink(kTestFilename);
   }
-  virtual bool IsPathDead(StringPiece) const { return false; }
+  virtual bool IsPathDead(std::string_view) const { return false; }
 };
 
 TEST_F(CleanDeadTest, CleanDead) {

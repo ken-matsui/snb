@@ -171,9 +171,9 @@ bool DepfileParser::Parse(string* content, string* err) {
     }
 
     if (len > 0) {
-      StringPiece piece = StringPiece(filename, len);
+      std::string_view piece(filename, len);
       // If we've seen this as an input before, skip it.
-      std::vector<StringPiece>::iterator pos = std::find(ins_.begin(), ins_.end(), piece);
+      std::vector<std::string_view>::iterator pos = std::find(ins_.begin(), ins_.end(), piece);
       if (pos == ins_.end()) {
         if (is_dependency) {
           if (poisoned_input) {

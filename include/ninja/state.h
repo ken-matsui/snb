@@ -101,14 +101,14 @@ struct State {
 
   Edge* AddEdge(const Rule* rule);
 
-  Node* GetNode(StringPiece path, uint64_t slash_bits);
-  Node* LookupNode(StringPiece path) const;
+  Node* GetNode(std::string_view path, uint64_t slash_bits);
+  Node* LookupNode(std::string_view path) const;
   Node* SpellcheckNode(const std::string& path);
 
-  void AddIn(Edge* edge, StringPiece path, uint64_t slash_bits);
-  bool AddOut(Edge* edge, StringPiece path, uint64_t slash_bits);
-  void AddValidation(Edge* edge, StringPiece path, uint64_t slash_bits);
-  bool AddDefault(StringPiece path, std::string* error);
+  void AddIn(Edge* edge, std::string_view path, uint64_t slash_bits);
+  bool AddOut(Edge* edge, std::string_view path, uint64_t slash_bits);
+  void AddValidation(Edge* edge, std::string_view path, uint64_t slash_bits);
+  bool AddDefault(std::string_view path, std::string* error);
 
   /// Reset state.  Keeps all nodes and edges, but restores them to the
   /// state where we haven't yet examined the disk for dirty state.
@@ -123,7 +123,7 @@ struct State {
   std::vector<Node*> DefaultNodes(std::string* error) const;
 
   /// Mapping of path -> Node.
-  using Paths = std::unordered_map<StringPiece, Node*>;
+  using Paths = std::unordered_map<std::string_view, Node*>;
   Paths paths_;
 
   /// All the pools used in the graph.

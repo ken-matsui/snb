@@ -93,16 +93,16 @@ Edge* State::AddEdge(const Rule* rule) {
   return edge;
 }
 
-Node* State::GetNode(StringPiece path, uint64_t slash_bits) {
+Node* State::GetNode(std::string_view path, uint64_t slash_bits) {
   Node* node = LookupNode(path);
   if (node)
     return node;
-  node = new Node(path.AsString(), slash_bits);
+  node = new Node(std::string(path), slash_bits);
   paths_[node->path()] = node;
   return node;
 }
 
-Node* State::LookupNode(StringPiece path) const {
+Node* State::LookupNode(std::string_view path) const {
   Paths::const_iterator i = paths_.find(path);
   if (i != paths_.end())
     return i->second;
@@ -126,13 +126,13 @@ Node* State::SpellcheckNode(const string& path) {
   return result;
 }
 
-void State::AddIn(Edge* edge, StringPiece path, uint64_t slash_bits) {
+void State::AddIn(Edge* edge, std::string_view path, uint64_t slash_bits) {
   Node* node = GetNode(path, slash_bits);
   edge->inputs_.push_back(node);
   node->AddOutEdge(edge);
 }
 
-bool State::AddOut(Edge* edge, StringPiece path, uint64_t slash_bits) {
+bool State::AddOut(Edge* edge, std::string_view path, uint64_t slash_bits) {
   Node* node = GetNode(path, slash_bits);
   if (node->in_edge())
     return false;
@@ -141,16 +141,16 @@ bool State::AddOut(Edge* edge, StringPiece path, uint64_t slash_bits) {
   return true;
 }
 
-void State::AddValidation(Edge* edge, StringPiece path, uint64_t slash_bits) {
+void State::AddValidation(Edge* edge, std::string_view path, uint64_t slash_bits) {
   Node* node = GetNode(path, slash_bits);
   edge->validations_.push_back(node);
   node->AddValidationOutEdge(edge);
 }
 
-bool State::AddDefault(StringPiece path, string* err) {
+bool State::AddDefault(std::string_view path, string* err) {
   Node* node = LookupNode(path);
   if (!node) {
-    *err = "unknown target '" + path.AsString() + "'";
+    *err = "unknown target '" + std::string(path) + "'";
     return false;
   }
   defaults_.push_back(node);

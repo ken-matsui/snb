@@ -418,16 +418,16 @@ std::pair<int64_t, bool> readCount(const std::string& path) {
 struct MountPoint {
   int mountId;
   int parentId;
-  StringPiece deviceId;
-  StringPiece root;
-  StringPiece mountPoint;
-  vector<StringPiece> options;
-  vector<StringPiece> optionalFields;
-  StringPiece fsType;
-  StringPiece mountSource;
-  vector<StringPiece> superOptions;
+  std::string_view deviceId;
+  std::string_view root;
+  std::string_view mountPoint;
+  vector<std::string_view> options;
+  vector<std::string_view> optionalFields;
+  std::string_view fsType;
+  std::string_view mountSource;
+  vector<std::string_view> superOptions;
   bool parse(const string& line) {
-    vector<StringPiece> pieces = SplitStringPiece(line, ' ');
+    vector<std::string_view> pieces = SplitStringPiece(line, ' ');
     if (pieces.size() < 10)
       return false;
     size_t optionalStart = 0;
@@ -441,14 +441,14 @@ struct MountPoint {
       return false;
     if (optionalStart + 3 != pieces.size())
       return false;
-    mountId = atoi(pieces[0].AsString().c_str());
-    parentId = atoi(pieces[1].AsString().c_str());
+    mountId = atoi(pieces[0].data());
+    parentId = atoi(pieces[1].data());
     deviceId = pieces[2];
     root = pieces[3];
     mountPoint = pieces[4];
     options = SplitStringPiece(pieces[5], ',');
     optionalFields =
-        vector<StringPiece>(&pieces[6], &pieces[optionalStart - 1]);
+        vector<std::string_view>(&pieces[6], &pieces[optionalStart - 1]);
     fsType = pieces[optionalStart];
     mountSource = pieces[optionalStart + 1];
     superOptions = SplitStringPiece(pieces[optionalStart + 2], ',');
@@ -456,14 +456,14 @@ struct MountPoint {
   }
   string translate(string& path) const {
     // path must be sub dir of root
-    if (path.compare(0, root.len_, root.str_, root.len_) != 0) {
+    if (path.compare(0, root.size(), root.data(), root.size()) != 0) {
       return string();
     }
-    path.erase(0, root.len_);
+    path.erase(0, root.size());
     if (path == ".." || (path.length() > 2 && path.compare(0, 3, "../") == 0)) {
       return string();
     }
-    return mountPoint.AsString() + "/" + path;
+    return std::string(mountPoint) + "/" + path;
   }
 };
 
@@ -482,10 +482,10 @@ struct CGroupSubSys {
     line[second] = '\0';
     id = atoi(line.c_str());
     name = line.substr(second + 1);
-    vector<StringPiece> pieces =
-        SplitStringPiece(StringPiece(line.c_str() + first + 1), ',');
+    vector<std::string_view> pieces =
+        SplitStringPiece(std::string_view(line.c_str() + first + 1), ',');
     for (size_t i = 0; i < pieces.size(); i++) {
-      subsystems.push_back(pieces[i].AsString());
+      subsystems.emplace_back(std::string(pieces[i]));
     }
     return true;
   }
@@ -505,7 +505,7 @@ map<string, string> ParseMountInfo(map<string, CGroupSubSys>& subsystems) {
     if (mp.fsType != "cgroup")
       continue;
     for (size_t i = 0; i < mp.superOptions.size(); i++) {
-      string opt = mp.superOptions[i].AsString();
+      string opt(mp.superOptions[i]);
       map<string, CGroupSubSys>::iterator subsys = subsystems.find(opt);
       if (subsys == subsystems.end())
         continue;
