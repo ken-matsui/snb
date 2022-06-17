@@ -491,7 +491,7 @@ struct MountPoint {
 struct CGroupSubSys {
   int id;
   std::string name;
-  std::vector<string> subsystems;
+  std::vector<std::string> subsystems;
   bool
   parse(std::string& line) {
     size_t first = line.find(':');
@@ -516,7 +516,7 @@ struct CGroupSubSys {
 std::map<std::string, std::string>
 ParseMountInfo(std::map<std::string, CGroupSubSys>& subsystems) {
   std::map<std::string, std::string> cgroups;
-  ifstream mountinfo("/proc/self/mountinfo");
+  std::ifstream mountinfo("/proc/self/mountinfo");
   if (!mountinfo.is_open())
     return cgroups;
   while (!mountinfo.eof()) {
