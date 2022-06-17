@@ -16,8 +16,8 @@
 
 #include "util.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <termios.h>

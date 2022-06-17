@@ -14,7 +14,7 @@
 
 #include "eval_env.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 

@@ -18,8 +18,8 @@
 #include "graph.hpp"
 #include "util.hpp"
 
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
+#include <cstdio>
 
 using namespace std;
 

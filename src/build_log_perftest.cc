@@ -19,8 +19,8 @@
 #include "state.hpp"
 #include "util.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #ifndef _WIN32
 #  include <unistd.h>

@@ -18,7 +18,7 @@
 #include "graph.hpp"
 
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 
 using namespace std;
 

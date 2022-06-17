@@ -21,8 +21,8 @@
 
 #include <algorithm>
 #include <cstring>
-#include <errno.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdlib>
 #include <unistd.h>
 
 #ifdef _AIX

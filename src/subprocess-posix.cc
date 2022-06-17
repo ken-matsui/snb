@@ -14,12 +14,12 @@
 
 #include "subprocess.hpp"
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <fcntl.h>
 #include <spawn.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <sys/select.h>
 #include <sys/wait.h>
 #include <unistd.h>

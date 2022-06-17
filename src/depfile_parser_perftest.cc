@@ -16,8 +16,8 @@
 #include "metrics.hpp"
 #include "util.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 using namespace std;
 

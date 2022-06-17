@@ -16,9 +16,9 @@
 
 #include "build/browse_py.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <vector>
 

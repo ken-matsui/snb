@@ -17,7 +17,7 @@
 
 #ifndef _WIN32
 // SetWithLots need setrlimit.
-#  include <stdio.h>
+#  include <cstdio>
 #  include <sys/resource.h>
 #  include <sys/time.h>
 #  include <unistd.h>

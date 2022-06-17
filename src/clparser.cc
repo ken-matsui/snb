@@ -19,8 +19,8 @@
 #include "util.hpp"
 
 #include <algorithm>
-#include <assert.h>
-#include <string.h>
+#include <cassert>
+#include <cstring>
 
 using namespace std;
 

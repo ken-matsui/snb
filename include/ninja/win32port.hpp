@@ -19,7 +19,7 @@
 #  ifndef __STDC_FORMAT_MACROS
 #    define __STDC_FORMAT_MACROS
 #  endif
-#  include <inttypes.h>
+#  include <cinttypes>
 #endif
 
 using int16_t = signed short;

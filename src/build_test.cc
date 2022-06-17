@@ -19,7 +19,7 @@
 #include "status.hpp"
 #include "test.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 using namespace std;
 

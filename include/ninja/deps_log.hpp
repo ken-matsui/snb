@@ -18,7 +18,7 @@
 #include "load_status.hpp"
 #include "timestamp.hpp"
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <vector>
 
