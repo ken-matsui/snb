@@ -99,7 +99,7 @@ VerifyGraph(const State& state) {
   std::set<const Edge*> node_edge_set;
   for (State::Paths::const_iterator p = state.paths_.begin();
        p != state.paths_.end(); ++p) {
-    const Node* n = p->second;
+    const Node* n = p->second.get();
     if (n->in_edge())
       node_edge_set.insert(n->in_edge());
     node_edge_set.insert(n->out_edges().begin(), n->out_edges().end());

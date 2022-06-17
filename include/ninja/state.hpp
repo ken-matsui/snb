@@ -20,6 +20,7 @@
 #include "util.hpp"
 
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -160,7 +161,7 @@ struct State {
   DefaultNodes(std::string* error) const;
 
   /// Mapping of path -> Node.
-  using Paths = std::unordered_map<std::string_view, Node*>;
+  using Paths = std::unordered_map<std::string_view, std::unique_ptr<Node>>;
   Paths paths_;
 
   /// All the pools used in the graph.

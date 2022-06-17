@@ -101,8 +101,9 @@ State::GetNode(std::string_view path, uint64_t slash_bits) {
   Node* node = LookupNode(path);
   if (node)
     return node;
-  node = new Node(std::string(path), slash_bits);
-  paths_[node->path()] = node;
+  std::unique_ptr<Node> node_ptr = std::make_unique<Node>(std::string(path), slash_bits);
+  node = node_ptr.get();
+  paths_[node->path()] = std::move(node_ptr);
   return node;
 }
 
@@ -110,7 +111,7 @@ Node*
 State::LookupNode(std::string_view path) const {
   Paths::const_iterator i = paths_.find(path);
   if (i != paths_.end())
-    return i->second;
+    return i->second.get();
   return nullptr;
 }
 
@@ -126,7 +127,7 @@ State::SpellcheckNode(const std::string& path) {
         EditDistance(i.first, path, kAllowReplacements, kMaxValidEditDistance);
     if (distance < min_distance && i.second) {
       min_distance = distance;
-      result = i.second;
+      result = i.second.get();
     }
   }
   return result;
@@ -205,7 +206,7 @@ State::Reset() {
 void
 State::Dump() {
   for (Paths::iterator i = paths_.begin(); i != paths_.end(); ++i) {
-    Node* node = i->second;
+    Node* node = i->second.get();
     printf(
         "%s %s [id:%d]\n", node->path().c_str(),
         node->status_known() ? (node->dirty() ? "dirty" : "clean") : "unknown",
