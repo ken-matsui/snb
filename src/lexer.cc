@@ -20,10 +20,8 @@
 
 #include <cstdio>
 
-using namespace std;
-
 bool
-Lexer::Error(const string& message, string* err) {
+Lexer::Error(const std::string& message, std::string* err) {
   // Compute line/column.
   int line = 1;
   const char* line_start = input_.data();
@@ -51,11 +49,11 @@ Lexer::Error(const string& message, string* err) {
         break;
       }
     }
-    *err += string(line_start, len);
+    *err += std::string(line_start, len);
     if (truncated)
       *err += "...";
     *err += "\n";
-    *err += string(col, ' ');
+    *err += std::string(col, ' ');
     *err += "^ near here";
   }
 
@@ -121,7 +119,7 @@ Lexer::TokenErrorHint(Token expected) {
   }
 }
 
-string
+std::string
 Lexer::DescribeLastError() {
   if (last_token_) {
     switch (last_token_[0]) {
@@ -648,7 +646,7 @@ Lexer::EatWhitespace() {
 }
 
 bool
-Lexer::ReadIdent(string* out) {
+Lexer::ReadIdent(std::string* out) {
   const char* p = ofs_;
   const char* start;
   for (;;) {
@@ -704,7 +702,7 @@ Lexer::ReadIdent(string* out) {
 }
 
 bool
-Lexer::ReadEvalString(EvalString* eval, bool path, string* err) {
+Lexer::ReadEvalString(EvalString* eval, bool path, std::string* err) {
   const char* p = ofs_;
   const char* q;
   const char* start;

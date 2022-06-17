@@ -22,8 +22,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-using namespace std;
-
 namespace {
 
 const char kTestFilename[] = "BuildLogTest-tempfile";
@@ -52,7 +50,7 @@ TEST_F(BuildLogTest, WriteRead) {
   );
 
   BuildLog log1;
-  string err;
+  std::string err;
   EXPECT_TRUE(log1.OpenForWrite(kTestFilename, *this, &err));
   ASSERT_EQ("", err);
   log1.RecordCommand(state_.edges_[0], 15, 18);
@@ -79,7 +77,7 @@ TEST_F(BuildLogTest, FirstWriteAddsSignature) {
   const size_t kVersionPos = strlen(kExpectedVersion) - 2; // Points at 'X'.
 
   BuildLog log;
-  string contents, err;
+  std::string contents, err;
 
   EXPECT_TRUE(log.OpenForWrite(kTestFilename, *this, &err));
   ASSERT_EQ("", err);
@@ -111,7 +109,7 @@ TEST_F(BuildLogTest, DoubleEntry) {
   fprintf(f, "3\t4\t5\tout\tcommand def\n");
   fclose(f);
 
-  string err;
+  std::string err;
   BuildLog log;
   EXPECT_TRUE(log.Load(kTestFilename, &err));
   ASSERT_EQ("", err);
@@ -130,7 +128,7 @@ TEST_F(BuildLogTest, Truncate) {
 
   {
     BuildLog log1;
-    string err;
+    std::string err;
     EXPECT_TRUE(log1.OpenForWrite(kTestFilename, *this, &err));
     ASSERT_EQ("", err);
     log1.RecordCommand(state_.edges_[0], 15, 18);
@@ -146,7 +144,7 @@ TEST_F(BuildLogTest, Truncate) {
   // crash when parsing.
   for (off_t size = statbuf.st_size; size > 0; --size) {
     BuildLog log2;
-    string err;
+    std::string err;
     EXPECT_TRUE(log2.OpenForWrite(kTestFilename, *this, &err));
     ASSERT_EQ("", err);
     log2.RecordCommand(state_.edges_[0], 15, 18);
@@ -167,10 +165,10 @@ TEST_F(BuildLogTest, ObsoleteOldVersion) {
   fprintf(f, "123 456 0 out command\n");
   fclose(f);
 
-  string err;
+  std::string err;
   BuildLog log;
   EXPECT_TRUE(log.Load(kTestFilename, &err));
-  ASSERT_NE(err.find("version"), string::npos);
+  ASSERT_NE(err.find("version"), std::string::npos);
 }
 
 TEST_F(BuildLogTest, SpacesInOutputV4) {
@@ -179,7 +177,7 @@ TEST_F(BuildLogTest, SpacesInOutputV4) {
   fprintf(f, "123\t456\t456\tout with space\tcommand\n");
   fclose(f);
 
-  string err;
+  std::string err;
   BuildLog log;
   EXPECT_TRUE(log.Load(kTestFilename, &err));
   ASSERT_EQ("", err);
@@ -203,7 +201,7 @@ TEST_F(BuildLogTest, DuplicateVersionHeader) {
   fprintf(f, "456\t789\t789\tout2\tcommand2\n");
   fclose(f);
 
-  string err;
+  std::string err;
   BuildLog log;
   EXPECT_TRUE(log.Load(kTestFilename, &err));
   ASSERT_EQ("", err);
@@ -225,26 +223,26 @@ TEST_F(BuildLogTest, DuplicateVersionHeader) {
 
 struct TestDiskInterface : public DiskInterface {
   virtual TimeStamp
-  Stat(const string& path, string* err) const {
+  Stat(const std::string& path, std::string* err) const {
     return 4;
   }
   virtual bool
-  WriteFile(const string& path, const string& contents) {
+  WriteFile(const std::string& path, const std::string& contents) {
     assert(false);
     return true;
   }
   virtual bool
-  MakeDir(const string& path) {
+  MakeDir(const std::string& path) {
     assert(false);
     return false;
   }
   virtual Status
-  ReadFile(const string& path, string* contents, string* err) {
+  ReadFile(const std::string& path, std::string* contents, std::string* err) {
     assert(false);
     return NotFound;
   }
   virtual int
-  RemoveFile(const string& path) {
+  RemoveFile(const std::string& path) {
     assert(false);
     return 0;
   }
@@ -291,7 +289,7 @@ TEST_F(BuildLogTest, VeryLongInputLine) {
   fprintf(f, "456\t789\t789\tout2\tcommand2\n");
   fclose(f);
 
-  string err;
+  std::string err;
   BuildLog log;
   EXPECT_TRUE(log.Load(kTestFilename, &err));
   ASSERT_EQ("", err);
@@ -341,7 +339,7 @@ TEST_F(BuildLogRecompactTest, Recompact) {
   );
 
   BuildLog log1;
-  string err;
+  std::string err;
   EXPECT_TRUE(log1.OpenForWrite(kTestFilename, *this, &err));
   ASSERT_EQ("", err);
   // Record the same edge several times, to trigger recompaction

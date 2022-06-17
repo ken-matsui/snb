@@ -17,8 +17,6 @@
 #include <algorithm>
 #include <vector>
 
-using namespace std;
-
 int
 EditDistance(
     std::string_view s1, std::string_view s2, bool allow_replacements,
@@ -39,7 +37,7 @@ EditDistance(
   int m = s1.size();
   int n = s2.size();
 
-  vector<int> row(n + 1);
+  std::vector<int> row(n + 1);
   for (int i = 1; i <= n; ++i)
     row[i] = i;
 
@@ -51,17 +49,18 @@ EditDistance(
     for (int x = 1; x <= n; ++x) {
       int old_row = row[x];
       if (allow_replacements) {
-        row[x] =
-            min(previous + (s1[y - 1] == s2[x - 1] ? 0 : 1),
-                min(row[x - 1], row[x]) + 1);
+        row[x] = std::min(
+            previous + (s1[y - 1] == s2[x - 1] ? 0 : 1),
+            std::min(row[x - 1], row[x]) + 1
+        );
       } else {
         if (s1[y - 1] == s2[x - 1])
           row[x] = previous;
         else
-          row[x] = min(row[x - 1], row[x]) + 1;
+          row[x] = std::min(row[x - 1], row[x]) + 1;
       }
       previous = old_row;
-      best_this_row = min(best_this_row, row[x]);
+      best_this_row = std::min(best_this_row, row[x]);
     }
 
     if (max_edit_distance && best_this_row > max_edit_distance)

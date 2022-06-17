@@ -16,8 +16,6 @@
 #include "state.hpp"
 #include "test.hpp"
 
-using namespace std;
-
 namespace {
 
 TEST(State, Basic) {

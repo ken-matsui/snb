@@ -21,8 +21,8 @@
 #include "state.hpp"
 #include "util.hpp"
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 namespace {
 

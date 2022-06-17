@@ -22,8 +22,6 @@
 #include <unistd.h>
 #include <vector>
 
-using namespace std;
-
 void
 RunBrowsePython(
     State* state, const char* ninja_command, const char* input_file, int argc,

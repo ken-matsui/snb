@@ -16,10 +16,10 @@
 // directory.
 
 #include <cerrno>
-#include <numeric>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <numeric>
 
 #ifdef _AIX
 #  include "getopt.h"
@@ -37,16 +37,14 @@
 #include "state.hpp"
 #include "util.hpp"
 
-using namespace std;
-
 bool
-WriteFakeManifests(const string& dir, string* err) {
+WriteFakeManifests(const std::string& dir, std::string* err) {
   RealDiskInterface disk_interface;
   TimeStamp mtime = disk_interface.Stat(dir + "/build.ninja", err);
   if (mtime != 0) // 0 means that the file doesn't exist yet.
     return mtime != -1;
 
-  string command = "python misc/write_fake_manifests.py " + dir;
+  std::string command = "python misc/write_fake_manifests.py " + dir;
   printf("Creating manifest data...");
   fflush(stdout);
   int exit_code = system(command.c_str());
@@ -58,7 +56,7 @@ WriteFakeManifests(const string& dir, string* err) {
 
 int
 LoadManifests(bool measure_command_evaluation) {
-  string err;
+  std::string err;
   RealDiskInterface disk_interface;
   State state;
   ManifestParser parser(&state, &disk_interface);
@@ -99,7 +97,7 @@ main(int argc, char* argv[]) {
 
   const char kManifestDir[] = "build/manifest_perftest";
 
-  string err;
+  std::string err;
   if (!WriteFakeManifests(kManifestDir, &err)) {
     fprintf(stderr, "Failed to write test data: %s\n", err.c_str());
     return 1;
@@ -109,7 +107,7 @@ main(int argc, char* argv[]) {
     Fatal("chdir: %s", strerror(errno));
 
   const int kNumRepetitions = 5;
-  vector<int> times;
+  std::vector<int> times;
   for (int i = 0; i < kNumRepetitions; ++i) {
     int64_t start = GetTimeMillis();
     int optimization_guard = LoadManifests(measure_command_evaluation);

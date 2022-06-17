@@ -21,8 +21,8 @@
 #  include <cstdint>
 #endif
 
-#include <memory>
 #include <cstdarg>
+#include <memory>
 #include <string>
 #include <vector>
 

@@ -141,14 +141,7 @@ set_target_properties(
 )
 
 if(WIN32)
-	target_sources(libninja PRIVATE
-		src/subprocess-win32.cc
-		src/includes_normalize-win32.cc
-		src/msvc_helper-win32.cc
-		src/msvc_helper_main-win32.cc
-		src/getopt.c
-		src/minidump-win32.cc
-	)
+	target_sources(libninja PRIVATE src/getopt.c)
 else()
 	target_sources(libninja PRIVATE src/subprocess-posix.cc)
 	if(CMAKE_SYSTEM_NAME STREQUAL "OS400" OR CMAKE_SYSTEM_NAME STREQUAL "AIX")

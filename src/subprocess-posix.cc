@@ -16,10 +16,10 @@
 
 #include <cassert>
 #include <cerrno>
-#include <fcntl.h>
-#include <spawn.h>
 #include <cstdio>
 #include <cstring>
+#include <fcntl.h>
+#include <spawn.h>
 #include <sys/select.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -34,8 +34,6 @@ extern char** environ;
 
 #include "util.hpp"
 
-using namespace std;
-
 Subprocess::Subprocess(bool use_console)
     : fd_(-1), pid_(-1), use_console_(use_console) {}
 
@@ -48,7 +46,7 @@ Subprocess::~Subprocess() {
 }
 
 bool
-Subprocess::Start(SubprocessSet* set, const string& command) {
+Subprocess::Start(SubprocessSet* set, const std::string& command) {
   int output_pipe[2];
   if (pipe(output_pipe) < 0)
     Fatal("pipe: %s", strerror(errno));
@@ -185,7 +183,7 @@ Subprocess::Done() const {
   return fd_ == -1;
 }
 
-const string&
+const std::string&
 Subprocess::GetOutput() const {
   return buf_;
 }
@@ -247,7 +245,7 @@ SubprocessSet::~SubprocessSet() {
 }
 
 Subprocess*
-SubprocessSet::Add(const string& command, bool use_console) {
+SubprocessSet::Add(const std::string& command, bool use_console) {
   Subprocess* subprocess = new Subprocess(use_console);
   if (!subprocess->Start(this, command)) {
     delete subprocess;
@@ -315,8 +313,8 @@ SubprocessSet::DoWork() {
   int nfds = 0;
   FD_ZERO(&set);
 
-  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
-       ++i) {
+  for (std::vector<Subprocess*>::iterator i = running_.begin();
+       i != running_.end(); ++i) {
     int fd = (*i)->fd_;
     if (fd >= 0) {
       FD_SET(fd, &set);
@@ -339,7 +337,7 @@ SubprocessSet::DoWork() {
   if (IsInterrupted())
     return true;
 
-  for (vector<Subprocess*>::iterator i = running_.begin();
+  for (std::vector<Subprocess*>::iterator i = running_.begin();
        i != running_.end();) {
     int fd = (*i)->fd_;
     if (fd >= 0 && FD_ISSET(fd, &set)) {
@@ -368,14 +366,14 @@ SubprocessSet::NextFinished() {
 
 void
 SubprocessSet::Clear() {
-  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
-       ++i)
+  for (std::vector<Subprocess*>::iterator i = running_.begin();
+       i != running_.end(); ++i)
     // Since the foreground process is in our process group, it will receive
     // the interruption signal (i.e. SIGINT or SIGTERM) at the same time as us.
     if (!(*i)->use_console_)
       kill(-(*i)->pid_, interrupted_);
-  for (vector<Subprocess*>::iterator i = running_.begin(); i != running_.end();
-       ++i)
+  for (std::vector<Subprocess*>::iterator i = running_.begin();
+       i != running_.end(); ++i)
     delete *i;
   running_.clear();
 }

@@ -23,12 +23,10 @@
 #include <termios.h>
 #include <unistd.h>
 
-using namespace std;
-
 LinePrinter::LinePrinter() : have_blank_line_(true), console_locked_(false) {
   const char* term = getenv("TERM");
 #ifndef _WIN32
-  smart_terminal_ = isatty(1) && term && string(term) != "dumb";
+  smart_terminal_ = isatty(1) && term && std::string(term) != "dumb";
 #else
   if (term && string(term) == "dumb") {
     smart_terminal_ = false;
@@ -41,12 +39,12 @@ LinePrinter::LinePrinter() : have_blank_line_(true), console_locked_(false) {
   supports_color_ = smart_terminal_;
   if (!supports_color_) {
     const char* clicolor_force = getenv("CLICOLOR_FORCE");
-    supports_color_ = clicolor_force && string(clicolor_force) != "0";
+    supports_color_ = clicolor_force && std::string(clicolor_force) != "0";
   }
 }
 
 void
-LinePrinter::Print(string to_print, LineType type) {
+LinePrinter::Print(std::string to_print, LineType type) {
   if (console_locked_) {
     line_buffer_ = to_print;
     line_type_ = type;
@@ -88,7 +86,7 @@ LinePrinter::PrintOrBuffer(const char* data, size_t size) {
 }
 
 void
-LinePrinter::PrintOnNewLine(const string& to_print) {
+LinePrinter::PrintOnNewLine(const std::string& to_print) {
   if (console_locked_ && !line_buffer_.empty()) {
     output_buffer_.append(line_buffer_);
     output_buffer_.append(1, '\n');

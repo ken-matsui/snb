@@ -17,17 +17,16 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-using namespace std;
 
-vector<std::string_view>
+std::vector<std::string_view>
 SplitStringPiece(std::string_view input, char sep) {
-  vector<std::string_view> elems;
-  elems.reserve(count(input.begin(), input.end(), sep) + 1);
+  std::vector<std::string_view> elems;
+  elems.reserve(std::count(input.begin(), input.end(), sep) + 1);
 
   std::string_view::const_iterator pos = input.begin();
 
   for (;;) {
-    const char* next_pos = find(pos, input.end(), sep);
+    const char* next_pos = std::find(pos, input.end(), sep);
     if (next_pos == input.end()) {
       elems.emplace_back(pos, input.end() - pos);
       break;
@@ -39,13 +38,13 @@ SplitStringPiece(std::string_view input, char sep) {
   return elems;
 }
 
-string
-JoinStringPiece(const vector<std::string_view>& list, char sep) {
+std::string
+JoinStringPiece(const std::vector<std::string_view>& list, char sep) {
   if (list.empty()) {
     return "";
   }
 
-  string ret;
+  std::string ret;
 
   {
     size_t cap = list.size() - 1;

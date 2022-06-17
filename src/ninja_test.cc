@@ -29,8 +29,6 @@
 
 #include <cstring>
 
-using namespace std;
-
 struct RegisteredTest {
   testing::Test* (*factory)();
   const char* name;
@@ -52,7 +50,7 @@ RegisterTest(testing::Test* (*factory)(), const char* name) {
 }
 
 namespace {
-string
+std::string
 StringPrintf(const char* format, ...) {
   const int N = 1024;
   char buf[N];
