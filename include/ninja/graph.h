@@ -219,8 +219,8 @@ struct Edge {
   enum VisitMark { VisitNone, VisitInStack, VisitDone };
 
   Edge()
-      : rule_(nullptr), pool_(nullptr), dyndep_(nullptr), env_(nullptr), mark_(VisitNone),
-        id_(0), outputs_ready_(false), deps_loaded_(false),
+      : rule_(nullptr), pool_(nullptr), dyndep_(nullptr), env_(nullptr),
+        mark_(VisitNone), id_(0), outputs_ready_(false), deps_loaded_(false),
         deps_missing_(false), generated_by_dep_loader_(false),
         command_start_time_(0), implicit_deps_(0), order_only_deps_(0),
         implicit_outs_(0) {}

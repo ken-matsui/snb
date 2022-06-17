@@ -545,8 +545,9 @@ struct BuildTest : public StateTestWithBuiltinRules, public BuildLogUser {
   /// Handy to check for NOOP builds, and higher-level rebuild tests.
   void
   RebuildTarget(
-      const string& target, const char* manifest, const char* log_path = nullptr,
-      const char* deps_path = nullptr, State* state = nullptr
+      const string& target, const char* manifest,
+      const char* log_path = nullptr, const char* deps_path = nullptr,
+      State* state = nullptr
   );
 
   // Mark a path dirty.

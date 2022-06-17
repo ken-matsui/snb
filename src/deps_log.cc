@@ -54,7 +54,8 @@ DepsLog::OpenForWrite(const string& path, string* err) {
 bool
 DepsLog::RecordDeps(Node* node, TimeStamp mtime, const vector<Node*>& nodes) {
   return RecordDeps(
-      node, mtime, nodes.size(), nodes.empty() ? nullptr : (Node**)&nodes.front()
+      node, mtime, nodes.size(),
+      nodes.empty() ? nullptr : (Node**)&nodes.front()
   );
 }
 
