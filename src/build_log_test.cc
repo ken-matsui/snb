@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build_log.hpp"
-#include "test.hpp"
-#include "util.hpp"
-
 #include <cassert>
 #include <cstring>
+#include <ninja/build_log.hpp>
+#include <ninja/test.hpp>
+#include <ninja/util.hpp>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>

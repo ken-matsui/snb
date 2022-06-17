@@ -30,12 +30,12 @@
 #  include <unistd.h>
 #endif
 
-#include "disk_interface.hpp"
-#include "graph.hpp"
-#include "manifest_parser.hpp"
-#include "metrics.hpp"
-#include "state.hpp"
-#include "util.hpp"
+#include <ninja/disk_interface.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/manifest_parser.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 
 bool
 WriteFakeManifests(const std::string& dir, std::string* err) {

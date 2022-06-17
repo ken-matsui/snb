@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "deps_log.hpp"
-
-#include "graph.hpp"
-#include "metrics.hpp"
-#include "state.hpp"
-#include "util.hpp"
-
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <ninja/deps_log.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 #include <unistd.h>
 
 // The version is stored as 4 bytes after the signature and also serves as a

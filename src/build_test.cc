@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build.hpp"
-#include "build_log.hpp"
-#include "deps_log.hpp"
-#include "graph.hpp"
-#include "status.hpp"
-#include "test.hpp"
-
 #include <cassert>
+#include <ninja/build.hpp>
+#include <ninja/build_log.hpp>
+#include <ninja/deps_log.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/status.hpp>
+#include <ninja/test.hpp>
 
 struct CompareEdgesByOutput {
   static bool

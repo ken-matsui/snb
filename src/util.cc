@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "util.hpp"
-
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -21,6 +19,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
+#include <ninja/util.hpp>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -39,7 +38,7 @@
 #elif defined(_AIX) && !defined(__PASE__)
 #  include <libperfstat.h>
 #elif defined(linux) || defined(__GLIBC__)
-#  include "string_piece_util.hpp"
+#  include <ninja/string_piece_util.hpp>
 
 #  include <fstream>
 #  include <map>
@@ -50,7 +49,7 @@
 #  include <sys/cpuset.h>
 #endif
 
-#include "edit_distance.hpp"
+#include <ninja/edit_distance.hpp>
 
 void
 Fatal(const char* msg, ...) {

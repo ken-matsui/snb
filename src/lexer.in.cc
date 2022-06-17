@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "lexer.hpp"
-
-#include "eval_env.hpp"
-#include "util.hpp"
-
 #include <cstdio>
+#include <ninja/eval_env.hpp>
+#include <ninja/lexer.hpp>
+#include <ninja/util.hpp>
 
 bool
 Lexer::Error(const std::string& message, std::string* err) {

@@ -24,10 +24,9 @@
 #  include <getopt.h>
 #endif
 
-#include "line_printer.hpp"
-#include "test.hpp"
-
 #include <cstring>
+#include <ninja/line_printer.hpp>
+#include <ninja/test.hpp>
 
 struct RegisteredTest {
   testing::Test* (*factory)();

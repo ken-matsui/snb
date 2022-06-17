@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "state.hpp"
-
-#include "edit_distance.hpp"
-#include "graph.hpp"
-#include "util.hpp"
-
 #include <cassert>
 #include <cstdio>
+#include <ninja/edit_distance.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 
 void
 Pool::EdgeScheduled(const Edge& edge) {

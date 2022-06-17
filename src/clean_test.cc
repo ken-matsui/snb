@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build.hpp"
-#include "clean.hpp"
-#include "test.hpp"
-#include "util.hpp"
+#include <ninja/build.hpp>
+#include <ninja/clean.hpp>
+#include <ninja/test.hpp>
+#include <ninja/util.hpp>
 
 #ifndef _WIN32
 #  include <unistd.h>

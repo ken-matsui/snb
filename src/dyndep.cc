@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dyndep.hpp"
-
-#include "debug_flags.hpp"
-#include "disk_interface.hpp"
-#include "dyndep_parser.hpp"
-#include "graph.hpp"
-#include "state.hpp"
-#include "util.hpp"
-
 #include <cassert>
 #include <cstdio>
+#include <ninja/debug_flags.hpp>
+#include <ninja/disk_interface.hpp>
+#include <ninja/dyndep.hpp>
+#include <ninja/dyndep_parser.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 
 bool
 DyndepLoader::LoadDyndeps(Node* node, std::string* err) const {

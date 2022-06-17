@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "line_printer.hpp"
-
-#include "util.hpp"
-
 #include <cstdio>
 #include <cstdlib>
+#include <ninja/line_printer.hpp>
+#include <ninja/util.hpp>
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <termios.h>

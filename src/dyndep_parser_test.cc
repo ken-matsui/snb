@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dyndep.hpp"
-#include "dyndep_parser.hpp"
-#include "graph.hpp"
-#include "state.hpp"
-#include "test.hpp"
-
 #include <map>
+#include <ninja/dyndep.hpp>
+#include <ninja/dyndep_parser.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/state.hpp>
+#include <ninja/test.hpp>
 #include <vector>
 
 struct DyndepParserTest : public testing::Test {

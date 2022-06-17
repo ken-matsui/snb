@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "string_piece_util.hpp"
-#include "test.hpp"
+#include <ninja/string_piece_util.hpp>
+#include <ninja/test.hpp>
 
 TEST(StringPieceUtilTest, SplitStringPiece) {
   {

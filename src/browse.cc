@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "browse.hpp"
-
 #include "build/browse_py.h"
 
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <ninja/browse.hpp>
 #include <unistd.h>
 #include <vector>
 

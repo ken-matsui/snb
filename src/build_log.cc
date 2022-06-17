@@ -20,19 +20,17 @@
 #  endif
 #endif
 
-#include "build_log.hpp"
-
-#include "build.hpp"
-#include "disk_interface.hpp"
-#include "graph.hpp"
-#include "metrics.hpp"
-#include "util.hpp"
-
 #include <cassert>
 #include <cerrno>
 #include <cinttypes>
 #include <cstdlib>
 #include <cstring>
+#include <ninja/build.hpp>
+#include <ninja/build_log.hpp>
+#include <ninja/disk_interface.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/util.hpp>
 #include <unistd.h>
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
 #  define strtoll _strtoi64

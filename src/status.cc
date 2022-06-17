@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "status.hpp"
-
-#include "debug_flags.hpp"
-
 #include <cstdarg>
 #include <cstdlib>
+#include <ninja/debug_flags.hpp>
+#include <ninja/status.hpp>
 
 StatusPrinter::StatusPrinter(const BuildConfig& config)
     : config_(config), started_edges_(0), finished_edges_(0), total_edges_(0),

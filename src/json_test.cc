@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "json.hpp"
-#include "test.hpp"
+#include <ninja/json.hpp>
+#include <ninja/test.hpp>
 
 TEST(JSONTest, RegularAscii) {
   EXPECT_EQ(EncodeJSONString("foo bar"), "foo bar");

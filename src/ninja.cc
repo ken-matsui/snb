@@ -28,24 +28,24 @@
 #  include <unistd.h>
 #endif
 
-#include "browse.hpp"
-#include "build.hpp"
-#include "build_log.hpp"
-#include "clean.hpp"
-#include "debug_flags.hpp"
-#include "depfile_parser.hpp"
-#include "deps_log.hpp"
-#include "disk_interface.hpp"
-#include "graph.hpp"
-#include "graphviz.hpp"
-#include "json.hpp"
-#include "manifest_parser.hpp"
-#include "metrics.hpp"
-#include "missing_deps.hpp"
-#include "state.hpp"
-#include "status.hpp"
-#include "util.hpp"
-#include "version.hpp"
+#include <ninja/browse.hpp>
+#include <ninja/build.hpp>
+#include <ninja/build_log.hpp>
+#include <ninja/clean.hpp>
+#include <ninja/debug_flags.hpp>
+#include <ninja/depfile_parser.hpp>
+#include <ninja/deps_log.hpp>
+#include <ninja/disk_interface.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/graphviz.hpp>
+#include <ninja/json.hpp>
+#include <ninja/manifest_parser.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/missing_deps.hpp>
+#include <ninja/state.hpp>
+#include <ninja/status.hpp>
+#include <ninja/util.hpp>
+#include <ninja/version.hpp>
 
 namespace {
 

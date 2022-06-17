@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "graph.hpp"
-
-#include "build_log.hpp"
-#include "debug_flags.hpp"
-#include "depfile_parser.hpp"
-#include "deps_log.hpp"
-#include "disk_interface.hpp"
-#include "manifest_parser.hpp"
-#include "metrics.hpp"
-#include "state.hpp"
-#include "util.hpp"
-
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <deque>
+#include <ninja/build_log.hpp>
+#include <ninja/debug_flags.hpp>
+#include <ninja/depfile_parser.hpp>
+#include <ninja/deps_log.hpp>
+#include <ninja/disk_interface.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/manifest_parser.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 
 bool
 Node::Stat(DiskInterface* disk_interface, std::string* err) {

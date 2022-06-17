@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "test.hpp"
-
-#include "build_log.hpp"
-#include "graph.hpp"
-#include "manifest_parser.hpp"
-#include "util.hpp"
-
 #include <algorithm>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
+#include <ninja/build_log.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/manifest_parser.hpp>
+#include <ninja/test.hpp>
+#include <ninja/util.hpp>
 #include <unistd.h>
 
 #ifdef _AIX

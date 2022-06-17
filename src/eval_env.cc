@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "eval_env.hpp"
-
 #include <cassert>
+#include <ninja/eval_env.hpp>
 
 std::string
 BindingEnv::LookupVariable(const std::string& var) {

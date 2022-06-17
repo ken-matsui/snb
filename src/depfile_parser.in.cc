@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "depfile_parser.hpp"
-
-#include "util.hpp"
-
 #include <algorithm>
+#include <ninja/depfile_parser.hpp>
+#include <ninja/util.hpp>
 
 DepfileParser::DepfileParser(DepfileParserOptions options)
     : options_(options) {}

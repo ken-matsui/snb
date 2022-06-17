@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "metrics.hpp"
-#include "util.hpp"
-
 #include <cstdio>
 #include <cstring>
+#include <ninja/metrics.hpp>
+#include <ninja/util.hpp>
 
 const char kPath[] =
     "../../third_party/WebKit/Source/WebCore/"
