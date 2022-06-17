@@ -555,7 +555,7 @@ Edge::Dump(const char* prefix) const {
       printf("(in pool '%s')", pool_->name().c_str());
     }
   } else {
-    printf("(nullptr pool?)");
+    printf("(null pool?)");
   }
   printf("] 0x%p\n", this);
 }
