@@ -111,7 +111,9 @@ VerifyGraph(const State& state) {
 }
 
 void
-VirtualFileSystem::Create(const std::string& path, const std::string& contents) {
+VirtualFileSystem::Create(
+    const std::string& path, const std::string& contents
+) {
   files_[path].mtime = now_;
   files_[path].contents = contents;
   files_created_.insert(path);
@@ -128,7 +130,9 @@ VirtualFileSystem::Stat(const std::string& path, std::string* err) const {
 }
 
 bool
-VirtualFileSystem::WriteFile(const std::string& path, const std::string& contents) {
+VirtualFileSystem::WriteFile(
+    const std::string& path, const std::string& contents
+) {
   Create(path, contents);
   return true;
 }
@@ -140,7 +144,9 @@ VirtualFileSystem::MakeDir(const std::string& path) {
 }
 
 FileReader::Status
-VirtualFileSystem::ReadFile(const std::string& path, std::string* contents, std::string* err) {
+VirtualFileSystem::ReadFile(
+    const std::string& path, std::string* contents, std::string* err
+) {
   files_read_.push_back(path);
   FileMap::iterator i = files_.find(path);
   if (i != files_.end()) {

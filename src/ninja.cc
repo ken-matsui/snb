@@ -392,7 +392,8 @@ NinjaMain::ToolGraph(const Options* options, int argc, char* argv[]) {
 
   GraphViz graph(&state_, &disk_interface_);
   graph.Start();
-  for (std::vector<Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n)
+  for (std::vector<Node*>::const_iterator n = nodes.begin(); n != nodes.end();
+       ++n)
     graph.AddTarget(*n);
   graph.Finish();
 
@@ -492,7 +493,8 @@ NinjaMain::ToolMSVC(const Options* options, int argc, char* argv[]) {
 
 int
 ToolTargetsList(const std::vector<Node*>& nodes, int depth, int indent) {
-  for (std::vector<Node*>::const_iterator n = nodes.begin(); n != nodes.end(); ++n) {
+  for (std::vector<Node*>::const_iterator n = nodes.begin(); n != nodes.end();
+       ++n) {
     for (int i = 0; i < indent; ++i)
       printf("  ");
     const char* target = (*n)->path().c_str();
@@ -536,7 +538,8 @@ ToolTargetsList(State* state, const std::string& rule_name) {
   }
 
   // Print them.
-  for (std::set<std::string>::const_iterator i = rules.begin(); i != rules.end(); ++i) {
+  for (std::set<std::string>::const_iterator i = rules.begin();
+       i != rules.end(); ++i) {
     printf("%s\n", (*i).c_str());
   }
 
@@ -575,8 +578,8 @@ NinjaMain::ToolDeps(const Options* options, int argc, char** argv) {
   }
 
   RealDiskInterface disk_interface;
-  for (std::vector<Node*>::iterator it = nodes.begin(), end = nodes.end(); it != end;
-       ++it) {
+  for (std::vector<Node*>::iterator it = nodes.begin(), end = nodes.end();
+       it != end; ++it) {
     DepsLog::Deps* deps = deps_log_.GetDeps(*it);
     if (!deps) {
       printf("%s: deps not found\n", (*it)->path().c_str());
@@ -613,7 +616,8 @@ NinjaMain::ToolMissingDeps(const Options* options, int argc, char** argv) {
   MissingDependencyScanner scanner(
       &printer, &deps_log_, &state_, &disk_interface
   );
-  for (std::vector<Node*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
+  for (std::vector<Node*>::iterator it = nodes.begin(); it != nodes.end();
+       ++it) {
     scanner.ProcessNode(*it);
   }
   scanner.PrintStats();

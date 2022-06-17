@@ -197,7 +197,8 @@ void
 State::Reset() {
   for (Paths::iterator i = paths_.begin(); i != paths_.end(); ++i)
     i->second->ResetState();
-  for (std::vector<Edge*>::iterator e = edges_.begin(); e != edges_.end(); ++e) {
+  for (std::vector<Edge*>::iterator e = edges_.begin(); e != edges_.end();
+       ++e) {
     (*e)->outputs_ready_ = false;
     (*e)->deps_loaded_ = false;
     (*e)->mark_ = Edge::VisitNone;

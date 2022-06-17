@@ -176,7 +176,9 @@ ManifestParser::ParseRule(std::string* err) {
 }
 
 bool
-ManifestParser::ParseLet(std::string* key, EvalString* value, std::string* err) {
+ManifestParser::ParseLet(
+    std::string* key, EvalString* value, std::string* err
+) {
   if (!lexer_.ReadIdent(key))
     return lexer_.Error("expected variable name", err);
   if (!ExpectToken(Lexer::EQUALS, err))

@@ -255,8 +255,8 @@ GetShellEscapedString(const std::string& input, std::string* result) {
   result->push_back(kQuote);
 
   std::string::const_iterator span_begin = input.begin();
-  for (std::string::const_iterator it = input.begin(), end = input.end(); it != end;
-       ++it) {
+  for (std::string::const_iterator it = input.begin(), end = input.end();
+       it != end; ++it) {
     if (*it == kQuote) {
       result->append(span_begin, it);
       result->append(kEscapeSequence);
@@ -281,8 +281,8 @@ GetWin32EscapedString(const std::string& input, std::string* result) {
   result->push_back(kQuote);
   size_t consecutive_backslash_count = 0;
   std::string::const_iterator span_begin = input.begin();
-  for (std::string::const_iterator it = input.begin(), end = input.end(); it != end;
-       ++it) {
+  for (std::string::const_iterator it = input.begin(), end = input.end();
+       it != end; ++it) {
     switch (*it) {
       case kBackslash:
         ++consecutive_backslash_count;
@@ -355,14 +355,16 @@ SetCloseOnExec(int fd) {
 }
 
 const char*
-SpellcheckStringV(const std::string& text, const std::vector<const char*>& words) {
+SpellcheckStringV(
+    const std::string& text, const std::vector<const char*>& words
+) {
   const bool kAllowReplacements = true;
   const int kMaxValidEditDistance = 3;
 
   int min_distance = kMaxValidEditDistance + 1;
   const char* result = nullptr;
-  for (std::vector<const char*>::const_iterator i = words.begin(); i != words.end();
-       ++i) {
+  for (std::vector<const char*>::const_iterator i = words.begin();
+       i != words.end(); ++i) {
     int distance =
         EditDistance(*i, text, kAllowReplacements, kMaxValidEditDistance);
     if (distance < min_distance) {
