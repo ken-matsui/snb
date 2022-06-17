@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "test.hpp"
-#include "util.hpp"
-
 #include <cstring>
+#include <ninja/test.hpp>
+#include <ninja/util.hpp>
 
 namespace {
 

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "clparser.hpp"
-#include "test.hpp"
-#include "util.hpp"
+#include <ninja/clparser.hpp>
+#include <ninja/test.hpp>
+#include <ninja/util.hpp>
 
 TEST(CLParserTest, ShowIncludes) {
   ASSERT_EQ("", CLParser::FilterShowIncludes("", ""));

@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "subprocess.hpp"
-
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
+#include <ninja/subprocess.hpp>
 #include <spawn.h>
 #include <sys/select.h>
 #include <sys/wait.h>
@@ -32,7 +31,7 @@
 
 extern char** environ;
 
-#include "util.hpp"
+#include <ninja/util.hpp>
 
 Subprocess::Subprocess(bool use_console)
     : fd_(-1), pid_(-1), use_console_(use_console) {}

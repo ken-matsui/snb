@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "clparser.hpp"
-
-#include "metrics.hpp"
-#include "string_piece_util.hpp"
-#include "util.hpp"
-
 #include <algorithm>
 #include <cassert>
 #include <cstring>
+#include <ninja/clparser.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/string_piece_util.hpp>
+#include <ninja/util.hpp>
 
 namespace {
 

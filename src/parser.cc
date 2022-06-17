@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "parser.hpp"
-
-#include "disk_interface.hpp"
-#include "metrics.hpp"
+#include <ninja/disk_interface.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/parser.hpp>
 
 bool
 Parser::Load(const std::string& filename, std::string* err, Lexer* parent) {

@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "graphviz.hpp"
-
-#include "dyndep.hpp"
-#include "graph.hpp"
-
 #include <algorithm>
 #include <cstdio>
+#include <ninja/dyndep.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/graphviz.hpp>
 
 void
 GraphViz::AddTarget(Node* node) {

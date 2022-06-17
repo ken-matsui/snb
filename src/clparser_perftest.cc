@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "clparser.hpp"
-#include "metrics.hpp"
-
 #include <cstdio>
 #include <cstdlib>
+#include <ninja/clparser.hpp>
+#include <ninja/metrics.hpp>
 
 int
 main(int argc, char* argv[]) {

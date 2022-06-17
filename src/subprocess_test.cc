@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "subprocess.hpp"
-#include "test.hpp"
+#include <ninja/subprocess.hpp>
+#include <ninja/test.hpp>
 
 #ifndef _WIN32
 // SetWithLots need setrlimit.

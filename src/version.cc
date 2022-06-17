@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "version.hpp"
-
-#include "util.hpp"
-
 #include <cstdlib>
+#include <ninja/util.hpp>
+#include <ninja/version.hpp>
 
 const char* kNinjaVersion = "1.11.0.git";
 

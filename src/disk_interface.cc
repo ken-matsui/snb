@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "disk_interface.hpp"
-
-#include "metrics.hpp"
-#include "util.hpp"
-
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <ninja/disk_interface.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/util.hpp>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>

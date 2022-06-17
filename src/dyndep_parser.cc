@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dyndep_parser.hpp"
-
-#include "dyndep.hpp"
-#include "graph.hpp"
-#include "state.hpp"
-#include "util.hpp"
-#include "version.hpp"
-
+#include <ninja/dyndep.hpp>
+#include <ninja/dyndep_parser.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
+#include <ninja/version.hpp>
 #include <vector>
 
 DyndepParser::DyndepParser(

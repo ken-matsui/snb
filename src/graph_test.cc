@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build.hpp"
-#include "graph.hpp"
-#include "test.hpp"
+#include <ninja/build.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/test.hpp>
 
 struct GraphTest : public StateTestWithBuiltinRules {
   GraphTest() : scan_(&state_, nullptr, nullptr, &fs_, nullptr) {}

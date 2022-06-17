@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "depfile_parser.hpp"
-#include "metrics.hpp"
-#include "util.hpp"
-
 #include <cstdio>
 #include <cstdlib>
+#include <ninja/depfile_parser.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/util.hpp>
 
 int
 main(int argc, char* argv[]) {

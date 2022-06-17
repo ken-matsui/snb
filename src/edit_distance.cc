@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "edit_distance.hpp"
-
 #include <algorithm>
+#include <ninja/edit_distance.hpp>
 #include <vector>
 
 int

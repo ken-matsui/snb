@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "eval_env.hpp"
-#include "lexer.hpp"
-#include "test.hpp"
+#include <ninja/eval_env.hpp>
+#include <ninja/lexer.hpp>
+#include <ninja/test.hpp>
 
 TEST(Lexer, ReadVarValue) {
   Lexer lexer("plain text $var $VaR ${x}\n");

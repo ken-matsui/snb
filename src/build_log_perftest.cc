@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "build_log.hpp"
-#include "graph.hpp"
-#include "manifest_parser.hpp"
-#include "metrics.hpp"
-#include "state.hpp"
-#include "util.hpp"
-
 #include <cstdio>
 #include <cstdlib>
+#include <ninja/build_log.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/manifest_parser.hpp>
+#include <ninja/metrics.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 
 #ifndef _WIN32
 #  include <unistd.h>

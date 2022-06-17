@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "missing_deps.hpp"
-
-#include "depfile_parser.hpp"
-#include "deps_log.hpp"
-#include "disk_interface.hpp"
-#include "graph.hpp"
-#include "state.hpp"
-#include "util.hpp"
-
 #include <cstring>
 #include <iostream>
+#include <ninja/depfile_parser.hpp>
+#include <ninja/deps_log.hpp>
+#include <ninja/disk_interface.hpp>
+#include <ninja/graph.hpp>
+#include <ninja/missing_deps.hpp>
+#include <ninja/state.hpp>
+#include <ninja/util.hpp>
 
 namespace {
 

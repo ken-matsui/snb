@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "metrics.hpp"
-
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
+#include <ninja/metrics.hpp>
 
 #ifndef _WIN32
 #  include <sys/time.h>
@@ -24,9 +23,8 @@
 #  include <windows.h>
 #endif
 
-#include "util.hpp"
-
 #include <algorithm>
+#include <ninja/util.hpp>
 
 Metrics* g_metrics = nullptr;
 

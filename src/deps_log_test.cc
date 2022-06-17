@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "deps_log.hpp"
-
+#include <ninja/deps_log.hpp>
 #include <sys/stat.h>
 #ifndef _WIN32
 #  include <unistd.h>
 #endif
 
-#include "graph.hpp"
-#include "test.hpp"
-#include "util.hpp"
-
 #include <cstring>
+#include <ninja/graph.hpp>
+#include <ninja/test.hpp>
+#include <ninja/util.hpp>
 
 namespace {
 

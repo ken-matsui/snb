@@ -54,7 +54,7 @@ else()
 	message(WARNING "re2c was not found; changes to src/*.in.cc will not affect your build.")
 	add_library(libninja-re2c OBJECT src/depfile_parser.cc src/lexer.cc)
 endif()
-target_include_directories(libninja-re2c PUBLIC include/ninja)
+target_include_directories(libninja-re2c PUBLIC include)
 add_library(libninja-re2c_static STATIC $<TARGET_OBJECTS:libninja-re2c>)
 set_target_properties(libninja-re2c_static PROPERTIES OUTPUT_NAME libninja-re2c)
 # add_library(libninja-re2c_shared SHARED $<TARGET_OBJECTS:libninja-re2c>)
@@ -124,7 +124,7 @@ add_library(libninja OBJECT
 	src/util.cc
 	src/version.cc
 )
-target_include_directories(libninja PUBLIC include/ninja)
+target_include_directories(libninja PUBLIC include)
 add_library(libninja_static STATIC $<TARGET_OBJECTS:libninja>)
 set_target_properties(libninja_static PROPERTIES OUTPUT_NAME libninja)
 # add_library(libninja_shared SHARED $<TARGET_OBJECTS:libninja>)
