@@ -15,7 +15,6 @@
 #ifndef NINJA_BUILD_LOG_H_
 #define NINJA_BUILD_LOG_H_
 
-#include "hash_map.h"
 #include "load_status.h"
 #include "timestamp.h"
 #include "util.h" // uint64_t
@@ -24,6 +23,7 @@
 #include <stdio.h>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
 struct DiskInterface;
 struct Edge;

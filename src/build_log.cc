@@ -58,11 +58,7 @@ const int kOldestSupportedVersion = 4;
 const int kCurrentVersion = 5;
 
 // 64bit MurmurHash2, by Austin Appleby
-#if defined(_MSC_VER)
-#  define BIG_CONSTANT(x) (x)
-#else // defined(_MSC_VER)
-#  define BIG_CONSTANT(x) (x##LLU)
-#endif // !defined(_MSC_VER)
+#define BIG_CONSTANT(x) (x##LLU)
 inline uint64_t
 MurmurHash64A(const void* key, size_t len) {
   static const uint64_t seed = 0xDECAFBADDECAFBADull;
