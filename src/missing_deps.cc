@@ -54,6 +54,9 @@ bool NodeStoringImplicitDepLoader::ProcessDepfileDeps(
     uint64_t slash_bits;
     size_t size = i->size();
     CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
+    // CanonicalizePath wants to edit the size.
+    *i = i->substr(0, size);
+
     Node* node = state_->GetNode(*i, slash_bits);
     dep_nodes_output_->push_back(node);
   }

@@ -586,8 +586,7 @@ struct matches {
   explicit matches(std::vector<std::string_view>::iterator i) : i_(i) {}
 
   bool operator()(const Node* node) const {
-    std::string_view opath(node->path());
-    return *i_ == opath;
+    return *i_ == node->path();
   }
 
   std::vector<std::string_view>::iterator i_;
@@ -633,6 +632,8 @@ bool ImplicitDepLoader::LoadDepFile(Edge* edge, const string& path,
   size_t size = primary_out->size();
   CanonicalizePath(const_cast<char*>(primary_out->data()), &size,
                    &unused);
+  // CanonicalizePath wants to edit the size.
+  *primary_out = primary_out->substr(0, size);
 
   // Check that this depfile matches the edge's output, if not return false to
   // mark the edge as dirty.
@@ -669,6 +670,9 @@ bool ImplicitDepLoader::ProcessDepfileDeps(
     uint64_t slash_bits;
     size_t size = i->size();
     CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
+    // CanonicalizePath wants to edit the size.
+    *i = i->substr(0, size);
+
     Node* node = state_->GetNode(*i, slash_bits);
     *implicit_dep = node;
     node->AddOutEdge(edge);

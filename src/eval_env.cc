@@ -112,7 +112,7 @@ string EvalString::Evaluate(Env* env) const {
 void EvalString::AddText(std::string_view text) {
   // Add it to the end of an existing RAW token if possible.
   if (!parsed_.empty() && parsed_.back().second == RAW) {
-    parsed_.back().first.append(text.data(), text.size());
+    parsed_.back().first.append(text);
   } else {
     parsed_.push_back(make_pair(std::string(text), RAW));
   }

@@ -264,12 +264,7 @@ bool Plan::CleanNode(DependencyScan* scan, Node* node, string* err) {
     vector<Node*>::iterator
         begin = (*oe)->inputs_.begin(),
         end = (*oe)->inputs_.end() - (*oe)->order_only_deps_;
-#if __cplusplus < 201703L
-#define MEM_FN mem_fun
-#else
-#define MEM_FN mem_fn  // mem_fun was removed in C++17.
-#endif
-    if (find_if(begin, end, MEM_FN(&Node::dirty)) == end) {
+    if (find_if(begin, end, std::mem_fn(&Node::dirty)) == end) {
       // Recompute most_recent_input.
       Node* most_recent_input = nullptr;
       for (vector<Node*>::iterator i = begin; i != end; ++i) {
@@ -911,6 +906,9 @@ bool Builder::ExtractDeps(CommandRunner::Result* result,
       uint64_t slash_bits;
       size_t size = i->size();
       CanonicalizePath(const_cast<char*>(i->data()), &size, &slash_bits);
+      // CanonicalizePath wants to edit the size.
+      *i = i->substr(0, size);
+
       deps_nodes->push_back(state_->GetNode(*i, slash_bits));
     }
 
