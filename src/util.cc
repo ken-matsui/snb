@@ -544,7 +544,7 @@ ParseMountInfo(std::map<std::string, CGroupSubSys>& subsystems) {
 std::map<std::string, CGroupSubSys>
 ParseSelfCGroup() {
   std::map<std::string, CGroupSubSys> cgroups;
-  ifstream cgroup("/proc/self/cgroup");
+  std::ifstream cgroup("/proc/self/cgroup");
   if (!cgroup.is_open())
     return cgroups;
   std::string line;
