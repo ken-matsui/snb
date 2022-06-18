@@ -78,33 +78,32 @@ AssertHash(const char* expected, uint64_t actual) {
 
 void
 VerifyGraph(const State& state) {
-  for (std::vector<Edge*>::const_iterator e = state.edges_.begin();
-       e != state.edges_.end(); ++e) {
+  for (const std::unique_ptr<Edge>& edge : state.edges_) {
     // All edges need at least one output.
-    EXPECT_FALSE((*e)->outputs_.empty());
+    EXPECT_FALSE(edge->outputs_.empty());
     // Check that the edge's inputs have the edge as out-edge.
-    for (std::vector<Node*>::const_iterator in_node = (*e)->inputs_.begin();
-         in_node != (*e)->inputs_.end(); ++in_node) {
-      const std::vector<Edge*>& out_edges = (*in_node)->out_edges();
-      EXPECT_NE(find(out_edges.begin(), out_edges.end(), *e), out_edges.end());
+    for (Node* in_node : edge->inputs_) {
+      const std::vector<Edge*>& out_edges = in_node->out_edges();
+      EXPECT_NE(find(out_edges.begin(), out_edges.end(), edge.get()), out_edges.end());
     }
     // Check that the edge's outputs have the edge as in-edge.
-    for (std::vector<Node*>::const_iterator out_node = (*e)->outputs_.begin();
-         out_node != (*e)->outputs_.end(); ++out_node) {
-      EXPECT_EQ((*out_node)->in_edge(), *e);
+    for (Node* out_node : edge->outputs_) {
+      EXPECT_EQ(out_node->in_edge(), edge.get());
     }
   }
 
   // The union of all in- and out-edges of each nodes should be exactly edges_.
   std::set<const Edge*> node_edge_set;
-  for (State::Paths::const_iterator p = state.paths_.begin();
-       p != state.paths_.end(); ++p) {
-    const Node* n = p->second;
+  for (const auto& path : state.paths_) {
+    const Node* n = path.second.get();
     if (n->in_edge())
       node_edge_set.insert(n->in_edge());
     node_edge_set.insert(n->out_edges().begin(), n->out_edges().end());
   }
-  std::set<const Edge*> edge_set(state.edges_.begin(), state.edges_.end());
+  std::set<const Edge*> edge_set;
+  for (const std::unique_ptr<Edge>& e : state.edges_) {
+    edge_set.insert(e.get());
+  }
   EXPECT_EQ(node_edge_set, edge_set);
 }
 

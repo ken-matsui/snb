@@ -363,7 +363,6 @@ ManifestParser::ParseEdge(std::string* err) {
     // All outputs of the edge are already created by other edges. Don't add
     // this edge.  Do this check before input nodes are connected to the edge.
     state_->edges_.pop_back();
-    delete edge;
     return true;
   }
   edge->implicit_outs_ = implicit_outs;

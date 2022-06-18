@@ -105,7 +105,7 @@ Cleaner::CleanAll(bool generator) {
   Reset();
   PrintHeader();
   LoadDyndeps();
-  for (Edge* edge : state_->edges_) {
+  for (std::unique_ptr<Edge>& edge : state_->edges_) {
     // Do not try to remove phony targets
     if (edge->is_phony())
       continue;
@@ -116,7 +116,7 @@ Cleaner::CleanAll(bool generator) {
       Remove(output->path());
     }
 
-    RemoveEdgeFiles(edge);
+    RemoveEdgeFiles(edge.get());
   }
   PrintFooter();
   return status_;
@@ -227,12 +227,12 @@ void
 Cleaner::DoCleanRule(const Rule* rule) {
   assert(rule);
 
-  for (Edge* edge : state_->edges_) {
+  for (std::unique_ptr<Edge>& edge : state_->edges_) {
     if (edge->rule().name() == rule->name()) {
       for (std::vector<Node*>::iterator out_node = edge->outputs_.begin();
            out_node != edge->outputs_.end(); ++out_node) {
         Remove((*out_node)->path());
-        RemoveEdgeFiles(edge);
+        RemoveEdgeFiles(edge.get());
       }
     }
   }
@@ -299,7 +299,7 @@ Cleaner::Reset() {
 void
 Cleaner::LoadDyndeps() {
   // Load dyndep files that exist, before they are cleaned.
-  for (Edge* edge : state_->edges_) {
+  for (std::unique_ptr<Edge>& edge : state_->edges_) {
     if (Node* dyndep = edge->dyndep_) {
       // Capture and ignore errors loading the dyndep file.
       // We clean as much of the graph as we know.

@@ -1022,7 +1022,7 @@ TEST_F(BuildTest, DepFileOK) {
       "rule cc\n  command = cc $in\n  depfile = $out.d\n"
       "build foo.o: cc foo.c\n"
   ));
-  Edge* edge = state_.edges_.back();
+  Edge* edge = state_.edges_.back().get();
 
   fs_.Create("foo.c", "");
   GetNode("bar.h")->MarkDirty(); // Mark bar.h as missing.
@@ -1087,7 +1087,7 @@ TEST_F(BuildTest, OrderOnlyDeps) {
       "rule cc\n  command = cc $in\n  depfile = $out.d\n"
       "build foo.o: cc foo.c || otherfile\n"
   ));
-  Edge* edge = state_.edges_.back();
+  Edge* edge = state_.edges_.back().get();
 
   fs_.Create("foo.c", "");
   fs_.Create("otherfile", "");
@@ -3064,7 +3064,7 @@ TEST_F(BuildWithDepsLogTest, DepFileOKDepsLog) {
     Builder builder(&state, config_, nullptr, &deps_log, &fs_, &status_, 0);
     builder.command_runner_.reset(&command_runner_);
 
-    Edge* edge = state.edges_.back();
+    Edge* edge = state.edges_.back().get();
 
     state.GetNode("bar.h", 0)->MarkDirty(); // Mark bar.h as missing.
     EXPECT_TRUE(builder.AddTarget("fo o.o", &err));

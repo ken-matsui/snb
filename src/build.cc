@@ -31,6 +31,7 @@
 #include <ninja/deps_log.hpp>
 #include <ninja/disk_interface.hpp>
 #include <ninja/graph.hpp>
+#include <memory>
 #include <ninja/metrics.hpp>
 #include <ninja/state.hpp>
 #include <ninja/status.hpp>
@@ -637,11 +638,11 @@ Builder::Build(std::string* err) {
   int failures_allowed = config_.failures_allowed;
 
   // Set up the command runner if we haven't done so already.
-  if (!command_runner_.get()) {
+  if (!command_runner_) {
     if (config_.dry_run)
-      command_runner_.reset(new DryRunCommandRunner);
+      command_runner_ = std::make_unique<DryRunCommandRunner>();
     else
-      command_runner_.reset(new RealCommandRunner(config_));
+      command_runner_ = std::make_unique<RealCommandRunner>(config_);
   }
 
   // We are about to start the build process.

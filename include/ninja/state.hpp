@@ -20,6 +20,7 @@
 #include "util.hpp"
 
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -42,25 +43,25 @@ struct Pool {
       : name_(name), current_use_(0), depth_(depth), delayed_() {}
 
   // A depth of 0 is infinite
-  bool
+  [[nodiscard]] bool
   is_valid() const {
     return depth_ >= 0;
   }
-  int
+  [[nodiscard]] int
   depth() const {
     return depth_;
   }
-  const std::string&
+  [[nodiscard]] const std::string&
   name() const {
     return name_;
   }
-  int
+  [[nodiscard]] int
   current_use() const {
     return current_use_;
   }
 
   /// true if the Pool might delay this edge
-  bool
+  [[nodiscard]] bool
   ShouldDelayEdge() const {
     return depth_ != 0;
   }
@@ -160,14 +161,14 @@ struct State {
   DefaultNodes(std::string* error) const;
 
   /// Mapping of path -> Node.
-  using Paths = std::unordered_map<std::string_view, Node*>;
+  using Paths = std::unordered_map<std::string_view, std::unique_ptr<Node>>;
   Paths paths_;
 
   /// All the pools used in the graph.
   std::map<std::string, Pool*> pools_;
 
   /// All the edges of the graph.
-  std::vector<Edge*> edges_;
+  std::vector<std::unique_ptr<Edge>> edges_;
 
   BindingEnv bindings_;
   std::vector<Node*> defaults_;
