@@ -54,10 +54,9 @@ Pool::RetrieveReadyEdges(EdgeSet* ready_queue) {
 void
 Pool::Dump() const {
   printf("%s (%d/%d) ->\n", name_.c_str(), current_use_, depth_);
-  for (DelayedEdges::const_iterator it = delayed_.begin(); it != delayed_.end();
-       ++it) {
+  for (Edge* it : delayed_) {
     printf("\t");
-    (*it)->Dump();
+    it->Dump();
   }
 }
 
@@ -67,22 +66,23 @@ const Rule State::kPhonyRule("phony");
 
 State::State() {
   bindings_.AddRule(&kPhonyRule);
-  AddPool(std::make_unique<Pool>(kDefaultPool));
-  AddPool(std::make_unique<Pool>(kConsolePool));
+  AddPool(&kDefaultPool);
+  AddPool(&kConsolePool);
 }
 
 void
-State::AddPool(std::unique_ptr<Pool> pool) {
-  assert(LookupPool(pool->name()) == nullptr);
-  pools_[pool->name()] = std::move(pool);
+State::AddPool(Pool* pool) {
+  const std::string& pool_name = pool->name();
+  assert(LookupPool(pool_name) == nullptr);
+  pools_[pool_name] = pool;
 }
 
 Pool*
 State::LookupPool(const std::string& pool_name) {
-  auto i = pools_.find(pool_name);
+  const auto i = pools_.find(pool_name);
   if (i == pools_.end())
     return nullptr;
-  return i->second.get();
+  return i->second;
 }
 
 Edge*

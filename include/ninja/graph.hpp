@@ -273,19 +273,19 @@ struct Edge {
   bool generated_by_dep_loader_;
   TimeStamp command_start_time_;
 
-  const Rule&
+  [[nodiscard]] const Rule&
   rule() const {
     return *rule_;
   }
-  Pool*
+  [[nodiscard]] Pool*
   pool() const {
     return pool_;
   }
-  int
+  [[nodiscard]] int
   weight() const {
     return 1;
   }
-  bool
+  [[nodiscard]] bool
   outputs_ready() const {
     return outputs_ready_;
   }

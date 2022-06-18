@@ -43,25 +43,25 @@ struct Pool {
       : name_(name), current_use_(0), depth_(depth), delayed_() {}
 
   // A depth of 0 is infinite
-  bool
+  [[nodiscard]] bool
   is_valid() const {
     return depth_ >= 0;
   }
-  int
+  [[nodiscard]] int
   depth() const {
     return depth_;
   }
-  const std::string&
+  [[nodiscard]] const std::string&
   name() const {
     return name_;
   }
-  int
+  [[nodiscard]] int
   current_use() const {
     return current_use_;
   }
 
   /// true if the Pool might delay this edge
-  bool
+  [[nodiscard]] bool
   ShouldDelayEdge() const {
     return depth_ != 0;
   }
@@ -121,7 +121,7 @@ struct State {
   State();
 
   void
-  AddPool(std::unique_ptr<Pool> pool);
+  AddPool(Pool* pool);
   Pool*
   LookupPool(const std::string& pool_name);
 
@@ -165,7 +165,7 @@ struct State {
   Paths paths_;
 
   /// All the pools used in the graph.
-  std::map<std::string, std::unique_ptr<Pool>> pools_;
+  std::map<std::string, Pool*> pools_;
 
   /// All the edges of the graph.
   std::vector<std::unique_ptr<Edge>> edges_;
